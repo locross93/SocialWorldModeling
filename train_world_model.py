@@ -80,7 +80,9 @@ def main(args):
     val_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
     
     # initialize the replay buffer
-    sequence_length = 50
+    burn_in_length = args.burn_in_length
+    rollout_length = args.rollout_length
+    sequence_length = burn_in_length + rollout_length
     replay_buffer = ReplayBuffer(sequence_length)
     replay_buffer.upload_training_set(train_data)
     if platform.system() == 'Windows':
@@ -126,15 +128,15 @@ def main(args):
             batch_recon_loss = []
             batch_kl_loss = []
         nsamples = 0
-        for batch in loader:
-            batch_x = batch[0]
+        for i in range(batches_per_epoch):
+            batch_x = replay_buffer.sample(batch_size)
             batch_x = batch_x.to(DEVICE)
             nsamples += batch_x.shape[0]
             opt.zero_grad()
             if config['model_type'][:4] == 'rssm':
                 loss = model.loss(batch_x)
             elif config['model_type'] == 'multistep_predictor':
-                loss = model.loss(batch_x, args.burn_in_length, args.rollout_length)
+                loss = model.loss(batch_x, burn_in_length, rollout_length)
             loss.backward()
             opt.step()
             
@@ -151,7 +153,10 @@ def main(args):
         # test on validation set
         with torch.no_grad():
             model.eval()
-            val_loss = model.loss(val_trajs)
+            if config['model_type'][:4] == 'rssm':
+                val_loss = model.loss(val_trajs)
+            elif config['model_type'] == 'multistep_predictor':
+                val_loss = model.loss(val_trajs, burn_in_length, rollout_length)
             val_loss = val_loss.item()
             loss_dict['val'].append(val_loss)
         # log to tensorboard
@@ -192,8 +197,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_rnn_layers', type=int, help='Number of RNN layers')
     parser.add_argument('--burn_in_length', type=int, default=50, help='Amount of frames to burn into RNN')
     parser.add_argument('--rollout_length', type=int, default=30, help='Forward rollout length')
-
-    # Add more arguments as needed...
+    
 
     model_dict = {
         'dreamerv2': DreamerV2,
