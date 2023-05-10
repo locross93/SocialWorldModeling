@@ -6,6 +6,7 @@ Created on Tue May  9 14:06:24 2023
 """
 
 # example usage: python train_world_model.py --model dreamerv2 --config rssm_disc_default_config.json --dec_hidden_size 512
+# python train_world_model.py --model multistep_predictor --config multistep_predictor_default_config.json --mlp_hidden_size 512
 
 import argparse
 import json
@@ -24,10 +25,12 @@ from torch.utils.tensorboard import SummaryWriter
 if platform.system() == 'Windows':
     # We are running on Windows
     analysis_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/'
+    data_dir = '/Users/locro/Documents/Stanford/analysis/data/'
     checkpoint_dir = analysis_dir
 elif platform.system() == 'Linux':
     # We are running on Linux
     analysis_dir = '/home/locross/SocialWorldModeling'
+    data_dir = '/home/locross/analysis/data/'
     checkpoint_dir = '/mnt/fs2/locross/analysis/'
 
 def load_config(file):
@@ -49,8 +52,6 @@ def main(args):
             config[k] = v
             overridden_parameters.append(f"{k}_{v}")
             print(f"{k}_{v}")
-    import pdb
-    pdb.set_trace()
     
     model_class = model_dict[args.model]
     model = model_class(config)
@@ -71,7 +72,7 @@ def main(args):
     print(DEVICE)
 
     # load data
-    data_file = analysis_dir+'data/train_test_splits_3D_dataset.pkl'
+    data_file = data_dir+'train_test_splits_3D_dataset.pkl'
     with open(data_file, 'rb') as f:
         loaded_dataset = pickle.load(f)
     train_dataset, test_dataset = loaded_dataset
@@ -130,7 +131,10 @@ def main(args):
             batch_x = batch_x.to(DEVICE)
             nsamples += batch_x.shape[0]
             opt.zero_grad()
-            loss = model.loss(batch_x)
+            if config['model_type'][:4] == 'rssm':
+                loss = model.loss(batch_x)
+            elif config['model_type'] == 'multistep_predictor':
+                loss = model.loss(batch_x, args.burn_in_length, args.rollout_length)
             loss.backward()
             opt.step()
             
@@ -181,6 +185,13 @@ if __name__ == '__main__':
     parser.add_argument('--rnn_type', type=str, help='RNN type')
     parser.add_argument('--category_size', type=int, help='Category size')
     parser.add_argument('--class_size', type=int, help='Class size')
+    # multistep predictor parameters
+    parser.add_argument('--mlp_hidden_size', type=int, help='MLP hidden size')
+    parser.add_argument('--num_mlp_layers', type=int, help='Number of MLP layers')
+    parser.add_argument('--rnn_hidden_size', type=int, help='RNN hidden size')
+    parser.add_argument('--num_rnn_layers', type=int, help='Number of RNN layers')
+    parser.add_argument('--burn_in_length', type=int, default=50, help='Amount of frames to burn into RNN')
+    parser.add_argument('--rollout_length', type=int, default=30, help='Forward rollout length')
 
     # Add more arguments as needed...
 
