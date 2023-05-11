@@ -10,6 +10,7 @@ Example usage:
 
 ```bash
 python train_world_model.py --model dreamerv2 --config rssm_disc_default_config.json
+```
 
 In this example, dreamerv2 is the model type and rssm_disc_default_config.json is the configuration file.
 
@@ -31,6 +32,7 @@ Here is an example of what a configuration file might look like:
     "rnn_type": "GRU",
     ...
 }
+```
 
 ## Evaluation Pipeline
 
