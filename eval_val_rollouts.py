@@ -5,7 +5,6 @@ Created on Wed May 10 16:57:33 2023
 @author: locro
 """
 
-import argparse
 import matplotlib.pylab as plt
 import numpy as np
 import pandas as pd
@@ -155,7 +154,7 @@ if __name__ == "__main__":
         print(key)
         model_info = model_dict[key]
         model_name = model_info[4]
-        model = load_trained_model(model_info, key, 300, DEVICE)
+        model = load_trained_model(model_info, key, test_dataset.dataset.tensors[0].size(1), DEVICE)
         
         for train_or_val in eval_sets:
             if train_or_val == 'Train':
