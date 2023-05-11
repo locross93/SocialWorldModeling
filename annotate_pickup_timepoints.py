@@ -23,7 +23,7 @@ elif platform.system() == 'Linux':
     
 os.chdir(analysis_dir)
 
-from eval_rollout_goal_events import eval_recon_goals
+from eval_rollouts_goal_events import eval_recon_goals
 
 def annotate_pickup_timepoints(train_or_val='val', pickup_or_move='move'):
     # load data
