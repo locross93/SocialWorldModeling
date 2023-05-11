@@ -185,6 +185,7 @@ if __name__ == "__main__":
     task_names = df_plot.Task.unique()
     
     # Plot the results using seaborn
+    fig = plt.figure()
     task = task_names[0]
     sns.barplot(x='Model', y='Score', hue='Eval Set', data=df_plot[df_plot['Task']==task]) 
     plt.title('Model Error', fontsize=18)
@@ -205,6 +206,7 @@ if __name__ == "__main__":
     new_metric_names = [string.replace('0', '').replace('1', '').replace('2', '') for string in metric_names]
     recon_feats_df.loc[:,'Feature'] = new_metric_names
 
+    fig = plt.figure()
     sns.barplot(x='Feature', y='Score', hue='Model', data=recon_feats_df, ci=None, palette="Set2")
     plt.title('Evaluate Reconstructed Inputs - Validation Set', fontsize=18)
     plt.ylabel('Correlation (r)', fontsize=14)
