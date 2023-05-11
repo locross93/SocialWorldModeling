@@ -101,6 +101,28 @@ def eval_recon_features(input_matrices, recon_matrices, model_name='', remove_ou
     plt.show()
     
     return scores
+
+
+def eval_forward_rollout_mse(model, input_data, batch_size, burn_in_length, rollout_length):
+    real_trajs = []
+    imag_trajs = []
+    loader = DataLoader(input_data, batch_size=batch_size, shuffle=True, pin_memory=True)
+    for batch_x in loader:
+        batch_x = batch_x.to(DEVICE)
+        rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length)
+        rollout_x = rollout_x.to("cpu")
+        real_traj = batch_x[:,burn_in_length:(burn_in_length+rollout_length),:].to("cpu")
+        assert rollout_x.size() == real_traj.size()
+        imag_trajs.append(rollout_x)
+        real_trajs.append(real_traj)
+        
+    x_supervise = torch.cat(real_trajs, dim=0)
+    x_hat = torch.cat(imag_trajs, dim=0)
+    mse = ((x_supervise - x_hat)**2).mean().item()
+    
+    recon_features = eval_recon_features(x_supervise, x_hat, model_name)
+        
+    return mse, recon_features
     
 
 if __name__ == "__main__":
@@ -113,7 +135,6 @@ if __name__ == "__main__":
     # burn in first 50 frames, predict next 50 frames
     burn_in_length = 50
     rollout_length = 50
-    sequence_length = burn_in_length + rollout_length
     
     batch_size = 64
     save_plot = True
@@ -146,21 +167,7 @@ if __name__ == "__main__":
             elif train_or_val == 'Validation':
                 input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
                 
-            real_trajs = []
-            imag_trajs = []
-            loader = DataLoader(input_data, batch_size=batch_size, shuffle=True, pin_memory=True)
-            for batch_x in loader:
-                batch_x = batch_x.to(DEVICE)
-                rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length)
-                rollout_x = rollout_x.to("cpu")
-                real_traj = batch_x[:,burn_in_length:sequence_length,:].to("cpu")
-                assert rollout_x.size() == real_traj.size()
-                imag_trajs.append(rollout_x)
-                real_trajs.append(real_traj)
-                
-            x_supervise = torch.cat(real_trajs, dim=0)
-            x_hat = torch.cat(imag_trajs, dim=0)
-            mse = ((x_supervise - x_hat)**2).mean().item()
+            mse, recon_features = eval_forward_rollout_mse(model, input_data, batch_size, burn_in_length, rollout_length)
                 
             results.append({
                         'Model': model_name,
@@ -170,7 +177,6 @@ if __name__ == "__main__":
                         'Eval Set': train_or_val
                     })
             
-            recon_features = eval_recon_features(x_supervise, x_hat, model_name)
             for item in recon_features.items():
                 results.append({
                         'Model': model_name,
@@ -207,7 +213,7 @@ if __name__ == "__main__":
     recon_feats_df.loc[:,'Feature'] = new_metric_names
 
     fig = plt.figure()
-    sns.barplot(x='Feature', y='Score', hue='Model', data=recon_feats_df, ci=None, palette="Set2")
+    sns.barplot(x='Feature', y='Score', hue='Model', data=recon_feats_df, errorbar=None, palette="Set2")
     plt.title('Evaluate Reconstructed Inputs - Validation Set', fontsize=18)
     plt.ylabel('Correlation (r)', fontsize=14)
     plt.xlabel('Feature', fontsize=16)
