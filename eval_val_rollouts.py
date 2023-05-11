@@ -194,7 +194,7 @@ if __name__ == "__main__":
     plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
     if save_plot:
         df_plot.to_csv(analysis_dir+'results/figures/'+save_file+'.csv')
-        plt.savefig(analysis_dir+'results/figures/'+save_file, dpi=300)
+        plt.savefig(analysis_dir+'results/figures/'+save_file, dpi=300, bbox_inches='tight')
     plt.show()
     
     # Plot reconstructed feature correlations
@@ -214,5 +214,5 @@ if __name__ == "__main__":
     plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
     if save_plot:
         df_plot.to_csv(analysis_dir+'results/figures/'+save_file+'_feature_corr.csv')
-        plt.savefig(analysis_dir+'results/figures/'+save_file+'_feature_corr', dpi=300)
+        plt.savefig(analysis_dir+'results/figures/'+save_file+'_feature_corr', dpi=300, bbox_inches='tight')
     plt.show()

@@ -12,12 +12,12 @@ Example usage:
 python train_world_model.py --model dreamerv2 --config rssm_disc_default_config.json
 ```
 
-In this example, dreamerv2 is the model type and rssm_disc_default_config.json is the configuration file.
+In this example, dreamerv2 is the model class and rssm_disc_default_config.json is the configuration file.
 
 
 ### Model Configuration
 
-Model configurations are specified using JSON files. These files contain the hyperparameters and model class that is used during training. You can find the configuration files in the config directory.
+Model configurations are specified using JSON files. These files contain the hyperparameters and model type that is used during training. You can find the configuration files in the config directory.
 
 You can modify these files to change the configuration, or you can create new ones if you want to experiment with different settings. If you specify a configuration parameter via the command line, that will override the value in the configuration file.
 
