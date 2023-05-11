@@ -30,7 +30,7 @@ if platform.system() == 'Windows':
 elif platform.system() == 'Linux':
     # We are running on Linux
     analysis_dir = '/home/locross/SocialWorldModeling'
-    data_dir = '/home/locross/analysis/data/'
+    data_dir = '/mnt/fs2/locross/analysis/data/'
     checkpoint_dir = '/mnt/fs2/locross/analysis/'
 
 def load_config(file):
@@ -119,7 +119,6 @@ def main(args):
         loss_dict['kl_loss'] = []
     
     model.to(DEVICE)
-    loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, pin_memory=True)
     start_time = time.time()
     for epoch in range(args.epochs):
         model.train()

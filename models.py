@@ -700,7 +700,6 @@ class TRAJ_VAE_delta(torch.nn.Module):
         std = torch.exp(0.5 * log_var)   # e^(0.5 log_var) = var^0.5
         
         # Generate a unit gaussian noise.
-        seq_len = output_encoder.size(1)
         noise = torch.randn(self.batch_size, self.latent_size).to(self.device)
         
         z = noise * std + mean
@@ -962,6 +961,47 @@ class DreamerV2(nn.Module):
             stoch = dist.sample()
             stoch += dist.probs - dist.probs.detach()
             return torch.flatten(stoch, start_dim=-2, end_dim=-1)
+        
+    def get_imagined_states(self, prior, num_steps):
+        deter_state = prior.deter[:,-1,:]
+        hidden_encoder = deter_state.unsqueeze(0)
+        z_prior = prior.stoch[:,-1,:]
+        z_prior = z_prior.unsqueeze(1)
+        
+        priors_imagined = []
+        for step in range(num_steps):
+            output_encoder, hidden_encoder = self.encoder_rnn(z_prior, hidden_encoder.contiguous())
+            if self.rnn_type == 'GRU':
+                deter_state = hidden_encoder.view(-1, hidden_encoder.size(2))
+            elif self.rnn_type == 'LSTM':
+                deter_state = hidden_encoder[0].view(-1, hidden_encoder.size(2))
+            if self.rssm_type == 'discrete':
+                prior_logit = self.fc_prior(deter_state)
+                stats = {'logit': prior_logit}
+                z_prior = self.get_stoch_state(stats)
+                prior_rssm_state = RSSMDiscState(prior_logit, z_prior, deter_state)
+            elif self.rssm_type == 'continuous':
+                mean_prior = self.mean_prior(deter_state)
+                log_var_prior = self.log_var_prior(deter_state)
+                std_prior = torch.exp(0.5 * log_var_prior)
+                noise_prior = torch.randn(self.batch_size, self.stoch_size).to(self.device)
+                z_prior = noise_prior * std_prior + mean_prior
+                prior_rssm_state = RSSMContState(mean_prior, std_prior, z_prior, deter_state)
+            priors_imagined.append(prior_rssm_state)
+            # use z for input of next rnn iteration, resized for (B, T, Z) 
+            z_prior = z_prior.reshape(z_prior.size(0), 1, z_prior.size(1))
+    
+        priors_imag = self.rssm_stack_states(priors_imagined, dim=1)
+        x_hat_imag = self.decoder(priors_imag)
+        
+        return x_hat_imag
+        
+    def forward_rollout(self, x, burn_in_length, rollout_length):
+        x_burnin = x[:,:burn_in_length,:]
+        prior, post = self.encoder(x_burnin)
+        x_hat_imag = self.get_imagined_states(prior, rollout_length)
+        
+        return x_hat_imag
     
     def forward(self, x):
         # Encoder
