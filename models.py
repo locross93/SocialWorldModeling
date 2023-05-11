@@ -12,7 +12,6 @@ import torch
 import torch.nn.functional as F
 import torch.nn as nn
 import torch.distributions as td
-import pdb
 
 class MlpAutoencoder(torch.nn.Module):
     def __init__(self, config):
@@ -136,8 +135,7 @@ class LSTM_VAE(torch.nn.Module):
     
     def encoder(self, x):
     	# TO DO MAKE BATCH SIZE DEPENDENT ON X
-        hidden_encoder = self.init_hidden(self.batch_size) 
-        #pdb.set_trace()
+        hidden_encoder = self.init_hidden(self.batch_size)
         output_encoder, hidden_encoder = self.encoder_lstm(x, hidden_encoder)
         
         # Extimate the mean and the variance of q(z|x)
@@ -168,7 +166,6 @@ class LSTM_VAE(torch.nn.Module):
         # Iterate over the time steps
         for t in range(self.num_steps):
             # Concatenate the input features and latent features
-            #pdb.set_trace()
             combined_features = torch.cat((x, z), dim=2)
             output_decoder, self.hidden_decoder = self.decoder_lstm(combined_features, self.hidden_decoder)
             
@@ -231,8 +228,7 @@ class LSTM_VAE_delta(torch.nn.Module):
         return (hidden_cell, state_cell)
     
     def encoder(self, x):
-        hidden_encoder = self.init_hidden(self.batch_size) 
-        #pdb.set_trace()
+        hidden_encoder = self.init_hidden(self.batch_size)
         output_encoder, hidden_encoder = self.encoder_lstm(x, hidden_encoder)
         
         # Extimate the mean and the variance of q(z|x)
@@ -263,7 +259,6 @@ class LSTM_VAE_delta(torch.nn.Module):
         # Iterate over the time steps
         for t in range(self.num_steps):
             # Concatenate the input features and latent features
-            #pdb.set_trace()
             combined_features = torch.cat((x, z), dim=2)
             output_decoder, self.hidden_decoder = self.decoder_lstm(combined_features, self.hidden_decoder)
             
@@ -371,7 +366,6 @@ class TRAJ_VAE(torch.nn.Module):
         # Iterate over the time steps
         for t in range(self.num_steps):
             # Concatenate the input features and latent features
-            #pdb.set_trace()
             combined_features = torch.cat((x, z), dim=2)
             output_decoder, self.hidden_decoder = self.decoder_lstm(combined_features, self.hidden_decoder)
             
@@ -690,8 +684,7 @@ class TRAJ_VAE_delta(torch.nn.Module):
         return (hidden_cell, state_cell)
     
     def encoder(self, x):
-        hidden_encoder = self.init_hidden(self.batch_size) 
-        #pdb.set_trace()
+        hidden_encoder = self.init_hidden(self.batch_size)
         output_encoder, hidden_encoder = self.encoder_lstm(x, hidden_encoder)
         
         # Extimate the mean and the variance of q(z|x)
@@ -723,7 +716,6 @@ class TRAJ_VAE_delta(torch.nn.Module):
         # Don't compute difference for last time step because we can't supervise on it
         for t in range(self.num_steps-1):
             # Concatenate the input features and latent features
-            #pdb.set_trace()
             combined_features = torch.cat((x, z), dim=2)
             output_decoder, self.hidden_decoder = self.decoder_lstm(combined_features, self.hidden_decoder)
             

@@ -8,30 +8,63 @@ Created on Tue May  9 14:06:24 2023
 # example usage: python train_world_model.py --model dreamerv2 --config rssm_disc_default_config.json --dec_hidden_size 512
 # python train_world_model.py --model multistep_predictor --config multistep_predictor_default_config.json --mlp_hidden_size 512
 
-import argparse
-import json
-import numpy as np
-from models import DreamerV2, MultistepPredictor, ReplayBuffer
 import os
-import pandas as pd
+import json
+import time
 import pickle
 import platform
-import time
+import argparse
+import numpy as np
+
 import torch
-import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
-if platform.system() == 'Windows':
-    # We are running on Windows
-    analysis_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/'
-    data_dir = '/Users/locro/Documents/Stanford/analysis/data/'
-    checkpoint_dir = analysis_dir
-elif platform.system() == 'Linux':
-    # We are running on Linux
-    analysis_dir = '/home/locross/SocialWorldModeling/'
-    data_dir = '/mnt/fs2/locross/analysis/data/'
-    checkpoint_dir = '/mnt/fs2/locross/analysis/'
+from models import DreamerV2, MultistepPredictor, ReplayBuffer
+
+
+"""Global variables"""
+model_dict = {
+    'dreamerv2': DreamerV2,
+    'multistep_predictor': MultistepPredictor
+    }
+DEFAULT_VALUES = {
+    'analysis_dir': './',
+    'data_dir': '/data2/ziyxiang/social_world_model/data',
+    'checkpoint_dir': '/data2/ziyxiang/social_world_model/checkpoint',
+}
+
+
+def load_args():
+    parser = argparse.ArgumentParser()
+    # general pipeline parameters
+    parser.add_argument('--analysis_dir', type=str, default=DEFAULT_VALUES['analysis_dir'], help='Analysis directory')
+    parser.add_argument('--data_dir', type=str, default=DEFAULT_VALUES['data_dir'], help='Data directory')
+    parser.add_argument('--checkpoint_dir', type=str, default=DEFAULT_VALUES['checkpoint_dir'], help='Checkpoint directory')
+    # general training parameters
+    parser.add_argument('--model', type=str, required=True, help='Model to use for training')
+    parser.add_argument('--config', type=str, required=True, help='Config JSON file')
+    parser.add_argument('--model_filename', type=str, default=None, help='Filename for saving model')
+    parser.add_argument('--lr', type=float, default=1e-4, help='Learning Rate')
+    parser.add_argument('--epochs', type=int, default=int(1e5), help='Epochs')
+    parser.add_argument('--save_every', type=int, default=500, help='Epoch Save Interval')
+    # rssm parameters
+    parser.add_argument('--deter_size', type=int, help='Deterministic size')
+    parser.add_argument('--dec_hidden_size', type=int, help='Decoder hidden size')
+    parser.add_argument('--rssm_type', type=str, help='RSSM type')
+    parser.add_argument('--rnn_type', type=str, help='RNN type')
+    parser.add_argument('--category_size', type=int, help='Category size')
+    parser.add_argument('--class_size', type=int, help='Class size')
+    # multistep predictor parameters
+    parser.add_argument('--mlp_hidden_size', type=int, help='MLP hidden size')
+    parser.add_argument('--num_mlp_layers', type=int, help='Number of MLP layers')
+    parser.add_argument('--rnn_hidden_size', type=int, help='RNN hidden size')
+    parser.add_argument('--num_rnn_layers', type=int, help='Number of RNN layers')
+    parser.add_argument('--burn_in_length', type=int, default=50, help='Amount of frames to burn into RNN')
+    parser.add_argument('--rollout_length', type=int, default=30, help='Forward rollout length')    
+
+    return parser.parse_args()
+    
 
 def load_config(file):
     with open(file) as f:
@@ -42,8 +75,9 @@ def save_config(config, filename):
     with open(filename, 'w') as f:
         json.dump(config, f, indent=4)
 
-def main(args):
-    config = load_config(analysis_dir+'models/configs/'+args.config)
+def main():
+    args = load_args()
+    config = load_config(os.path.join(args.analysis_dir, 'models/configs/', args.config))
     
     # Update config with args and keep track of overridden parameters
     overridden_parameters = []
@@ -64,7 +98,7 @@ def main(args):
     
     # If parameters overwritte, save updated config to new file
     if len(overridden_parameters) > 0:
-        new_config_filename = analysis_dir+'models/configs/'+f"{model_filename}_{'_'.join(overridden_parameters)}.json"
+        new_config_filename = os.path.join(args.analysis_dir, 'models/configs/', f"{model_filename}_{'_'.join(overridden_parameters)}.json")
         save_config(config, new_config_filename)
     
     # Check that we are using GPU
@@ -72,7 +106,7 @@ def main(args):
     print(DEVICE)
 
     # load data
-    data_file = data_dir+'train_test_splits_3D_dataset.pkl'
+    data_file = os.path.join(args.data_dir, 'train_test_splits_3D_dataset.pkl')
     with open(data_file, 'rb') as f:
         loaded_dataset = pickle.load(f)
     train_dataset, test_dataset = loaded_dataset
@@ -103,7 +137,7 @@ def main(args):
     print('Starting', model_filename)
     
     # log to tensorboard
-    log_dir = checkpoint_dir+'models/training_info/tensorboard/'+model_filename
+    log_dir = os.path.join(args.checkpoint_dir, 'models/training_info/tensorboard/', model_filename)
     writer = SummaryWriter(log_dir=log_dir)
     
     # optimizer
@@ -166,43 +200,13 @@ def main(args):
             writer.add_scalar('Train Loss/kl_loss', np.sum(batch_kl_loss), epoch)
         if epoch % args.save_every == 0 or epoch == (args.epochs-1):
             # save checkpoints in checkpoint directory with plenty of storage
-            save_dir = checkpoint_dir+'models/'+model_filename+'/'
+            save_dir = args.checkpoint_dir+'models/'+model_filename+'/'
             if not os.path.exists(save_dir):
                 os.makedirs(save_dir)
             model_name = save_dir+model_filename+'_epoch'+str(epoch)
             torch.save(model.state_dict(), model_name)
         print(f'Epoch {epoch}, Train Loss {epoch_loss}, Validation Loss {val_loss}')
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--model', type=str, required=True, help='Model to use for training')
-    parser.add_argument('--config', type=str, required=True, help='Config JSON file')
-    parser.add_argument('--model_filename', type=str, default=None, help='Filename for saving model')
-    parser.add_argument('--lr', type=float, default=1e-4, help='Learning Rate')
-    parser.add_argument('--epochs', type=int, default=int(1e5), help='Epochs')
-    parser.add_argument('--save_every', type=int, default=500, help='Epoch Save Interval')
-    # rssm parameters
-    parser.add_argument('--deter_size', type=int, help='Deterministic size')
-    parser.add_argument('--dec_hidden_size', type=int, help='Decoder hidden size')
-    parser.add_argument('--rssm_type', type=str, help='RSSM type')
-    parser.add_argument('--rnn_type', type=str, help='RNN type')
-    parser.add_argument('--category_size', type=int, help='Category size')
-    parser.add_argument('--class_size', type=int, help='Class size')
-    # multistep predictor parameters
-    parser.add_argument('--mlp_hidden_size', type=int, help='MLP hidden size')
-    parser.add_argument('--num_mlp_layers', type=int, help='Number of MLP layers')
-    parser.add_argument('--rnn_hidden_size', type=int, help='RNN hidden size')
-    parser.add_argument('--num_rnn_layers', type=int, help='Number of RNN layers')
-    parser.add_argument('--burn_in_length', type=int, default=50, help='Amount of frames to burn into RNN')
-    parser.add_argument('--rollout_length', type=int, default=30, help='Forward rollout length')
-    
-
-    model_dict = {
-        'dreamerv2': DreamerV2,
-        'multistep_predictor': MultistepPredictor
-    }
-
-    args = parser.parse_args()
-    main(args)
+if __name__ == '__main__':    
+    main()
 
