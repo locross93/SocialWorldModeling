@@ -29,7 +29,7 @@ if platform.system() == 'Windows':
     checkpoint_dir = analysis_dir
 elif platform.system() == 'Linux':
     # We are running on Linux
-    analysis_dir = '/home/locross/SocialWorldModeling'
+    analysis_dir = '/home/locross/SocialWorldModeling/'
     data_dir = '/mnt/fs2/locross/analysis/data/'
     checkpoint_dir = '/mnt/fs2/locross/analysis/'
 
