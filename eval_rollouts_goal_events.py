@@ -94,19 +94,18 @@ if __name__ == "__main__":
         input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
     num_timepoints = input_data.size(1)
     
-    model_dict= {
-        'rssm_discrete': [DreamerV2, 'config', 'rssm_h1024_l2_mlp1024', 'rssm_h1024_l2_mlp1024', 'RSSM Discrete'],
-        'multistep_predictor': [MultistepPredictor, 'config', 'mp_input_embed_h1024_l2_mlp1024_l2', 'mp_input_embed_h1024_l2_mlp1024_l2', 'Multistep Predictor'],
-        'multistep_delta': [MultistepDelta, 'config', 'multistep_delta_h1024_l2_mlp1024_l2', 'multistep_delta_h1024_l2_mlp1024_l2', 'Multistep Delta']
+    model_dict = {
+        'rssm_disc': {'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
+                      'model_dir': 'rssm_disc', 'epoch': '1000', 'model_label': 'RSSM Discrete'},
         }
-    keys2analyze = ['rssm_discrete', 'multistep_predictor']
-    #keys2analyze = ['rssm_discrete']
+    #keys2analyze = ['rssm_discrete', 'multistep_predictor']
+    keys2analyze = ['rssm_disc']
     results = []
     for key in keys2analyze:
         print(key)
         model_info = model_dict[key]
-        model_name = model_info[4]
-        model = load_trained_model(model_info, key, num_timepoints, DEVICE)
+        model_name = model_info['model_label']
+        model = load_trained_model(model_info, DEVICE)
         
         # put on gpu
         input_data = input_data.to(DEVICE)
