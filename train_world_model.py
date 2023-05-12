@@ -200,10 +200,10 @@ def main():
             writer.add_scalar('Train Loss/kl_loss', np.sum(batch_kl_loss), epoch)
         if epoch % args.save_every == 0 or epoch == (args.epochs-1):
             # save checkpoints in checkpoint directory with plenty of storage
-            save_dir = args.checkpoint_dir+'models/'+model_filename+'/'
+            save_dir = os.path.join(args.checkpoint_dir, 'models/', model_filename)
             if not os.path.exists(save_dir):
                 os.makedirs(save_dir)
-            model_name = save_dir+model_filename+'_epoch'+str(epoch)
+            model_name = os.path.join(save_dir, f'{model_filename}_epoch{epoch}')
             torch.save(model.state_dict(), model_name)
         print(f'Epoch {epoch}, Train Loss {epoch_loss}, Validation Loss {val_loss}')
 
