@@ -45,6 +45,14 @@ The evaluation pipeline contains various tests on validation data, to probe the 
     2. Evaluate move events
     3. Evaluate pick up events
 
+In each evaluation file, specify the models you want to test in a dictionary of dicts, model_dict. Here's an example of what this might look like:
+
+```
+model_dict = {
+        'rssm_disc': {'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
+                      'model_dir': 'rssm_disc', 'epoch': '1000', 'model_label': 'RSSM Discrete'},
+        }
+```
 
 
 
