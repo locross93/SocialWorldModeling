@@ -39,8 +39,9 @@ Here is an example of what a configuration file might look like:
 The evaluation pipeline contains various tests on validation data, to probe the world model's understanding of events and goal-directed behavior, in addition to more traditional metrics for trajectory prediction.
 
 1. Prediction error of forward rollouts on validation set - eval_val_rollouts.py
-2. Reconstructing events in forward rollouts 
-    1. Evaluate goal events
+2. Simulating events in forward rollouts 
+    1. Evaluate single goal events - eval_rollouts_goal_events.py
+    2. Evaluate multi goal events - eval_rollouts_multigoal_events.py
     2. Evaluate move events
     3. Evaluate pick up events
 
