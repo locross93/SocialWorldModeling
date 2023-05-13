@@ -11,7 +11,7 @@ Created on Tue May  9 14:06:24 2023
 import argparse
 import json
 import numpy as np
-from models import DreamerV2, MultistepPredictor, ReplayBuffer
+from models import DreamerV2, MultistepPredictor, TransformerMSPredictor,ReplayBuffer
 import os
 import pandas as pd
 import pickle
@@ -136,6 +136,8 @@ def main(args):
                 loss = model.loss(batch_x)
             elif config['model_type'] == 'multistep_predictor':
                 loss = model.loss(batch_x, burn_in_length, rollout_length)
+            elif config['model_type'] == 'transformer_mp':
+                loss = model.loss(batch_x, burn_in_length, rollout_length, mask_type='triangular')
             loss.backward()
             opt.step()
             
@@ -156,6 +158,8 @@ def main(args):
                 val_loss = model.loss(val_trajs)
             elif config['model_type'] == 'multistep_predictor':
                 val_loss = model.loss(val_trajs, burn_in_length, rollout_length)
+            elif config['model_type'] == 'transformer_mp':
+                val_loss = model.loss(val_trajs, burn_in_length, rollout_length, mask_type='triangular')
             val_loss = val_loss.item()
             loss_dict['val'].append(val_loss)
         # log to tensorboard
@@ -200,7 +204,8 @@ if __name__ == '__main__':
 
     model_dict = {
         'dreamerv2': DreamerV2,
-        'multistep_predictor': MultistepPredictor
+        'multistep_predictor': MultistepPredictor,
+        'transformer_mp': TransformerMSPredictor
     }
 
     args = parser.parse_args()

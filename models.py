@@ -1519,7 +1519,7 @@ class TransformerMSPredictor(nn.Module):
         
         return x_hat
     
-    def supervised_loss(self, x, context_length, rollout_length, mask_type):
+    def loss(self, x, context_length, rollout_length, mask_type):
         src = x[:,:context_length,:]
         t_end = context_length + rollout_length
         if mask_type == 'triangular':
