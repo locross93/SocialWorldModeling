@@ -100,6 +100,45 @@ def eval_move_events(input_matrices, recon_matrices, move_thr=0.1, plot=True, mo
     
     return scores, obj_moved_flag, recon_moved_flag
 
+def eval_move_events_in_rollouts(model, input_data, ds='First'):
+    if ds == 'First':
+        # first dataset
+        pickup_timepoints = annotate_pickup_timepoints(train_or_val, pickup_or_move='move')
+        goal_timepoints = annotate_goal_timepoints(train_or_val)
+        single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
+        multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
+    else:
+        # use event log for new datasets - TO DO
+        pickup_timepoints = []
+        
+    imagined_trajs = np.zeros(input_data.shape)
+    for i in range(input_data.shape[0]):
+        if i%50 == 0:
+            print(i)
+        x = input_data[i,:,:].unsqueeze(0)
+        if i in single_goal_trajs:
+            # burn in to a few frames past the goal, so it is clear it is a single goal trial - TO DO THIS WILL BE DIFF FOR DS2
+            # get the only goal point in the trajectory
+            burn_in_length = np.max(goal_timepoints[i,:]).astype(int) + 10
+        elif i in multi_goal_trajs:
+            # burn in to the pick up point of the 2nd object that is picked up, so its unambiguous that all objects will be delivered
+            burn_in_length = np.sort(pickup_timepoints[i,:])[1].astype(int)
+        else:
+            burn_in_length = non_goal_burn_in
+        # store the steps of burn in with real frames in imagined_trajs
+        imagined_trajs[i,:burn_in_length,:] = x[:,:burn_in_length,:].cpu()
+        # rollout model for the rest of the trajectory
+        rollout_length = num_timepoints - burn_in_length
+        rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach()
+        # store the steps after pick up with predicted frames in imagined_trajs
+        imagined_trajs[i,burn_in_length:,:] = rollout_x
+        
+    input_data = input_data.to('cpu')
+    scores, obj_moved_flag, recon_moved_flag = eval_move_events(input_data, imagined_trajs, move_thr, plot=True, model_name=model_name)
+        
+    return scores
+    
+    
 if __name__ == "__main__":
     # train test splits
     data_file = data_dir+'train_test_splits_3D_dataset.pkl'
@@ -107,8 +146,8 @@ if __name__ == "__main__":
         loaded_dataset = pickle.load(f)
     train_dataset, test_dataset = loaded_dataset
     
-    save_plot = True
-    save_file = 'eval_rollouts_goal_events'
+    save_plot = False
+    save_file = 'eval_rollouts_move_events'
     DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
     train_or_val = 'val'
     # for non goal trials, how many steps to show before rollout - should large enough to disambiguate behavior
@@ -137,39 +176,35 @@ if __name__ == "__main__":
         # put on gpu
         input_data = input_data.to(DEVICE)
         
-        ds = 'First'
-        if ds == 'First':
-            # first dataset
-            pickup_timepoints = annotate_pickup_timepoints(train_or_val, pickup_or_move='move')
-            goal_timepoints = annotate_goal_timepoints(train_or_val)
-            single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
-            multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
-        else:
-            # use event log for new datasets - TO DO
-            pickup_timepoints = []
-            
-        imagined_trajs = np.zeros(input_data.shape)
-        for i in range(input_data.shape[0]):
-            if i%50 == 0:
-                print(i)
-            x = input_data[i,:,:].unsqueeze(0)
-            if i in single_goal_trajs:
-                # burn in to a few frames past the goal, so it is clear it is a single goal trial - TO DO THIS WILL BE DIFF FOR DS2
-                # get the only goal point in the trajectory
-                burn_in_length = np.max(goal_timepoints[i,:]).astype(int) + 10
-            elif i in multi_goal_trajs:
-                # burn in to the pick up point of the 2nd object that is picked up, so its unambiguous that all objects will be delivered
-                burn_in_length = np.sort(pickup_timepoints[i,:])[1].astype(int)
-            else:
-                burn_in_length = non_goal_burn_in
-            # store the steps of burn in with real frames in imagined_trajs
-            imagined_trajs[i,:burn_in_length,:] = x[:,:burn_in_length,:].cpu()
-            # rollout model for the rest of the trajectory
-            rollout_length = num_timepoints - burn_in_length
-            rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach()
-            # store the steps after pick up with predicted frames in imagined_trajs
-            imagined_trajs[i,burn_in_length:,:] = rollout_x
-            
-        input_data = input_data.to('cpu')
-        scores, obj_moved_flag, recon_moved_flag = eval_move_events(input_data, imagined_trajs, move_thr, plot=True, model_name=model_name)
-            
+        scores = eval_move_events_in_rollouts(model, input_data)
+        
+        results.append({
+                    'Model': model_name,
+                    'Metric': 'Accuracy',
+                    'Score': scores['Accuracy']
+                })
+        results.append({
+                    'Model': model_name,
+                    'Metric': 'Precision',
+                    'Score': scores['Precision']
+                })
+        results.append({
+                    'Model': model_name,
+                    'Metric': 'Recall',
+                    'Score': scores['Recall']
+                })
+        
+    df_plot = pd.DataFrame(results)
+    
+    # Plot the results using seaborn
+    fig = plt.figure()
+    sns.barplot(x='Metric', y='Score', hue='Model', data=df_plot) 
+    plt.title('Evaluate Move Events From Forward Rollouts', fontsize=14)
+    plt.xlabel('Metric', fontsize=16) 
+    plt.ylabel('Score', fontsize=16)
+    plt.ylim([0, 1])
+    plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
+    if save_plot:
+        df_plot.to_csv(analysis_dir+'results/figures/'+save_file+'.csv')
+        plt.savefig(analysis_dir+'results/figures/'+save_file, dpi=300, bbox_inches='tight')
+    plt.show()
