@@ -13,6 +13,7 @@ import torch.nn.functional as F
 import torch.nn as nn
 import torch.distributions as td
 
+
 class MlpAutoencoder(torch.nn.Module):
     def __init__(self, config):
         super(MlpAutoencoder, self).__init__()
@@ -485,6 +486,7 @@ class SEQ_VAE(torch.nn.Module):
 RSSMDiscState = namedtuple('RSSMDiscState', ['logit', 'stoch', 'deter'])
 RSSMContState = namedtuple('RSSMContState', ['mean', 'std', 'stoch', 'deter']) 
     
+
 class RSSM(nn.Module):
     def __init__(self, config):
         super(RSSM, self).__init__()
@@ -1005,6 +1007,7 @@ class DreamerV2(nn.Module):
         return x_hat
     
     def loss(self, x):
+        breakpoint()
         # Encoder
         prior, post = self.encoder(x)
         

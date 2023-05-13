@@ -20,13 +20,15 @@ import torch
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
-from models import DreamerV2, MultistepPredictor, ReplayBuffer
+from models import DreamerV2, MultistepPredictor, ReplayBuffer, \
+    TransformerMSPredictor
 
 
 """Global variables"""
 model_dict = {
     'dreamerv2': DreamerV2,
-    'multistep_predictor': MultistepPredictor
+    'multistep_predictor': MultistepPredictor,
+    'transformer_multistep_predictor': TransformerMSPredictor
     }
 DEFAULT_VALUES = {
     'analysis_dir': './',
@@ -206,6 +208,7 @@ def main():
             model_name = os.path.join(save_dir, f'{model_filename}_epoch{epoch}')
             torch.save(model.state_dict(), model_name)
         print(f'Epoch {epoch}, Train Loss {epoch_loss}, Validation Loss {val_loss}')
+
 
 if __name__ == '__main__':    
     main()
