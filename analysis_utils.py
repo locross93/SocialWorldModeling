@@ -41,8 +41,8 @@ def load_trained_model(model_info, device='cpu'):
     # load checkpoint weights
     # checkpoints are in folder named after model
     model_dir = os.path.join(checkpoint_dir, 'models', model_info['model_dir'])
-    model_file_name = os.path.join(model_dir, model_info['model_dir']+'_epoch'+model_info['epoch'])
-    if os.path.exists(model_file_name):
+    if 'epoch' in model_info:
+        model_file_name = os.path.join(model_dir, model_info['model_dir']+'_epoch'+model_info['epoch'])
         model.load_state_dict(torch.load(model_file_name))
         print('Loading model',model_file_name)
     else:
@@ -65,6 +65,6 @@ def get_highest_numbered_file(model_filename, directory):
             prefix, number = filename.rsplit('_', 1) if '_epoch' not in filename else filename.rsplit('_epoch', 1)
             if prefix == model_filename and int(number) > highest_number:
                 highest_number = int(number)
-                highest_numbered_file = directory+filename
+                highest_numbered_file = os.path.join(directory, filename)
     assert highest_number > -1,'No checkpoints found'
     return highest_numbered_file, highest_number

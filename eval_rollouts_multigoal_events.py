@@ -17,7 +17,8 @@ import torch
 
 from analysis_utils import load_trained_model
 from models import DreamerV2, MultistepPredictor, MultistepDelta
-from annotate_pickup_timepoints import annotate_pickup_timepoints, eval_recon_goals
+from annotate_pickup_timepoints import annotate_pickup_timepoints
+from annotate_goal_timepoints import eval_recon_goals
 
 if platform.system() == 'Windows':
     # We are running on Windows
