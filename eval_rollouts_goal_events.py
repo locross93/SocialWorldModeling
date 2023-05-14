@@ -86,8 +86,7 @@ if __name__ == "__main__":
     
     save_plot = True
     save_file = 'eval_rollouts_goal_events'
-    #DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-    DEVICE = 'cpu'
+    DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
     train_or_val = 'val'
     
     if train_or_val == 'train':
