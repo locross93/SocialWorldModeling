@@ -1532,6 +1532,10 @@ class TransformerMSPredictor(nn.Module):
             tgt = torch.zeros_like(x_supervise)
         tgt_length = tgt.size(1)
         tgt_mask = self.get_tgt_mask(tgt_length, mask_type='triangular').to(self.device)
+        # TEST - add N * num_heads dimensions https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html
+        batch_size = x.size(0)
+        tgt_mask = tgt_mask.unsqueeze(0)
+        tgt_mask = tgt_mask.expand(batch_size*self.num_heads, -1, -1)
         x_hat = self.forward(src, tgt, tgt_mask)
         # Permute pred to have batch size first again
         x_hat = x_hat.permute(1, 0, 2)   
