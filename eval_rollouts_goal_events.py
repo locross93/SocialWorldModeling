@@ -16,7 +16,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 import torch
 
 from analysis_utils import load_trained_model
-from models import DreamerV2, MultistepPredictor, MultistepDelta
+from models import DreamerV2, MultistepPredictor, MultistepDelta, TransformerMSPredictor
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals
 
@@ -86,7 +86,8 @@ if __name__ == "__main__":
     
     save_plot = True
     save_file = 'eval_rollouts_goal_events'
-    DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+    #DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+    DEVICE = 'cpu'
     train_or_val = 'val'
     
     if train_or_val == 'train':
@@ -98,9 +99,11 @@ if __name__ == "__main__":
     model_dict = {
         'rssm_disc': {'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
                       'model_dir': 'rssm_disc', 'epoch': '1000', 'model_label': 'RSSM Discrete'},
+        'transformer': {'class': TransformerMSPredictor, 'config': 'transformer_default_config.json', 
+                      'model_dir': 'transformer_mp', 'epoch': '500', 'model_label': 'Transformer MP'},
         }
     #keys2analyze = ['rssm_discrete', 'multistep_predictor']
-    keys2analyze = ['rssm_disc']
+    keys2analyze = ['transformer']
     results = []
     for key in keys2analyze:
         print(key)

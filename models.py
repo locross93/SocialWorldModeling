@@ -1500,22 +1500,20 @@ class TransformerMSPredictor(nn.Module):
         
         return mask
     
-    def forward_rollout(self, x, context_length, rollout_length, mask_type):
+    def forward_rollout(self, x, context_length, rollout_length, mask_type='triangular'):
         src = x[:,:context_length,:]
-        t_end = context_length + rollout_length
-        if mask_type == 'triangular':
-            # shift the tgt by one so we predict the token at pos +1
-            tgt = x[:,context_length:(t_end-1),:]
-            x_supervise = x[:,(context_length+1):t_end,:]
-        elif mask_type == 'square':
-            x_supervise = x[:,context_length:t_end,:]
-            # feed in a tensor of zeros as the target
-            tgt = torch.zeros_like(x_supervise)
-        tgt_length = tgt.size(1)
-        tgt_mask = self.get_tgt_mask(tgt_length, mask_type='triangular').to(self.device)
-        x_hat = self.forward(src, tgt, tgt_mask)
-        # Permute pred to have batch size first again
-        x_hat = x_hat.permute(1, 0, 2) 
+        # Tensor to hold predictions
+        x_hat = torch.zeros(x.shape[0], rollout_length, x.shape[2]).to(x.device)
+
+        for i in range(rollout_length):
+            # Use transformer to predict next step, use the last step of context as the tgt
+            #tgt = model.transformer(src, src[-1,:,:].unsqueeze(1))
+            #out = model.out(tgt)
+            out = self.forward(src, src[:,-1,:].unsqueeze(0))
+            # Append prediction to predictions tensor
+            x_hat[:,i,:] = out
+            # Append prediction to context for next prediction
+            src = torch.cat((src, out), dim=1)
         
         return x_hat
     
