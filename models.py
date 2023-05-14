@@ -1507,9 +1507,11 @@ class TransformerMSPredictor(nn.Module):
 
         for i in range(rollout_length):
             # Use transformer to predict next step, use the last step of context as the tgt
-            out = self.forward(src, src[:,-1,:].unsqueeze(0))
+            out = self.forward(src, src[:,-1,:].unsqueeze(1))
+            # Permute pred to have batch size first again
+            out = out.permute(1, 0, 2)  
             # Append prediction to predictions tensor
-            x_hat[:,i,:] = out
+            x_hat[:,i,:] = out.squeeze(1)
             # Append prediction to context for next prediction
             src = torch.cat((src, out), dim=1)
         
