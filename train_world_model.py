@@ -86,9 +86,9 @@ def main(args):
     replay_buffer = ReplayBuffer(sequence_length)
     replay_buffer.upload_training_set(train_data)
     if platform.system() == 'Windows':
-        batch_size = 64
+        batch_size = 32
     elif platform.system() == 'Linux':
-        batch_size = 256
+        batch_size = 32
     print(f'Batch size: {batch_size}')
     batches_per_epoch = replay_buffer.buffer_size // batch_size
     
