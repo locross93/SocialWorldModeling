@@ -172,6 +172,8 @@ def main():
                 loss = model.loss(batch_x)
             elif config['model_type'] == 'multistep_predictor':
                 loss = model.loss(batch_x, burn_in_length, rollout_length)
+            elif config['model_type'] == 'transformer_mp':
+                loss = model.loss(batch_x, burn_in_length, rollout_length, mask_type='triangular')
             loss.backward()
             opt.step()
             
@@ -192,6 +194,8 @@ def main():
                 val_loss = model.loss(val_trajs)
             elif config['model_type'] == 'multistep_predictor':
                 val_loss = model.loss(val_trajs, burn_in_length, rollout_length)
+            elif config['model_type'] == 'transformer_mp':
+                val_loss = model.loss(val_trajs, burn_in_length, rollout_length, mask_type='triangular')
             val_loss = val_loss.item()
             loss_dict['val'].append(val_loss)
         # log to tensorboard
