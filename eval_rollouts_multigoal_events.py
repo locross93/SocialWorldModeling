@@ -104,15 +104,16 @@ if __name__ == "__main__":
         input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
     num_timepoints = input_data.size(1)
     
-    model_dict= {
-        'rssm_discrete': [DreamerV2, 'config', 'rssm_h1024_l2_mlp1024', 'rssm_h1024_l2_mlp1024', 'RSSM Discrete'],
-        'multistep_predictor': [MultistepPredictor, 'config', 'mp_input_embed_h1024_l2_mlp1024_l2', 'mp_input_embed_h1024_l2_mlp1024_l2', 'Multistep Predictor'],
-        'multistep_delta': [MultistepDelta, 'config', 'multistep_delta_h1024_l2_mlp1024_l2', 'multistep_delta_h1024_l2_mlp1024_l2', 'Multistep Delta'],
+    model_dict = {
+        'rssm_disc': {'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
+                      'model_dir': 'rssm_disc', 'model_label': 'RSSM Discrete'},
+        'multistep_pred': {'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json', 
+                      'model_dir': 'multistep_predictor', 'model_label': 'Multistep Predictor'},
         'transformer': {'class': TransformerMSPredictor, 'config': 'transformer_default_config.json', 
-                      'model_dir': 'transformer_mp', 'epoch': '500', 'model_label': 'Transformer MP'},
+                      'model_dir': 'transformer_mp', 'model_label': 'Transformer MP'},
         }
-    #keys2analyze = ['rssm_discrete', 'multistep_predictor']
-    keys2analyze = ['transformer']
+    keys2analyze = ['rssm_disc', 'multistep_pred']
+    #keys2analyze = ['transformer']
     results = []
     for key in keys2analyze:
         print(key)

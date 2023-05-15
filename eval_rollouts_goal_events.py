@@ -85,7 +85,7 @@ if __name__ == "__main__":
     train_dataset, test_dataset = loaded_dataset
     
     save_plot = True
-    save_file = 'eval_rollouts_goal_events'
+    save_file = 'eval_rollouts_goal_events_rssm_mp'
     DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
     train_or_val = 'val'
     
@@ -97,12 +97,14 @@ if __name__ == "__main__":
     
     model_dict = {
         'rssm_disc': {'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
-                      'model_dir': 'rssm_disc', 'epoch': '1000', 'model_label': 'RSSM Discrete'},
+                      'model_dir': 'rssm_disc', 'model_label': 'RSSM Discrete'},
+        'multistep_pred': {'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json', 
+                      'model_dir': 'multistep_predictor', 'model_label': 'Multistep Predictor'},
         'transformer': {'class': TransformerMSPredictor, 'config': 'transformer_default_config.json', 
                       'model_dir': 'transformer_mp', 'model_label': 'Transformer MP'},
         }
-    #keys2analyze = ['rssm_discrete', 'multistep_predictor']
-    keys2analyze = ['transformer']
+    keys2analyze = ['rssm_disc', 'multistep_pred']
+    #keys2analyze = ['transformer']
     results = []
     for key in keys2analyze:
         print(key)

@@ -161,13 +161,15 @@ if __name__ == "__main__":
     num_timepoints = input_data.size(1)
     
     model_dict = {
-        'rssm': {'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
-                      'model_dir': 'rssm_h1024_l2_mlp1024', 'model_label': 'RSSM Discrete'},
+        'rssm_disc': {'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
+                      'model_dir': 'rssm_disc', 'model_label': 'RSSM Discrete'},
+        'multistep_pred': {'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json', 
+                      'model_dir': 'multistep_predictor', 'model_label': 'Multistep Predictor'},
         'transformer': {'class': TransformerMSPredictor, 'config': 'transformer_default_config.json', 
-                      'model_dir': 'transformer_mp', 'epoch': '500', 'model_label': 'Transformer MP'},
+                      'model_dir': 'transformer_mp', 'model_label': 'Transformer MP'},
         }
-    #keys2analyze = ['rssm_discrete', 'multistep_predictor']
-    keys2analyze = ['transformer']
+    keys2analyze = ['rssm_disc', 'multistep_pred']
+    #keys2analyze = ['transformer']
     results = []
     for key in keys2analyze:
         print(key)
