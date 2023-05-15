@@ -20,6 +20,7 @@ from models import DreamerV2, MultistepPredictor, MultistepDelta
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals
 
+# @TODO this section should be args from command line
 if platform.system() == 'Windows':
     # We are running on Windows
     analysis_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/'

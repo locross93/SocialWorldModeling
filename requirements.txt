@@ -1,6 +1,9 @@
+typeguard
 numpy
 scipy
 pandas
+seaborn
+scikit-learn
 matplotlib
 tensorboard
 --extra-index-url https://download.pytorch.org/whl/cu113

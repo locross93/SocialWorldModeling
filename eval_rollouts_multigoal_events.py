@@ -110,7 +110,6 @@ if __name__ == "__main__":
         'multistep_delta': [MultistepDelta, 'config', 'multistep_delta_h1024_l2_mlp1024_l2', 'multistep_delta_h1024_l2_mlp1024_l2', 'Multistep Delta']
         }
     keys2analyze = ['rssm_discrete', 'multistep_predictor']
-    #keys2analyze = ['rssm_discrete']
     results = []
     for key in keys2analyze:
         print(key)

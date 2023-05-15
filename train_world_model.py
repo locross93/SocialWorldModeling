@@ -17,25 +17,14 @@ import argparse
 import numpy as np
 
 import torch
-from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
-from models import DreamerV2, MultistepPredictor, ReplayBuffer, \
-    TransformerMSPredictor
+from constants import DEFAULT_VALUES, MODEL_DICT_TRAIN
+from models import ReplayBuffer
 
 
 """Global variables"""
-model_dict = {
-    'dreamerv2': DreamerV2,
-    'multistep_predictor': MultistepPredictor,
-    'transformer_multistep_predictor': TransformerMSPredictor
-    }
-DEFAULT_VALUES = {
-    'analysis_dir': './',
-    'data_dir': '/data2/ziyxiang/social_world_model/data',
-    'checkpoint_dir': '/data2/ziyxiang/social_world_model/checkpoint',
-}
-
+model_dict = MODEL_DICT_TRAIN
 
 def load_args():
     parser = argparse.ArgumentParser()
@@ -109,8 +98,7 @@ def main():
 
     # load data
     data_file = os.path.join(args.data_dir, 'train_test_splits_3D_dataset.pkl')
-    with open(data_file, 'rb') as f:
-        loaded_dataset = pickle.load(f)
+    loaded_dataset = pickle.load(open(data_file, 'rb'))
     train_dataset, test_dataset = loaded_dataset
     train_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     val_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
