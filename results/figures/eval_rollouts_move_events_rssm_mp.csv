@@ -1,7 +1,4 @@
 ,Model,Metric,Score
-0,RSSM Discrete,Accuracy,0.6395309882747069
-1,RSSM Discrete,Precision,0.5406836783822822
-2,RSSM Discrete,Recall,0.9020080321285141
-3,Multistep Predictor,Accuracy,0.47906197654941374
-4,Multistep Predictor,Precision,0.4440836940836941
-5,Multistep Predictor,Recall,0.9887550200803212
+0,Transformer,Accuracy,0.4190954773869347
+1,Transformer,Precision,0.4179254783484391
+2,Transformer,Recall,1.0

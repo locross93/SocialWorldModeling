@@ -16,7 +16,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 import torch
 
 from analysis_utils import load_trained_model
-from models import DreamerV2, MultistepPredictor, MultistepDelta, TransformerMSPredictor
+from models import DreamerV2, MultistepPredictor, MultistepDelta, TransformerMSPredictor, TransformerWorldModel
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import annotate_goal_timepoints
 
@@ -167,9 +167,11 @@ if __name__ == "__main__":
                       'model_dir': 'multistep_predictor', 'model_label': 'Multistep Predictor'},
         'transformer': {'class': TransformerMSPredictor, 'config': 'transformer_default_config.json', 
                       'model_dir': 'transformer_mp', 'model_label': 'Transformer MP'},
+        'transformer_wm': {'class': TransformerWorldModel, 'config': 'transformer_wm_default_config.json', 
+                      'model_dir': 'transformer_wm', 'model_label': 'Transformer'},
         }
-    keys2analyze = ['rssm_disc', 'multistep_pred']
-    #keys2analyze = ['transformer']
+    #keys2analyze = ['rssm_disc', 'multistep_pred']
+    keys2analyze = ['transformer_wm']
     results = []
     for key in keys2analyze:
         print(key)
