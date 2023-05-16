@@ -1620,6 +1620,7 @@ class TransformerWorldModel(nn.Module):
 
         # generate predictions until 
         while src.size(1) < (src.size(1) + rollout_length):
+            print(src.size(1))
             if src.size(1) < self.context_length:
                 # if context is less than the model's context length, pad the beginning with zeros
                 zero_padding = torch.zeros(src.size(0), self.context_length - src.size(1), src.size(2)).to(x.device)
