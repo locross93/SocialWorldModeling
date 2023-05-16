@@ -64,6 +64,7 @@ def eval_goal_events_in_rollouts(model, input_data, ds='First'):
         imag_trajs.append(rollout_x)
         # store the steps after pick up with predicted frames in imagined_trajs
         imagined_trajs[i,steps2pickup:,:] = rollout_x
+        torch.cuda.empty_cache()
     x_true = torch.cat(real_trajs, dim=1)
     x_hat = torch.cat(imag_trajs, dim=1)
     mse = ((x_true - x_hat)**2).mean().item()
@@ -88,7 +89,6 @@ if __name__ == "__main__":
     save_plot = True
     save_file = 'eval_rollouts_goal_events_transformer_wm'
     DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-    DEVICE = 'cpu'
     train_or_val = 'val'
     
     if train_or_val == 'train':
