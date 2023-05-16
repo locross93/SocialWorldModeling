@@ -46,9 +46,8 @@ def eval_goal_events_in_rollouts(model, input_data, ds='First'):
     real_trajs = []
     imag_trajs = []
     for i,row in enumerate(single_goal_trajs):
-        print(i)
-        # if i%50 == 0:
-        #     print(i)
+        if i%50 == 0:
+            print(i)
         x = input_data[row,:,:].unsqueeze(0)
         # get the only pick up point in the trajectory
         steps2pickup = np.max(pickup_timepoints[row,:]).astype(int)

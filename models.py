@@ -1615,12 +1615,12 @@ class TransformerWorldModel(nn.Module):
         return x_hat
     
     def variable_length_rollout(self, x, context_length, rollout_length):
+        sequence_length = context_length + rollout_length
         # only input obs from x up to context_length
         src = x[:,:context_length,:]
 
         # generate predictions until 
-        while src.size(1) < (src.size(1) + rollout_length):
-            print(src.size(1))
+        while src.size(1) < sequence_length:
             if src.size(1) < self.context_length:
                 # if context is less than the model's context length, pad the beginning with zeros
                 zero_padding = torch.zeros(src.size(0), self.context_length - src.size(1), src.size(2)).to(x.device)
@@ -1633,7 +1633,7 @@ class TransformerWorldModel(nn.Module):
                 out = self.forward(src)
             # Append prediction to context for next prediction
             src = torch.cat((src, out), dim=1)
-        x_hat = src[:,context_length:(context_length+rollout_length),:]
+        x_hat = src[:,context_length:sequence_length,:]
         
         assert x_hat.size(1) == rollout_length
         
