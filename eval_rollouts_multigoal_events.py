@@ -93,8 +93,8 @@ if __name__ == "__main__":
         loaded_dataset = pickle.load(f)
     train_dataset, test_dataset = loaded_dataset
     
-    save_plot = False
-    save_file = 'eval_rollouts_multigoal_events'
+    save_plot = True
+    save_file = 'eval_rollouts_multigoal_events_rssm_mp'
     DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
     train_or_val = 'val'
     

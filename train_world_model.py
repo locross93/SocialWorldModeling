@@ -11,7 +11,7 @@ Created on Tue May  9 14:06:24 2023
 import argparse
 import json
 import numpy as np
-from models import DreamerV2, MultistepPredictor, TransformerMSPredictor, ReplayBuffer
+from models import DreamerV2, MultistepPredictor, TransformerMSPredictor, TransformerWorldModel, ReplayBuffer
 import os
 import pandas as pd
 import pickle
@@ -138,6 +138,8 @@ def main(args):
                 loss = model.loss(batch_x, burn_in_length, rollout_length)
             elif config['model_type'] == 'transformer_mp':
                 loss = model.loss(batch_x, burn_in_length, rollout_length, mask_type='triangular')
+            elif config['model_type'] == 'transformer_wm':
+                loss = model.loss(batch_x, burn_in_length)
             loss.backward()
             opt.step()
             
@@ -205,7 +207,8 @@ if __name__ == '__main__':
     model_dict = {
         'dreamerv2': DreamerV2,
         'multistep_predictor': MultistepPredictor,
-        'transformer_mp': TransformerMSPredictor
+        'transformer_mp': TransformerMSPredictor,
+        'transformer_wm': TransformerWorldModel
     }
 
     args = parser.parse_args()

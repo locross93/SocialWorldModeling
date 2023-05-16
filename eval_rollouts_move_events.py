@@ -146,13 +146,13 @@ if __name__ == "__main__":
         loaded_dataset = pickle.load(f)
     train_dataset, test_dataset = loaded_dataset
     
-    save_plot = False
-    save_file = 'eval_rollouts_move_events'
+    save_plot = True
+    save_file = 'eval_rollouts_move_events_rssm_mp'
     DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
     train_or_val = 'val'
     # for non goal trials, how many steps to show before rollout - should large enough to disambiguate behavior
     non_goal_burn_in = 50
-    move_thr = 4.0
+    move_thr = 2.0
     
     if train_or_val == 'train':
         input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
