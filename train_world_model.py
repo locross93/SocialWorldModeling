@@ -49,7 +49,7 @@ def main(args):
     # Update config with args and keep track of overridden parameters
     overridden_parameters = []
     for k, v in vars(args).items():
-        if v is not None and k in config:
+        if v is not None and k in config and config[k] != v:
             config[k] = v
             overridden_parameters.append(f"{k}_{v}")
             print(f"{k}_{v}")
