@@ -7,6 +7,7 @@ Created on Tue May  9 14:06:24 2023
 
 # example usage: python train_world_model.py --model dreamerv2 --config rssm_disc_default_config.json --dec_hidden_size 512
 # python train_world_model.py --model multistep_predictor --config multistep_predictor_default_config.json --mlp_hidden_size 512
+# python train_world_model.py --model transformer_wm --config transformer_wm_default_config.json
 
 import argparse
 import json
@@ -85,10 +86,12 @@ def main(args):
     sequence_length = burn_in_length + rollout_length
     replay_buffer = ReplayBuffer(sequence_length)
     replay_buffer.upload_training_set(train_data)
+    if args.batch_size:
+        batch_size = args.batch_size
     if platform.system() == 'Windows':
         batch_size = 32
     elif platform.system() == 'Linux':
-        batch_size = 32
+        batch_size = 256
     print(f'Batch size: {batch_size}')
     batches_per_epoch = replay_buffer.buffer_size // batch_size
     
@@ -132,14 +135,12 @@ def main(args):
             batch_x = batch_x.to(DEVICE)
             nsamples += batch_x.shape[0]
             opt.zero_grad()
-            if config['model_type'][:4] == 'rssm':
+            if config['model_type'][:4] == 'rssm' or config['model_type'] == 'transformer_wm':
                 loss = model.loss(batch_x)
             elif config['model_type'] == 'multistep_predictor':
                 loss = model.loss(batch_x, burn_in_length, rollout_length)
             elif config['model_type'] == 'transformer_mp':
                 loss = model.loss(batch_x, burn_in_length, rollout_length, mask_type='triangular')
-            elif config['model_type'] == 'transformer_wm':
-                loss = model.loss(batch_x, burn_in_length)
             loss.backward()
             opt.step()
             
@@ -156,7 +157,7 @@ def main(args):
         # test on validation set
         with torch.no_grad():
             model.eval()
-            if config['model_type'][:4] == 'rssm':
+            if config['model_type'][:4] == 'rssm' or config['model_type'] == 'transformer_wm':
                 val_loss = model.loss(val_trajs)
             elif config['model_type'] == 'multistep_predictor':
                 val_loss = model.loss(val_trajs, burn_in_length, rollout_length)
@@ -188,6 +189,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=1e-4, help='Learning Rate')
     parser.add_argument('--epochs', type=int, default=int(1e5), help='Epochs')
     parser.add_argument('--save_every', type=int, default=500, help='Epoch Save Interval')
+    parser.add_argument('--batch_size', type=int, help='Epoch Save Interval')
     # rssm parameters
     parser.add_argument('--deter_size', type=int, help='Deterministic size')
     parser.add_argument('--dec_hidden_size', type=int, help='Decoder hidden size')
