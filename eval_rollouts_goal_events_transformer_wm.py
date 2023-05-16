@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu May 11 13:43:20 2023
+Created on Tue May 16 10:27:41 2023
 
 @author: locro
 """
@@ -55,7 +55,8 @@ def eval_goal_events_in_rollouts(model, input_data, ds='First'):
         imagined_trajs[i,:steps2pickup,:] = x[:,:steps2pickup,:].cpu()
         # rollout model for the rest of the trajectory
         rollout_length = num_timepoints - steps2pickup
-        rollout_x = model.forward_rollout(x, steps2pickup, rollout_length).cpu().detach()
+        #rollout_x = model.forward_rollout(x, steps2pickup, rollout_length).cpu().detach()
+        rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
         # get end portion of true trajectory to compare to rollout
         real_traj = x[:,steps2pickup:,:].to("cpu")
         assert rollout_x.size() == real_traj.size()
@@ -85,7 +86,7 @@ if __name__ == "__main__":
     train_dataset, test_dataset = loaded_dataset
     
     save_plot = True
-    save_file = 'eval_rollouts_goal_events_rssm_mp'
+    save_file = 'eval_rollouts_goal_events_transformer_wm'
     DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
     train_or_val = 'val'
     
