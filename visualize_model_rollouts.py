@@ -4,6 +4,7 @@ Created on Tue May 16 15:23:30 2023
 
 @author: locro
 """
+# example usage: python visualize_model_rollouts.py --model_key transformer_wm --trial_type single_goal --trial_num 0
 
 import os
 import argparse
@@ -20,10 +21,7 @@ from analysis_utils import load_trained_model, data_columns
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import annotate_goal_timepoints
 
-from constants import DEFAULT_VALUES, MODEL_DICT_VAL
-
-"""Global variables"""
-model_dict = MODEL_DICT_TRAIN
+from constants import MODEL_DICT_VAL
 
 if platform.system() == 'Windows':
     # We are running on Windows
@@ -39,7 +37,6 @@ elif platform.system() == 'Linux':
     
 def load_args():
     parser = argparse.ArgumentParser()
-
     parser.add_argument('--model_key', type=str, required=True, help='Model to use for visualization')
     parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--device', type=str, default='cpu', help='Device')
@@ -51,13 +48,14 @@ def load_args():
     # which visualizations
     parser.add_argument('--plot_traj_subplots', type=bool, default=True, help='Make subplot of true vs predicted trajectory')
     parser.add_argument('--make_video', type=bool, default=True, help='Make video - compare real and reconstructed traj side by side')
+    return parser.parse_args()
 
 def load_config(file):
     with open(file) as f:
         config = json.load(f)
     return config
 
-def make_traj_subplots(x_true, x_pred, subplot_dims, steps):
+def make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file):
     # ie subplot_dims = (3,3)
     fig, ax = plt.subplots(subplot_dims[0], subplot_dims[1], figsize=(15, 15))
     colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
@@ -99,6 +97,8 @@ def make_traj_subplots(x_true, x_pred, subplot_dims, steps):
             x_ind = data_columns.index('agent'+str(agent_num)+'_x')
             z_ind = data_columns.index('agent'+str(agent_num)+'_z')
             ax[row, col].plot(x_pred[step,x_ind], x_pred[step,z_ind], marker='^', markersize=16, markerfacecolor=color, markeredgecolor=color, alpha=0.5)
+    # save
+    plt.savefig(save_file, dpi=300)
     
     return fig, ax
 
@@ -184,12 +184,14 @@ if __name__ == '__main__':
     x = input_data[traj_ind,:,:].unsqueeze(0)
     x_true = x[0,:burn_in_length+rollout_length,:].numpy()
     x_pred = x_true.copy()
-    rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()
+    #rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()
+    rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
     x_pred[burn_in_length:,:] = rollout_x 
     
     viz_dir = os.path.join(analysis_dir, 'results/viz_trajs',args.model_key)
-    if not os.isdir(viz_dir):
+    if not os.path.exists(viz_dir):
         os.mkdir(viz_dir)
+        
     if args.trial_type == 'single_goal':
         save_file = os.path.join(viz_dir, 'traj_subplot'+'_sg_trial'+str(args.trial_num))
     elif args.trial_type == 'multi_goal':
