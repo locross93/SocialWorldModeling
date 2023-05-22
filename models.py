@@ -12,7 +12,7 @@ import torch
 import torch.nn.functional as F
 import torch.nn as nn
 import torch.distributions as td
-import pdb
+
 
 class MlpAutoencoder(torch.nn.Module):
     def __init__(self, config):
@@ -136,8 +136,7 @@ class LSTM_VAE(torch.nn.Module):
     
     def encoder(self, x):
     	# TO DO MAKE BATCH SIZE DEPENDENT ON X
-        hidden_encoder = self.init_hidden(self.batch_size) 
-        #pdb.set_trace()
+        hidden_encoder = self.init_hidden(self.batch_size)
         output_encoder, hidden_encoder = self.encoder_lstm(x, hidden_encoder)
         
         # Extimate the mean and the variance of q(z|x)
@@ -168,7 +167,6 @@ class LSTM_VAE(torch.nn.Module):
         # Iterate over the time steps
         for t in range(self.num_steps):
             # Concatenate the input features and latent features
-            #pdb.set_trace()
             combined_features = torch.cat((x, z), dim=2)
             output_decoder, self.hidden_decoder = self.decoder_lstm(combined_features, self.hidden_decoder)
             
@@ -231,8 +229,7 @@ class LSTM_VAE_delta(torch.nn.Module):
         return (hidden_cell, state_cell)
     
     def encoder(self, x):
-        hidden_encoder = self.init_hidden(self.batch_size) 
-        #pdb.set_trace()
+        hidden_encoder = self.init_hidden(self.batch_size)
         output_encoder, hidden_encoder = self.encoder_lstm(x, hidden_encoder)
         
         # Extimate the mean and the variance of q(z|x)
@@ -263,7 +260,6 @@ class LSTM_VAE_delta(torch.nn.Module):
         # Iterate over the time steps
         for t in range(self.num_steps):
             # Concatenate the input features and latent features
-            #pdb.set_trace()
             combined_features = torch.cat((x, z), dim=2)
             output_decoder, self.hidden_decoder = self.decoder_lstm(combined_features, self.hidden_decoder)
             
@@ -371,7 +367,6 @@ class TRAJ_VAE(torch.nn.Module):
         # Iterate over the time steps
         for t in range(self.num_steps):
             # Concatenate the input features and latent features
-            #pdb.set_trace()
             combined_features = torch.cat((x, z), dim=2)
             output_decoder, self.hidden_decoder = self.decoder_lstm(combined_features, self.hidden_decoder)
             
@@ -491,6 +486,7 @@ class SEQ_VAE(torch.nn.Module):
 RSSMDiscState = namedtuple('RSSMDiscState', ['logit', 'stoch', 'deter'])
 RSSMContState = namedtuple('RSSMContState', ['mean', 'std', 'stoch', 'deter']) 
     
+
 class RSSM(nn.Module):
     def __init__(self, config):
         super(RSSM, self).__init__()
@@ -690,8 +686,7 @@ class TRAJ_VAE_delta(torch.nn.Module):
         return (hidden_cell, state_cell)
     
     def encoder(self, x):
-        hidden_encoder = self.init_hidden(self.batch_size) 
-        #pdb.set_trace()
+        hidden_encoder = self.init_hidden(self.batch_size)
         output_encoder, hidden_encoder = self.encoder_lstm(x, hidden_encoder)
         
         # Extimate the mean and the variance of q(z|x)
@@ -723,7 +718,6 @@ class TRAJ_VAE_delta(torch.nn.Module):
         # Don't compute difference for last time step because we can't supervise on it
         for t in range(self.num_steps-1):
             # Concatenate the input features and latent features
-            #pdb.set_trace()
             combined_features = torch.cat((x, z), dim=2)
             output_decoder, self.hidden_decoder = self.decoder_lstm(combined_features, self.hidden_decoder)
             
@@ -1013,6 +1007,7 @@ class DreamerV2(nn.Module):
         return x_hat
     
     def loss(self, x):
+        breakpoint()
         # Encoder
         prior, post = self.encoder(x)
         
@@ -1525,31 +1520,6 @@ class TransformerMSPredictor(nn.Module):
         loss = ((x_supervise - x_hat)**2).sum()
         
         return loss
-    
-    # def loss(self, x, context_length, rollout_length, mask_type):
-    #     src = x[:,:context_length,:]
-    #     t_end = context_length + rollout_length
-    #     if mask_type == 'triangular':
-    #         # shift the tgt by one so we predict the token at pos +1
-    #         tgt = x[:,context_length:(t_end-1),:]
-    #         x_supervise = x[:,(context_length+1):t_end,:]
-    #     elif mask_type == 'square':
-    #         x_supervise = x[:,context_length:t_end,:]
-    #         # feed in a tensor of zeros as the target
-    #         tgt = torch.zeros_like(x_supervise)
-    #     tgt_length = tgt.size(1)
-    #     tgt_mask = self.get_tgt_mask(tgt_length, mask_type='triangular').to(self.device)
-    #     # TEST - add N * num_heads dimensions https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html
-    #     batch_size = x.size(0)
-    #     tgt_mask = tgt_mask.unsqueeze(0)
-    #     tgt_mask = tgt_mask.expand(batch_size*self.num_heads, -1, -1)
-    #     x_hat = self.forward(src, tgt, tgt_mask)
-    #     # Permute pred to have batch size first again
-    #     x_hat = x_hat.permute(1, 0, 2)   
-        
-    #     loss = ((x_supervise - x_hat)**2).sum()
-        
-    #     return loss
     
     
 class TransformerWorldModel(nn.Module):

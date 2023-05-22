@@ -8,17 +8,10 @@ Created on Mon Feb  6 12:00:58 2023
 import json
 import os
 import pickle
-import platform
-import torch
+import pandas as pd
+import matplotlib.pylab as plt
+import seaborn as sns
 
-if platform.system() == 'Windows':
-    # We are running on Windows
-    analysis_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/'
-    checkpoint_dir = analysis_dir
-elif platform.system() == 'Linux':
-    # We are running on Linux
-    analysis_dir = '/home/locross/SocialWorldModeling/'
-    checkpoint_dir = '/mnt/fs2/locross/analysis/'
     
 data_columns = ['obj0_x', 'obj0_y', 'obj0_z', 'obj1_x', 'obj1_y', 'obj1_z', 'obj2_x',
        'obj2_y', 'obj2_z', 'agent0_x', 'agent0_y', 'agent0_z', 'agent0_rot_x',
@@ -26,35 +19,11 @@ data_columns = ['obj0_x', 'obj0_y', 'obj0_z', 'obj1_x', 'obj1_y', 'obj1_z', 'obj
        'agent1_z', 'agent1_rot_x', 'agent1_rot_y', 'agent1_rot_z',
        'agent1_rot_w'] 
 
+
 def load_config(file):
     with open(file) as f:
         config = json.load(f)
     return config
-
-
-def load_trained_model(model_info, device='cpu'):
-    model_class = model_info['class']
-    # load config and initialize model class
-    config_file = os.path.join(analysis_dir, 'models/configs/',model_info['config'])
-    config = load_config(config_file)
-    model = model_class(config)
-    # load checkpoint weights
-    # checkpoints are in folder named after model
-    model_dir = os.path.join(checkpoint_dir, 'models', model_info['model_dir'])
-    if 'epoch' in model_info:
-        model_file_name = os.path.join(model_dir, model_info['model_dir']+'_epoch'+model_info['epoch'])
-        model.load_state_dict(torch.load(model_file_name))
-        print('Loading model',model_file_name)
-    else:
-        latest_checkpoint, _ =  get_highest_numbered_file(model_info['model_dir'], model_dir)
-        print('Loading from last checkpoint',latest_checkpoint)
-        model.load_state_dict(torch.load(latest_checkpoint))
-
-    model.eval()
-    model.device = device
-    model.to(device)
-        
-    return model
 
 
 def get_highest_numbered_file(model_filename, directory):
@@ -68,3 +37,25 @@ def get_highest_numbered_file(model_filename, directory):
                 highest_numbered_file = os.path.join(directory, filename)
     assert highest_number > -1,'No checkpoints found'
     return highest_numbered_file, highest_number
+
+
+# @TODO plot functions here
+# @TODO will need more work depending on the evaluation type
+def plot_results(result_file):
+    df_plot = pd.read_csv(result_file)
+    # Plot the results using seaborn
+    fig = plt.figure()
+    sns.barplot(x='Model', y='Score', data=df_plot) 
+    plt.title('Evaluate Single Goal Events From Forward Rollouts', fontsize=14)
+    plt.xlabel('Model Name', fontsize=16) 
+    plt.ylabel('Accuracy', fontsize=16)
+    plt.ylim([0, 1])
+    save_name = os.path.basename(result_file).split('.')[0]
+    plt.savefig(f'{save_name}_acc.png', dpi=300, bbox_inches='tight')
+    plt.show()
+
+    fig = sns.barplot(x='Model', y='MSE', data=df_plot) 
+    plt.title('Prediction Error of Goal Events in Imagination', fontsize=18)
+    plt.xlabel('Model Name', fontsize=16) 
+    plt.ylabel('MSE', fontsize=16)
+    plt.savefig(f'{save_name}_mse.png', dpi=300, bbox_inches='tight')
