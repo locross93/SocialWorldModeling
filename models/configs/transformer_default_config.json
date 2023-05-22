@@ -1,8 +1,0 @@
-{
-"input_size": 23,
- "embedding_size": 512,
- "num_heads": 4,
- "num_encoder_layers": 2,
- "num_decoder_layers": 2,
- "model_type": "transformer_mp"
- }

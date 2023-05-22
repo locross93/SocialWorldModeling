@@ -29,9 +29,18 @@ model_dict = MODEL_DICT_TRAIN
 def load_args():
     parser = argparse.ArgumentParser()
     # general pipeline parameters
-    parser.add_argument('--analysis_dir', type=str, default=DEFAULT_VALUES['analysis_dir'], help='Analysis directory')
-    parser.add_argument('--data_dir', type=str, default=DEFAULT_VALUES['data_dir'], help='Data directory')
-    parser.add_argument('--checkpoint_dir', type=str, default=DEFAULT_VALUES['checkpoint_dir'], help='Checkpoint directory')
+    parser.add_argument('--model_config_dir', type=str, action='store',
+                        default=DEFAULT_VALUES['model_config_dir'],
+                        help='Model config directory')
+    parser.add_argument('--analysis_dir', type=str, action='store',
+                        default=DEFAULT_VALUES['analysis_dir'], 
+                        help='Analysis directory')
+    parser.add_argument('--data_dir', type=str,
+                         default=DEFAULT_VALUES['data_dir'], 
+                         help='Data directory')
+    parser.add_argument('--checkpoint_dir', type=str, 
+                        default=DEFAULT_VALUES['checkpoint_dir'], 
+                        help='Checkpoint directory')
     # general training parameters
     parser.add_argument('--model', type=str, required=True, help='Model to use for training')
     parser.add_argument('--config', type=str, required=True, help='Config JSON file')
@@ -68,7 +77,7 @@ def save_config(config, filename):
 
 def main():
     args = load_args()
-    config = load_config(os.path.join(args.analysis_dir, 'models/configs/', args.config))
+    config = load_config(os.path.join(args.model_config_dir, args.config))
     
     # Update config with args and keep track of overridden parameters
     overridden_parameters = []
@@ -89,7 +98,7 @@ def main():
     
     # If parameters overwritte, save updated config to new file
     if len(overridden_parameters) > 0:
-        new_config_filename = os.path.join(args.analysis_dir, 'models/configs/', f"{model_filename}_{'_'.join(overridden_parameters)}.json")
+        new_config_filename = os.path.join(args.model_config_dir, f"{model_filename}_{'_'.join(overridden_parameters)}.json")
         save_config(config, new_config_filename)
     
     # Check that we are using GPU
@@ -194,7 +203,7 @@ def main():
             writer.add_scalar('Train Loss/kl_loss', np.sum(batch_kl_loss), epoch)
         if epoch % args.save_every == 0 or epoch == (args.epochs-1):
             # save checkpoints in checkpoint directory with plenty of storage
-            save_dir = os.path.join(args.checkpoint_dir, 'models/', model_filename)
+            save_dir = os.path.join(args.checkpoint_dir, 'models', model_filename)
             if not os.path.exists(save_dir):
                 os.makedirs(save_dir)
             model_name = os.path.join(save_dir, f'{model_filename}_epoch{epoch}')
