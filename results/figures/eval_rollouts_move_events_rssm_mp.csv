@@ -1,0 +1,4 @@
+,Model,Metric,Score
+0,Transformer,Accuracy,0.4190954773869347
+1,Transformer,Precision,0.4179254783484391
+2,Transformer,Recall,1.0

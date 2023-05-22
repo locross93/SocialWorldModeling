@@ -7,6 +7,7 @@ Created on Tue May  9 14:06:24 2023
 
 # example usage: python train_world_model.py --model dreamerv2 --config rssm_disc_default_config.json --dec_hidden_size 512
 # python train_world_model.py --model multistep_predictor --config multistep_predictor_default_config.json --mlp_hidden_size 512
+# python train_world_model.py --model transformer_wm --config transformer_wm_default_config.json
 
 import os
 import json
@@ -82,7 +83,7 @@ def main():
     # Update config with args and keep track of overridden parameters
     overridden_parameters = []
     for k, v in vars(args).items():
-        if v is not None and k in config:
+        if v is not None and k in config and config[k] != v:
             config[k] = v
             overridden_parameters.append(f"{k}_{v}")
             print(f"{k}_{v}")
@@ -118,8 +119,10 @@ def main():
     sequence_length = burn_in_length + rollout_length
     replay_buffer = ReplayBuffer(sequence_length)
     replay_buffer.upload_training_set(train_data)
+    if args.batch_size:
+        batch_size = args.batch_size
     if platform.system() == 'Windows':
-        batch_size = 64
+        batch_size = 32
     elif platform.system() == 'Linux':
         batch_size = 256
     print(f'Batch size: {batch_size}')
@@ -165,7 +168,7 @@ def main():
             batch_x = batch_x.to(DEVICE)
             nsamples += batch_x.shape[0]
             opt.zero_grad()
-            if config['model_type'][:4] == 'rssm':
+            if config['model_type'][:4] == 'rssm' or config['model_type'] == 'transformer_wm':
                 loss = model.loss(batch_x)
             elif config['model_type'] == 'multistep_predictor':
                 loss = model.loss(batch_x, burn_in_length, rollout_length)
@@ -187,7 +190,7 @@ def main():
         # test on validation set
         with torch.no_grad():
             model.eval()
-            if config['model_type'][:4] == 'rssm':
+            if config['model_type'][:4] == 'rssm' or config['model_type'] == 'transformer_wm':
                 val_loss = model.loss(val_trajs)
             elif config['model_type'] == 'multistep_predictor':
                 val_loss = model.loss(val_trajs, burn_in_length, rollout_length)

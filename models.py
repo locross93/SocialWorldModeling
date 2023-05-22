@@ -1495,45 +1495,149 @@ class TransformerMSPredictor(nn.Module):
         
         return mask
     
-    def forward_rollout(self, x, context_length, rollout_length, mask_type):
+    def forward_rollout(self, x, context_length, rollout_length):
         src = x[:,:context_length,:]
-        t_end = context_length + rollout_length
-        if mask_type == 'triangular':
-            # shift the tgt by one so we predict the token at pos +1
-            tgt = x[:,context_length:(t_end-1),:]
-            x_supervise = x[:,(context_length+1):t_end,:]
-        elif mask_type == 'square':
-            x_supervise = x[:,context_length:t_end,:]
-            # feed in a tensor of zeros as the target
-            tgt = torch.zeros_like(x_supervise)
-        tgt_length = tgt.size(1)
-        tgt_mask = self.get_tgt_mask(tgt_length, mask_type='triangular').to(self.device)
-        x_hat = self.forward(src, tgt, tgt_mask)
-        # Permute pred to have batch size first again
-        x_hat = x_hat.permute(1, 0, 2) 
+        # Tensor to hold predictions
+        x_hat = torch.zeros(x.shape[0], rollout_length, x.shape[2]).to(x.device)
+
+        for i in range(rollout_length):
+            # Use transformer to predict next step, use the last step of context as the tgt
+            out = self.forward(src, src[:,-1,:].unsqueeze(1))
+            # Permute pred to have batch size first again
+            out = out.permute(1, 0, 2)  
+            # Append prediction to predictions tensor
+            x_hat[:,i,:] = out.squeeze(1)
+            # Append prediction to context for next prediction
+            src = torch.cat((src, out), dim=1)
         
         return x_hat
     
     def loss(self, x, context_length, rollout_length, mask_type):
-        src = x[:,:context_length,:]
+        x_hat = self.forward_rollout(x, context_length, rollout_length)  
         t_end = context_length + rollout_length
-        if mask_type == 'triangular':
-            # shift the tgt by one so we predict the token at pos +1
-            tgt = x[:,context_length:(t_end-1),:]
-            x_supervise = x[:,(context_length+1):t_end,:]
-        elif mask_type == 'square':
-            x_supervise = x[:,context_length:t_end,:]
-            # feed in a tensor of zeros as the target
-            tgt = torch.zeros_like(x_supervise)
-        tgt_length = tgt.size(1)
-        tgt_mask = self.get_tgt_mask(tgt_length, mask_type='triangular').to(self.device)
-        # TEST - add N * num_heads dimensions https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html
-        batch_size = x.size(0)
-        tgt_mask = tgt_mask.unsqueeze(0)
-        tgt_mask = tgt_mask.expand(batch_size*self.num_heads, -1, -1)
-        x_hat = self.forward(src, tgt, tgt_mask)
+        x_supervise = x[:,context_length:t_end,:]
+        
+        loss = ((x_supervise - x_hat)**2).sum()
+        
+        return loss
+    
+    # def loss(self, x, context_length, rollout_length, mask_type):
+    #     src = x[:,:context_length,:]
+    #     t_end = context_length + rollout_length
+    #     if mask_type == 'triangular':
+    #         # shift the tgt by one so we predict the token at pos +1
+    #         tgt = x[:,context_length:(t_end-1),:]
+    #         x_supervise = x[:,(context_length+1):t_end,:]
+    #     elif mask_type == 'square':
+    #         x_supervise = x[:,context_length:t_end,:]
+    #         # feed in a tensor of zeros as the target
+    #         tgt = torch.zeros_like(x_supervise)
+    #     tgt_length = tgt.size(1)
+    #     tgt_mask = self.get_tgt_mask(tgt_length, mask_type='triangular').to(self.device)
+    #     # TEST - add N * num_heads dimensions https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html
+    #     batch_size = x.size(0)
+    #     tgt_mask = tgt_mask.unsqueeze(0)
+    #     tgt_mask = tgt_mask.expand(batch_size*self.num_heads, -1, -1)
+    #     x_hat = self.forward(src, tgt, tgt_mask)
+    #     # Permute pred to have batch size first again
+    #     x_hat = x_hat.permute(1, 0, 2)   
+        
+    #     loss = ((x_supervise - x_hat)**2).sum()
+        
+    #     return loss
+    
+    
+class TransformerWorldModel(nn.Module):
+    def __init__(self, config):
+        super(TransformerWorldModel, self).__init__()
+        self.input_size = config['input_size']
+        self.embedding_size = config['embedding_size']
+        self.num_heads = config['num_heads']
+        self.encoder_hidden_size = config['encoder_hidden_size']
+        self.num_encoder_layers = config['num_encoder_layers']
+        self.num_decoder_layers = config['num_decoder_layers']
+        self.decoder_hidden_size = config['decoder_hidden_size']
+        self.dropout_p = 0.1
+        self.context_length = config['context_length']
+        self.rollout_length = config['rollout_length']
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        
+        # LAYERS
+        #self.embedding = nn.Embedding(self.input_size, self.embedding_size)
+        self.embedding = nn.Linear(self.input_size, self.embedding_size)
+        self.positional_encoder = PositionalEncoding(
+            dim_model=self.embedding_size, dropout_p=self.dropout_p, max_len=5000
+        )
+        encoder_layers = nn.TransformerEncoderLayer(self.embedding_size, self.num_heads, self.encoder_hidden_size, self.dropout_p)
+        self.transformer_encoder = nn.TransformerEncoder(encoder_layers, self.num_encoder_layers)
+        self.decoder = self.build_mlp(self.num_decoder_layers, self.embedding_size*self.context_length, self.decoder_hidden_size, self.input_size*self.rollout_length, nn.ReLU)
+    
+    def build_mlp(self, num_layers, input_size, node_size, output_size, activation):
+        model = [nn.Linear(input_size, node_size)]
+        model += [activation()]
+        for i in range(num_layers-1):
+            model += [nn.Linear(node_size, node_size)]
+            model += [activation()]
+        model += [nn.Linear(node_size, output_size)]
+        return nn.Sequential(*model)
+    
+    def forward(self, src):
+        # Src size must be (batch_size, src sequence length)
+        # Tgt size must be (batch_size, tgt sequence length)
+
+        # Embedding + positional encoding - Out size = (batch_size, sequence length, dim_model)
+        src = self.embedding(src) * math.sqrt(self.embedding_size)
+        src = self.positional_encoder(src)
+        
+        # We could use the parameter batch_first=True, but our KDL version doesn't support it yet, so we permute
+        # to obtain size (sequence length, batch_size, dim_model),
+        src = src.permute(1,0,2)
+
+        # Transformer blocks - Out size = (sequence length, batch_size, num_tokens)
+        transformer_out = self.transformer_encoder(src)
         # Permute pred to have batch size first again
-        x_hat = x_hat.permute(1, 0, 2)   
+        transformer_out = transformer_out.permute(1, 0, 2)
+        decoder_input = transformer_out.reshape(transformer_out.shape[0], -1)
+        out = self.decoder(decoder_input)
+        out = out.reshape(out.shape[0], self.rollout_length, self.input_size)
+        
+        return out
+    
+    def forward_rollout(self, x):
+        src = x[:,:self.context_length,:]
+        x_hat = self.forward(src)
+        
+        return x_hat
+    
+    def variable_length_rollout(self, x, context_length, rollout_length):
+        sequence_length = context_length + rollout_length
+        # only input obs from x up to context_length
+        src = x[:,:context_length,:]
+
+        # generate predictions until 
+        while src.size(1) < sequence_length:
+            if src.size(1) < self.context_length:
+                # if context is less than the model's context length, pad the beginning with zeros
+                zero_padding = torch.zeros(src.size(0), self.context_length - src.size(1), src.size(2)).to(x.device)
+                src_temp = torch.cat((zero_padding, src), dim=1)
+                out = self.forward(src_temp)
+            elif src.size(1) > self.context_length:
+                # use the last 50 steps
+                out = self.forward(src[:,-self.context_length:,:])
+            else:
+                out = self.forward(src)
+            # Append prediction to context for next prediction
+            src = torch.cat((src, out), dim=1)
+        x_hat = src[:,context_length:sequence_length,:]
+        
+        assert x_hat.size(1) == rollout_length
+        
+        return x_hat
+    
+    def loss(self, x):
+        x_hat = self.forward_rollout(x)  
+        t_end = self.context_length + self.rollout_length
+        x_supervise = x[:,self.context_length:t_end,:]
         
         loss = ((x_supervise - x_hat)**2).sum()
         

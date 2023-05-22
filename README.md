@@ -42,8 +42,9 @@ The evaluation pipeline contains various tests on validation data, to probe the 
 2. Simulating events in forward rollouts 
     1. Evaluate single goal events - eval_rollouts_goal_events.py
     2. Evaluate multi goal events - eval_rollouts_multigoal_events.py
-    2. Evaluate move events
+    2. Evaluate move events - eval_rollouts_move_events.py
     3. Evaluate pick up events
+3. Visualizing forward rollouts - visualize_model_rollouts.py
 
 In each evaluation file, specify the models you want to test in a dictionary of dicts, model_dict. Here's an example of what this might look like:
 
