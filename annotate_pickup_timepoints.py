@@ -15,25 +15,9 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 from functools import reduce
 from annotate_goal_timepoints import eval_recon_goals
 
-if platform.system() == 'Windows':
-    # We are running on Windows
-    analysis_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/'
-    data_dir = '/Users/locro/Documents/Stanford/analysis/data/'
-    checkpoint_dir = analysis_dir
-elif platform.system() == 'Linux':
-    # We are running on Linux
-    analysis_dir = '/home/locross/SocialWorldModeling/'
-    data_dir = '/home/locross/analysis/data/'
-    checkpoint_dir = '/mnt/fs2/locross/analysis/'
-    
-os.chdir(analysis_dir)
 
-
-def annotate_pickup_timepoints(train_or_val='val', pickup_or_move='move'):
-    # load data
-    data_file = data_dir+'train_test_splits_3D_dataset.pkl'
-    with open(data_file, 'rb') as f:
-        loaded_dataset = pickle.load(f)
+def annotate_pickup_timepoints(loaded_dataset, train_or_val='val', pickup_or_move='move'):
+    # load train and val dataset
     train_dataset, test_dataset = loaded_dataset
     
     if train_or_val == 'train':
@@ -127,24 +111,23 @@ def detect_object_move_timepoint(trial_obj_pos, move_thr=0.1):
     index = -1
     # loop through the array elements, ignoring first 5 steps where movement sometimes occurs
     for i in range(5, len(obj_pos_delta_sum)):
-    	# check if the element is greater than 1e-5
-    	if obj_pos_delta_sum[i] > (move_thr / trial_obj_pos.shape[0]):
-    		# increment the counter
-    		count += 1
-    		# check if the counter is equal to 2
-    		if count == 2:
-    			# store the index of the first element of the consecutive values
-    			index = i - 1
-    		# check if the counter is greater than 2
-    		elif count > 2:
-    			# return the index of the first element of the consecutive values
-    			break
-    	else:
-    		# reset the counter to zero
-    		count = 0
-            
-    total_movement = obj_pos_delta_sum.sum()
+        # check if the element is greater than 1e-5
+        if obj_pos_delta_sum[i] > (move_thr / trial_obj_pos.shape[0]):
+            # # increment the counter
+            count += 1
+            # check if the counter is equal to 2
+            if count == 2:
+                # store the index of the first element of the consecutive values
+                index = i - 1
+            # check if the counter is greater than 2
+            elif count > 2:
+                # return the index of the first element of the consecutive values
+                break
+        else:
+            # reset the counter to zero
+            count = 0
     
+    total_movement = obj_pos_delta_sum.sum()    
     if total_movement > move_thr:
         return 1, index
     else:

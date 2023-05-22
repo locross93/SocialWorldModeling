@@ -13,18 +13,6 @@ import platform
 from scipy.spatial import distance
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
-if platform.system() == 'Windows':
-    # We are running on Windows
-    analysis_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/'
-    data_dir = '/Users/locro/Documents/Stanford/analysis/data/'
-    checkpoint_dir = analysis_dir
-elif platform.system() == 'Linux':
-    # We are running on Linux
-    analysis_dir = '/home/locross/SocialWorldModeling/'
-    data_dir = '/home/locross/analysis/data/'
-    checkpoint_dir = '/mnt/fs2/locross/analysis/'
-    
-os.chdir(analysis_dir)
 
 def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_location=True, plot=True):
     if input_matrices.shape[1:] != (300, 23):
@@ -129,11 +117,9 @@ def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_locati
     
     return scores, y_labels, y_recon
 
-def annotate_goal_timepoints(train_or_val='val'):
-    # load data
-    data_file = data_dir+'train_test_splits_3D_dataset.pkl'
-    with open(data_file, 'rb') as f:
-        loaded_dataset = pickle.load(f)
+
+def annotate_goal_timepoints(loaded_dataset, train_or_val='val'):
+    # load train and val dataset
     train_dataset, test_dataset = loaded_dataset
     
     if train_or_val == 'train':

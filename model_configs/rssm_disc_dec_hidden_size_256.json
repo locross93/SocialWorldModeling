@@ -1,0 +1,10 @@
+{
+    "input_size": 23,
+    "deter_size": 1024,
+    "dec_hidden_size": 256,
+    "rssm_type": "discrete",
+    "rnn_type": "GRU",
+    "category_size": 32,
+    "class_size": 32,
+    "model_type": "rssm_disc"
+}
