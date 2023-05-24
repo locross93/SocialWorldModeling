@@ -17,7 +17,7 @@ from typing import List, Tuple, Dict, Any
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 
-from constants import DEFAULT_VALUES, MODEL_DICT_VAL
+from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL
 from analysis_utils import load_config, get_highest_numbered_file
 from models import DreamerV2
 from annotate_pickup_timepoints import annotate_pickup_timepoints

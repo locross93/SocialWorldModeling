@@ -1007,7 +1007,6 @@ class DreamerV2(nn.Module):
         return x_hat
     
     def loss(self, x):
-        breakpoint()
         # Encoder
         prior, post = self.encoder(x)
         
