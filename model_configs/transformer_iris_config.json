@@ -1,0 +1,15 @@
+{
+    "model_type": "transformer_iris",
+    "obs_size": 23,
+    "tokens_per_block": 100,
+    "max_blocks": 10,
+    "attention": "causal",
+
+    "num_layers": 4,
+    "num_heads": 8,
+    "embed_dim": 512,
+
+    "embed_pdrop": 0.5,
+    "resid_pdrop": 0.5,
+    "attn_pdrop": 0.5
+}

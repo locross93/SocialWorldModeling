@@ -43,8 +43,10 @@ def load_args():
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
     # general training parameters
+    # @TODO put all these into constatns
     parser.add_argument('--model', type=str, required=True, help='Model to use for training')
     parser.add_argument('--config', type=str, required=True, help='Config JSON file')
+    parser.add_argument('--batch_size', type=int, default=128, help='Batch size')
     parser.add_argument('--model_filename', type=str, default=None, help='Filename for saving model')
     parser.add_argument('--lr', type=float, default=1e-4, help='Learning Rate')
     parser.add_argument('--epochs', type=int, default=int(1e5), help='Epochs')
@@ -104,7 +106,7 @@ def main():
     
     # Check that we are using GPU
     DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print(DEVICE)
+    print(f'Using device: {DEVICE}')
 
     # load data
     data_file = os.path.join(args.data_dir, 'train_test_splits_3D_dataset.pkl')
@@ -118,13 +120,9 @@ def main():
     rollout_length = args.rollout_length
     sequence_length = burn_in_length + rollout_length
     replay_buffer = ReplayBuffer(sequence_length)
-    replay_buffer.upload_training_set(train_data)
-    if args.batch_size:
-        batch_size = args.batch_size
-    if platform.system() == 'Windows':
-        batch_size = 32
-    elif platform.system() == 'Linux':
-        batch_size = 256
+    replay_buffer.upload_training_set(train_data)    
+    batch_size = args.batch_size
+    
     print(f'Batch size: {batch_size}')
     batches_per_epoch = replay_buffer.buffer_size // batch_size
     
@@ -168,7 +166,8 @@ def main():
             batch_x = batch_x.to(DEVICE)
             nsamples += batch_x.shape[0]
             opt.zero_grad()
-            if config['model_type'][:4] == 'rssm' or config['model_type'] == 'transformer_wm':
+            if config['model_type'][:4] == 'rssm' or \
+                config['model_type'] in ['transformer_wm', 'transformer_iris']:
                 loss = model.loss(batch_x)
             elif config['model_type'] == 'multistep_predictor':
                 loss = model.loss(batch_x, burn_in_length, rollout_length)
@@ -190,7 +189,7 @@ def main():
         # test on validation set
         with torch.no_grad():
             model.eval()
-            if config['model_type'][:4] == 'rssm' or config['model_type'] == 'transformer_wm':
+            if config['model_type'][:4] == 'rssm' or config['model_type'] in ['transformer_wm', 'transformer_iris']:
                 val_loss = model.loss(val_trajs)
             elif config['model_type'] == 'multistep_predictor':
                 val_loss = model.loss(val_trajs, burn_in_length, rollout_length)

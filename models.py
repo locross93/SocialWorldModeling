@@ -6,6 +6,7 @@ Created on Wed Nov 16 15:09:25 2022
 """
 
 from collections import namedtuple
+from typing import Tuple, Dict
 import math
 import numpy as np
 import torch
@@ -1007,7 +1008,6 @@ class DreamerV2(nn.Module):
         return x_hat
     
     def loss(self, x):
-        breakpoint()
         # Encoder
         prior, post = self.encoder(x)
         
@@ -2084,3 +2084,247 @@ class RND(nn.Module):
         loss = ((target_out - pred_out)**2).sum()
         
         return loss
+
+
+""" Tranformer world model adapted from IRIS(https://github.com/eloialonso/iris/blob/main/src/models/world_model.py) """
+from dataclasses import dataclass
+import math
+from typing import Optional
+
+from einops import rearrange
+from kv_caching import KeysValues, KVCache
+
+" Some util functions for the world model "
+def init_weights(module):
+    if isinstance(module, (nn.Linear, nn.Embedding)):
+        module.weight.data.normal_(mean=0.0, std=0.02)
+        if isinstance(module, nn.Linear) and module.bias is not None:
+            module.bias.data.zero_()
+    elif isinstance(module, nn.LayerNorm):
+        module.bias.data.zero_()
+        module.weight.data.fill_(1.0)
+
+
+class LossWithIntermediateLosses:
+    def __init__(self, **kwargs):
+        self.loss_total = sum(kwargs.values())
+        self.intermediate_losses = {k: v.item() for k, v in kwargs.items()}
+
+    def __truediv__(self, value):
+        for k, v in self.intermediate_losses.items():
+            self.intermediate_losses[k] = v / value
+        self.loss_total = self.loss_total / value
+        return self
+    
+
+" main transformer block "
+class Block(nn.Module):
+    def __init__(self, config: Dict) -> None:
+        super().__init__()
+        embed_dim = config['embed_dim']
+        self.ln1 = nn.LayerNorm(embed_dim)
+        self.ln2 = nn.LayerNorm(embed_dim)
+        self.attn = SelfAttention(config)
+        self.mlp = nn.Sequential(
+            nn.Linear(embed_dim, 4 * embed_dim),
+            nn.GELU(),
+            nn.Linear(4 * embed_dim, embed_dim),
+            nn.Dropout(config['resid_pdrop']),
+        )
+
+    def forward(self, x: torch.Tensor, past_keys_values: Optional[KeysValues] = None) -> torch.Tensor:
+        x_attn = self.attn(self.ln1(x), past_keys_values)
+        x = x + x_attn
+        x = x + self.mlp(self.ln2(x))
+        return x
+    
+
+class SelfAttention(nn.Module):
+    def __init__(self, config: Dict) -> None:
+        super().__init__()
+        embed_dim = config['embed_dim']
+        assert embed_dim % config['num_heads'] == 0
+        assert config['attention'] in ('causal', 'block_causal')
+        self.num_heads = config['num_heads']
+        self.key = nn.Linear(embed_dim, embed_dim)
+        self.query = nn.Linear(embed_dim, embed_dim)
+        self.value = nn.Linear(embed_dim, embed_dim)
+        self.attn_drop = nn.Dropout(config['attn_pdrop'])
+        self.resid_drop = nn.Dropout(config['resid_pdrop'])
+        self.proj = nn.Linear(embed_dim, embed_dim)
+
+        causal_mask = torch.tril(torch.ones(config['max_tokens'], config['max_tokens']))        
+        block_causal_mask = torch.max(causal_mask, torch.block_diag(*[torch.ones(config['tokens_per_block'], config['tokens_per_block']) for _ in range(config['max_blocks'])]))
+        self.register_buffer('mask', causal_mask if config['attention'] == 'causal' else block_causal_mask)
+
+    def forward(self, x: torch.Tensor, kv_cache: Optional[KVCache] = None) -> torch.Tensor:
+        B, T, C = x.size()
+        if kv_cache is not None:
+            b, nh, L, c = kv_cache.shape
+            assert nh == self.num_heads and b == B and c * nh == C
+        else:
+            L = 0
+
+        q = self.query(x).view(B, T, self.num_heads, C // self.num_heads).transpose(1, 2)   # (B, nh, T, hs)
+        k = self.key(x).view(B, T, self.num_heads, C // self.num_heads).transpose(1, 2)     # (B, nh, T, hs)
+        v = self.value(x).view(B, T, self.num_heads, C // self.num_heads).transpose(1, 2)   # (B, nh, T, hs)
+
+        if kv_cache is not None:
+            kv_cache.update(k, v)
+            k, v = kv_cache.get()
+
+        att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
+        att = att.masked_fill(self.mask[L:L + T, :L + T] == 0, float('-inf'))
+        att = F.softmax(att, dim=-1)
+        att = self.attn_drop(att)
+        y = att @ v
+        y = rearrange(y, 'b h t e -> b t (h e)')
+
+        y = self.resid_drop(self.proj(y))
+
+        return y
+    
+
+class Transformer(nn.Module):
+    def __init__(self, config: Dict) -> None:
+        super().__init__()
+        config['max_tokens'] = config['tokens_per_block'] * config['max_blocks']
+        self.config = config
+        self.drop = nn.Dropout(config["embed_pdrop"])
+        self.blocks = nn.ModuleList([Block(config) for _ in range(config['num_layers'])])
+        self.ln_f = nn.LayerNorm(config['embed_dim'])
+
+    def generate_empty_keys_values(self, n: int, max_tokens: int) -> KeysValues:
+        device = self.ln_f.weight.device  # Assumption that all submodules are on the same device
+        return KeysValues(n, self.config['num_heads'], max_tokens, self.config['embed_dim'], self.config['num_layers'], device)
+
+    def forward(self, sequences: torch.Tensor, past_keys_values: Optional[KeysValues] = None) -> torch.Tensor:
+        assert past_keys_values is None or len(past_keys_values) == len(self.blocks)        
+        x = self.drop(sequences)        
+        for i, block in enumerate(self.blocks):
+            x = block(x, None if past_keys_values is None else past_keys_values[i])
+
+        x = self.ln_f(x)
+        return x
+
+
+
+" Head to convert encoded sequence to logits "
+class Slicer(nn.Module):
+    def __init__(self, max_blocks: int, block_mask: torch.Tensor) -> None:
+        super().__init__()
+        self.block_size = block_mask.size(0)
+        self.num_kept_tokens = block_mask.sum().long().item()
+        kept_indices = torch.where(block_mask)[0].repeat(max_blocks)
+        offsets = torch.arange(max_blocks).repeat_interleave(self.num_kept_tokens)
+        self.register_buffer('indices', kept_indices + block_mask.size(0) * offsets)
+
+    def compute_slice(self, num_steps: int, prev_steps: int = 0) -> torch.Tensor:
+        total_steps = num_steps + prev_steps
+        num_blocks = math.ceil(total_steps / self.block_size)
+        indices = self.indices[:num_blocks * self.num_kept_tokens]        
+        return indices[torch.logical_and(prev_steps <= indices, indices < total_steps)] - prev_steps
+
+    def forward(self, *args, **kwargs):
+        raise NotImplementedError
+
+
+class Head(Slicer):
+    def __init__(self, max_blocks: int, block_mask: torch.Tensor, head_module: nn.Module) -> None:
+        super().__init__(max_blocks, block_mask)
+        assert isinstance(head_module, nn.Module)
+        self.head_module = head_module
+
+    def forward(self, x: torch.Tensor, num_steps: int, prev_steps: int) -> torch.Tensor:
+        #x_sliced = x[:, self.compute_slice(num_steps, prev_steps)]  # x is (B, T, E)        
+        #return self.head_module(x_sliced)
+        return self.head_module(x)
+
+
+
+" World model "
+@dataclass
+class WorldModelOutput:
+    output_embedding: torch.FloatTensor
+    output_observations: torch.FloatTensor
+
+
+class EmbeddingModule(nn.Module):
+    def __init__(self, feat_dim, emb_dim):
+        super().__init__()
+        self.linear = nn.Linear(feat_dim, emb_dim)
+        self.layer_norm = nn.LayerNorm(emb_dim)
+
+    def forward(self, x):
+        bs, ts, fs = x.shape
+        x = x.reshape(-1, fs)
+        x = self.linear(x)
+        x = self.layer_norm(x)
+        x = x.reshape(bs, ts, -1)
+        return x
+    
+
+class TransformerIrisWorldModel(nn.Module):
+    def __init__(self, config: Dict) -> None:
+        super().__init__()
+        self.config = config
+        self.embed = EmbeddingModule(config['obs_size'], config['embed_dim'])
+        self.transformer = Transformer(config)
+
+        all_but_last_obs_tokens_pattern = torch.ones(config['tokens_per_block'])
+        all_but_last_obs_tokens_pattern[-2] = 0
+
+        self.head_observations = Head(
+            max_blocks=config['max_blocks'],
+            block_mask=all_but_last_obs_tokens_pattern,
+            head_module=nn.Sequential(
+                nn.Linear(config['embed_dim'], config['embed_dim']),
+                nn.ReLU(),
+                nn.Linear(config['embed_dim'], config['obs_size'])
+            )
+        )
+
+        self.apply(init_weights)
+
+    def __repr__(self) -> str:
+        return "world_model"
+        
+    def forward(self, obs: torch.LongTensor, past_keys_values: Optional[KeysValues] = None) -> WorldModelOutput:
+        num_steps = obs.size(1)  # (B, T)
+        assert num_steps <= self.config['max_tokens'], \
+            "num_steps should be less than or equal to max_tokens"
+        prev_steps = 0 if past_keys_values is None else past_keys_values.size        
+        embds = self.embed(obs)        
+        x = self.transformer(embds, past_keys_values)        
+        output_observations = self.head_observations(x, num_steps=num_steps, prev_steps=prev_steps)
+        return WorldModelOutput(x, output_observations)    
+    
+    def compute_input_and_target_world_model(self, obs: torch.LongTensor) -> Tuple[torch.LongTensor, torch.LongTensor]:
+        inputs = obs[:, :-1]
+        labels = obs[:, 1:]
+        return inputs, labels
+
+    def loss(self, obs: torch.LongTensor) -> torch.FloatTensor:
+        inputs, labels_observations = self.compute_input_and_target_world_model(obs)
+        outputs = self(inputs)
+        output_observations = rearrange(outputs.output_observations, 'b t o -> (b t) o')        
+        labels_observations = rearrange(labels_observations, 'b t o -> (b t) o')        
+        loss = F.mse_loss(output_observations, labels_observations)
+        print(output_observations.max(), labels_observations.max())
+        return loss
+    
+    def forward_rollout(self, x, burn_in_length, rollout_length):
+        x_burn_in = x[:, :burn_in_length]
+        x_rollout = []
+        for i in range(rollout_length):
+            # roll out one step            
+            output_observations = self(x_burn_in).output_observations[:, -1].unsqueeze(1)
+            x_burn_in = torch.cat((x_burn_in, output_observations), dim=1)
+            x_rollout.append(output_observations)        
+        x_rollout = torch.stack(x_rollout).squeeze(1)
+        x_rollout = rearrange(x_rollout, 't b o -> b t o')
+        return x_rollout
+
+
+
+        

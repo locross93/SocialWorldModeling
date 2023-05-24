@@ -1,2 +1,2 @@
 ,model,g2_acc,g2_goal_num,g2_mse,acc_g3,g3_goal_num,g3_mse
-0,RSSM Discrete,0.3173076923076923,2nd Goal,4.272327423095703,0.1346153846153846,3rd Goal,4.272327423095703
+0,Transformer Iris,0.0,2nd Goal,5.139981746673584,0.0,3rd Goal,5.139981746673584

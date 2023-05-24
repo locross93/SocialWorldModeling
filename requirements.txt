@@ -1,4 +1,6 @@
 typeguard
+moviepy
+einops
 numpy
 scipy
 pandas
