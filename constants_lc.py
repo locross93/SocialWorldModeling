@@ -10,12 +10,12 @@ MODEL_DICT_TRAIN = {
     #'transformer_wm': TransformerWorldModel
 }
 MODEL_DICT_VAL=  {
+    # 'rssm_cont': {
+    #     'class': DreamerV2, 'config': 'rssm_cont_default_config.json', 
+    #     'model_dir': 'rssm_cont_h1024_l2_mlp1024', 'model_label': 'RSSM Continuous'},
     'rssm_disc': {
         'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
         'model_dir': 'rssm_disc', 'model_label': 'RSSM Discrete'},
-    'rssm_cont': {
-        'class': DreamerV2, 'config': 'rssm_cont_default_config.json', 
-        'model_dir': 'rssm_cont_h1024_l2_mlp1024', 'model_label': 'RSSM Continuous'},
     'multistep_pred': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json', 
         'model_dir': 'multistep_predictor', 'model_label': 'Multistep Predictor'},
