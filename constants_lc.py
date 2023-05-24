@@ -18,7 +18,7 @@ MODEL_DICT_VAL=  {
         'model_dir': 'rssm_disc', 'model_label': 'RSSM Discrete'},
     'multistep_pred': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json', 
-        'model_dir': 'multistep_pred_h1024_l2_mlp1024', 'model_label': 'Multistep Predictor'},
+        'model_dir': 'mp_input_embed_h1024_l2_mlp1024_l2', 'model_label': 'Multistep Predictor'},
     'multistep_delta': {
         'class': MultistepDelta, 'config': 'multistep_delta_default_config.json', 
         'model_dir': 'multistep_delta_h1024_l2_mlp1024_l2', 'model_label': 'Multistep Delta'},
