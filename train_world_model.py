@@ -29,7 +29,7 @@ model_dict = MODEL_DICT_TRAIN
 
 def load_args():
     parser = argparse.ArgumentParser()
-    # general pipeline parameters
+    
     parser.add_argument('--model_config_dir', type=str, action='store',
                         default=DEFAULT_VALUES['model_config_dir'],
                         help='Model config directory')
@@ -44,13 +44,25 @@ def load_args():
                         help='Checkpoint directory')
     # general training parameters
     # @TODO put all these into constatns
-    parser.add_argument('--model', type=str, required=True, help='Model to use for training')
-    parser.add_argument('--config', type=str, required=True, help='Config JSON file')
-    parser.add_argument('--batch_size', type=int, default=128, help='Batch size')
-    parser.add_argument('--model_filename', type=str, default=None, help='Filename for saving model')
-    parser.add_argument('--lr', type=float, default=1e-4, help='Learning Rate')
-    parser.add_argument('--epochs', type=int, default=int(1e5), help='Epochs')
-    parser.add_argument('--save_every', type=int, default=500, help='Epoch Save Interval')
+    parser.add_argument('--model', type=str,                        
+                        required=True, help='Model to use for training')
+    parser.add_argument('--config', type=str,
+                        required=True, help='Config JSON file')
+    parser.add_argument('--batch_size', type=int, action='store',
+                        default=DEFAULT_VALUES['batch_size'],
+                        help='Batch size')
+    parser.add_argument('--model_filename', type=str,
+                        default=None, 
+                        help='Filename for saving model')
+    parser.add_argument('--lr', type=float, action='store',
+                        default=DEFAULT_VALUES['lr'], 
+                        help='Learning Rate')
+    parser.add_argument('--epochs', type=int, action='store',
+                        default=DEFAULT_VALUES['epochs'], 
+                        help='Epochs')
+    parser.add_argument('--save_every', type=int, action='store',
+                        default=DEFAULT_VALUES['save_every'], 
+                        help='Epoch Save Interval')
     # rssm parameters
     parser.add_argument('--deter_size', type=int, help='Deterministic size')
     parser.add_argument('--dec_hidden_size', type=int, help='Decoder hidden size')

@@ -15,15 +15,22 @@ MODEL_DICT_VAL=  {
     #     'model_dir': 'rssm_disc', 'epoch': '1000', 'model_label': 'RSSM Discrete'},
     'transformer_iris': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_config.json',
-        'model_dir': 'transformer_wm', 'epoch': '1000', 'model_label': 'Transformer Iris'},
+        'model_dir': 'transformer_iris', 'epoch': '1000', 'model_label': 'Transformer Iris'},
 }
 
 
 DEFAULT_VALUES = {
+    # general pipeline parameters
     'analysis_dir': './',
     'data_dir': '/data2/ziyxiang/social_world_model/data',
     'checkpoint_dir': '/data2/ziyxiang/social_world_model/checkpoint',
     'model_config_dir': './model_configs',
+    # general training parameters for all models
+    'batch_size': 2048,
+    'lr': 1e-4,
+    'epochs': int(1e5),
+    'save_every': 500,
+    # eval parameters
     'model_keys': list(MODEL_DICT_VAL.keys()),
     'eval_types': ['goal_events', 'multigoal_events', 'move_events'],
     'move_threshold': 4.0,
