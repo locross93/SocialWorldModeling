@@ -13,9 +13,9 @@ import os
 import json
 import time
 import pickle
-import platform
 import argparse
 import numpy as np
+from tqdm import tqdm
 
 import torch
 from torch.utils.tensorboard import SummaryWriter
@@ -42,10 +42,7 @@ def load_args():
     parser.add_argument('--checkpoint_dir', type=str, 
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
-    # general training parameters
-    # @TODO put all these into constatns
-    parser.add_argument('--model', type=str,                        
-                        required=True, help='Model to use for training')
+    # general training parameters    
     parser.add_argument('--config', type=str,
                         required=True, help='Config JSON file')
     parser.add_argument('--batch_size', type=int, action='store',
@@ -102,14 +99,17 @@ def main():
             overridden_parameters.append(f"{k}_{v}")
             print(f"{k}_{v}")
     
-    model_class = model_dict[args.model]
+    #model_class = model_dict[args.model]
+    model_class = model_dict[config['model_type']]
     model = model_class(config)
     
-    # filename for saving
+    # filename same as cofnig makes it easier for identifying different parameters
     if args.model_filename is None:
-        model_filename = config['model_type']
+        #model_filename = config['model_type']
+        model_filename = '_'.join(args.config.split('.')[0].split('_')[:-1])
     else:
         model_filename = args.model_filename
+    print(f"model will be saved to {model_filename}")
     
     # If parameters overwritte, save updated config to new file
     if len(overridden_parameters) > 0:
@@ -166,7 +166,7 @@ def main():
     
     model.to(DEVICE)
     start_time = time.time()
-    for epoch in range(args.epochs):
+    for epoch in tqdm(range(args.epochs)):
         model.train()
         batch_loss = []
         if config['model_type'][:4] == 'rssm':
@@ -179,7 +179,7 @@ def main():
             nsamples += batch_x.shape[0]
             opt.zero_grad()
             if config['model_type'][:4] == 'rssm' or \
-                config['model_type'] in ['transformer_wm', 'transformer_iris']:
+                config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
                 loss = model.loss(batch_x)
             elif config['model_type'] == 'multistep_predictor':
                 loss = model.loss(batch_x, burn_in_length, rollout_length)
@@ -201,7 +201,8 @@ def main():
         # test on validation set
         with torch.no_grad():
             model.eval()
-            if config['model_type'][:4] == 'rssm' or config['model_type'] in ['transformer_wm', 'transformer_iris']:
+            if config['model_type'][:4] == 'rssm' or \
+                config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
                 val_loss = model.loss(val_trajs)
             elif config['model_type'] == 'multistep_predictor':
                 val_loss = model.loss(val_trajs, burn_in_length, rollout_length)
@@ -213,8 +214,8 @@ def main():
         writer.add_scalar('Train Loss/loss', epoch_loss, epoch)
         writer.add_scalar('Val Loss/val', val_loss, epoch)
         if config['model_type'][:4] == 'rssm':
-            writer.add_scalar('Train Loss/recon_loss', np.sum(batch_recon_loss), epoch)
-            writer.add_scalar('Train Loss/kl_loss', np.sum(batch_kl_loss), epoch)
+            writer.add_scalar('Train_Loss/recon_loss', np.sum(batch_recon_loss), epoch)
+            writer.add_scalar('Train_Loss/kl_loss', np.sum(batch_kl_loss), epoch)
         if epoch % args.save_every == 0 or epoch == (args.epochs-1):
             # save checkpoints in checkpoint directory with plenty of storage
             save_dir = os.path.join(args.checkpoint_dir, 'models', model_filename)

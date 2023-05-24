@@ -2260,7 +2260,8 @@ class TransformerIrisWorldModel(nn.Module):
         x_rollout = []
         for i in range(rollout_length):
             # roll out one step at a time
-            output_observations = self(x_burn_in).output_observations[:, -1].unsqueeze(1)
+            _, output_observations = self(x_burn_in)            
+            output_observations = output_observations[:, -1].unsqueeze(1)
             x_burn_in = torch.cat((x_burn_in, output_observations), dim=1)
             x_rollout.append(output_observations)        
         x_rollout = torch.stack(x_rollout).squeeze(1)

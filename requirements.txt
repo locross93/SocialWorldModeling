@@ -1,3 +1,4 @@
+tqdm
 typeguard
 moviepy
 einops
