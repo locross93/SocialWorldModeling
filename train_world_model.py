@@ -106,7 +106,7 @@ def main():
     # filename same as cofnig makes it easier for identifying different parameters
     if args.model_filename is None:
         #model_filename = config['model_type']
-        model_filename = '_'.join(args.config.split('.')[0].split('_')[:-1])
+        model_filename = '_'.join(args.config.split('.')[0].split('_')[:-1])       
     else:
         model_filename = args.model_filename
     print(f"model will be saved to {model_filename}")
@@ -218,7 +218,7 @@ def main():
             writer.add_scalar('Train_Loss/kl_loss', np.sum(batch_kl_loss), epoch)
         if epoch % args.save_every == 0 or epoch == (args.epochs-1):
             # save checkpoints in checkpoint directory with plenty of storage
-            save_dir = os.path.join(args.checkpoint_dir, 'models', model_filename)
+            save_dir = os.path.join(args.checkpoint_dir, 'models', model_filename)            
             if not os.path.exists(save_dir):
                 os.makedirs(save_dir)
             model_name = os.path.join(save_dir, f'{model_filename}_epoch{epoch}')

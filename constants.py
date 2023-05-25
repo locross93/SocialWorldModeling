@@ -37,7 +37,7 @@ DEFAULT_VALUES = {
     'model_config_dir': './model_configs',
     # general training parameters for all models
     'batch_size': 2048,
-    'lr': 1e-4,
+    'lr': 1e-3,
     'epochs': int(1e5),
     'save_every': 500,
     # eval parameters

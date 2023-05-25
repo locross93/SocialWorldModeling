@@ -1480,7 +1480,14 @@ class TransformerMSPredictor(nn.Module):
             mask = torch.tril(torch.ones(size, size) == 1) # Lower triangular matrix
             mask = mask.float()
             mask = mask.masked_fill(mask == 0, float('-inf')) # Convert zeros to -inf
-            mask = mask.masked_fill(mask == 1, float(0.0)) # Convert ones to 0                 
+            mask = mask.masked_fill(mask == 1, float(0.0)) # Convert ones to 0
+            
+            # EX for size=5:
+            # [[0., -inf, -inf, -inf, -inf],
+            #  [0.,   0., -inf, -inf, -inf],
+            #  [0.,   0.,   0., -inf, -inf],
+            #  [0.,   0.,   0.,   0., -inf],
+            #  [0.,   0.,   0.,   0.,   0.]]
         elif mask_type == 'square':
             # Generates a square matrix where no all elements are masked out
             # THIS DOESN'T WORK, TRANSFORMER SPITS OUT NANS
@@ -2114,9 +2121,10 @@ class LossWithIntermediateLosses:
 class SelfAttention(nn.Module):
     def __init__(self, config: Dict) -> None:
         super().__init__()
+        self.config = config
         embed_dim = config['embed_dim']
         assert embed_dim % config['num_heads'] == 0
-        assert config['attention'] in ('causal')
+        assert config['attention'] in ['causal', 'window']
         self.num_heads = config['num_heads']
         self.key = nn.Linear(embed_dim, embed_dim)
         self.query = nn.Linear(embed_dim, embed_dim)
@@ -2124,9 +2132,19 @@ class SelfAttention(nn.Module):
         self.attn_drop = nn.Dropout(config['attn_pdrop'])
         self.resid_drop = nn.Dropout(config['resid_pdrop'])
         self.proj = nn.Linear(embed_dim, embed_dim)
+        self._create_attn_mask()
 
-        causal_mask = torch.tril(torch.ones(config['max_seq_len'], config['max_seq_len']))                
-        self.register_buffer('mask', causal_mask)
+    def _create_attn_mask(self) -> None:
+        mask_type = self.config['attention']
+        max_seq_len = self.config['max_seq_len']
+        if mask_type == 'causal':    # autoregressive mask, keeps diagonal and below
+            mask = torch.tril(torch.ones(max_seq_len, max_seq_len))
+        elif mask_type == 'window':
+            mask = torch.zeros(max_seq_len, max_seq_len)
+            for i in range(self.config['max_seq_len']):
+                # can attend to previous window_size steps
+                mask[i, i: min(i + self.config['window_size'] + 1, max_seq_len)] = 1
+        self.register_buffer('mask', mask)
 
     def forward(self, x: torch.Tensor, kv_cache: Optional[KVCache] = None) -> torch.Tensor:
         B, T, C = x.size()
@@ -2240,8 +2258,17 @@ class TransformerIrisWorldModel(nn.Module):
         return (x, output_observations)
     
     def loss(self, obs: torch.LongTensor) -> torch.FloatTensor:
-        inputs = obs[:, :-1]
-        labels = obs[:, 1:]
+        if self.config['attention'] == 'causal':
+            inputs = obs[:, :-1]
+            labels = obs[:, 1:]
+        elif self.config['attention'] == 'window':
+            # model can see up to T-window_size steps and predict the window_size steps
+            assert self.config['window_size'] is not None, "window_size should be specified"
+            assert self.config['window_size'] < obs.size(1), \
+                f"window_size should be less than the sequence length {obs.size(1)}"            
+            inputs = obs[:, :-self.config['window_size']]
+            labels = obs[:, self.config['window_size']:]            
+
         x, output_observations = self(inputs)
         outputs = rearrange(output_observations, 'b t o -> (b t) o')        
         labels = rearrange(labels, 'b t o -> (b t) o')        
