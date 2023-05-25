@@ -11,15 +11,21 @@ MODEL_DICT_TRAIN = {
 }
 
 MODEL_DICT_VAL=  {
-    'rssm_disc': {
-        'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
-        'model_dir': 'rssm_disc', 'epoch': '1000', 'model_label': 'RSSM Discrete'},
-    'transformer_iris': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_config.json',
-        'model_dir': 'transformer_iris', 'epoch': '1000', 'model_label': 'Transformer Iris'},
+    # 'rssm_disc': {
+    #     'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
+    #     'model_dir': 'rssm_disc', 'epoch': '1000', 'model_label': 'RSSM Discrete'},
+    # 'transformer_iris': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_config.json',
+    #     'model_dir': 'transformer_iris', 'epoch': '5000', 'model_label': 'Transformer Iris'},
     'transformer_iris_dropout_0.1': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_dropout_0.1_config.json',
-        'model_dir': 'transformer_iris_dropout_0.1', 'epoch': '1000', 'model_label': 'Transformer Iris Dropout 0.1'},
+        'model_dir': 'transformer_iris_dropout', 'epoch': '5000', 'model_label': 'Transformer Iris Dropout 0.1'},
+    # 'transformer_wm': {
+    #     'class': TransformerWorldModel, 'config': 'transformer_wm_default_config.json',
+    #     'model_dir': 'transformer_wm_default', 'epoch': '5000', 'model_label': 'Transformer WM Default'},
+    # 'transformer_mp': {
+    #     'class': TransformerMSPredictor, 'config': 'transformer_mp_default_config.json',
+    #     'model_dir': 'transformer_mp_default', 'epoch': '5000', 'model_label': 'Transformer MP Default'},
 }
 
 

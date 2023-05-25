@@ -1480,14 +1480,7 @@ class TransformerMSPredictor(nn.Module):
             mask = torch.tril(torch.ones(size, size) == 1) # Lower triangular matrix
             mask = mask.float()
             mask = mask.masked_fill(mask == 0, float('-inf')) # Convert zeros to -inf
-            mask = mask.masked_fill(mask == 1, float(0.0)) # Convert ones to 0
-            
-            # EX for size=5:
-            # [[0., -inf, -inf, -inf, -inf],
-            #  [0.,   0., -inf, -inf, -inf],
-            #  [0.,   0.,   0., -inf, -inf],
-            #  [0.,   0.,   0.,   0., -inf],
-            #  [0.,   0.,   0.,   0.,   0.]]
+            mask = mask.masked_fill(mask == 1, float(0.0)) # Convert ones to 0                 
         elif mask_type == 'square':
             # Generates a square matrix where no all elements are masked out
             # THIS DOESN'T WORK, TRANSFORMER SPITS OUT NANS

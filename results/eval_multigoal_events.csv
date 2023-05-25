@@ -1,2 +1,2 @@
 ,model,g2_acc,g2_goal_num,g2_mse,acc_g3,g3_goal_num,g3_mse
-0,Transformer Iris,0.0,2nd Goal,7.9260334968566895,0.0,3rd Goal,7.9260334968566895
+0,Transformer Iris Dropout 0.1,0.0,2nd Goal,8.418702125549316,0.0,3rd Goal,8.418702125549316

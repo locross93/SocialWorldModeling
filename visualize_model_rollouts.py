@@ -21,22 +21,23 @@ from analysis_utils import load_trained_model, data_columns
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import annotate_goal_timepoints
 
-from constants import MODEL_DICT_VAL
-
-if platform.system() == 'Windows':
-    # We are running on Windows
-    analysis_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/'
-    data_dir = '/Users/locro/Documents/Stanford/analysis/data/'
-    checkpoint_dir = analysis_dir
-elif platform.system() == 'Linux':
-    # We are running on Linux
-    analysis_dir = '/home/locross/SocialWorldModeling/'
-    data_dir = '/mnt/fs2/locross/analysis/data/'
-    checkpoint_dir = '/mnt/fs2/locross/analysis/'
+from constants import MODEL_DICT_VAL, DEFAULT_VALUES
     
     
 def load_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--model_config_dir', type=str, action='store',
+                        default=DEFAULT_VALUES['model_config_dir'],
+                        help='Model config directory')
+    parser.add_argument('--analysis_dir', type=str, action='store',
+                        default=DEFAULT_VALUES['analysis_dir'], 
+                        help='Analysis directory')
+    parser.add_argument('--data_dir', type=str,
+                         default=DEFAULT_VALUES['data_dir'], 
+                         help='Data directory')
+    parser.add_argument('--checkpoint_dir', type=str, 
+                        default=DEFAULT_VALUES['checkpoint_dir'], 
+                        help='Checkpoint directory')
     parser.add_argument('--model_key', type=str, required=True, help='Model to use for visualization')
     parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--device', type=str, default='cpu', help='Device')
@@ -150,10 +151,10 @@ if __name__ == '__main__':
     
     model_info = MODEL_DICT_VAL[args.model_key]
     model_name = model_info['model_label']
-    model = load_trained_model(model_info, args.device)
+    model = load_trained_model(model_info, args.model_config_dir, args.checkpoint_dir, args.device)
     
     # load data
-    data_file = os.path.join(data_dir, 'train_test_splits_3D_dataset.pkl')
+    data_file = os.path.join(args.data_dir, 'train_test_splits_3D_dataset.pkl')
     loaded_dataset = pickle.load(open(data_file, 'rb'))
     train_dataset, test_dataset = loaded_dataset
     if args.train_or_val == 'train':
@@ -162,7 +163,7 @@ if __name__ == '__main__':
         input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
     
     # select trajectory where goal occurred
-    pickup_timepoints = annotate_pickup_timepoints(args.train_or_val, pickup_or_move='move')
+    pickup_timepoints = annotate_pickup_timepoints(loaded_dataset, args.train_or_val, pickup_or_move='move')
     single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
     multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
     
@@ -184,13 +185,13 @@ if __name__ == '__main__':
     x = input_data[traj_ind,:,:].unsqueeze(0)
     x_true = x[0,:burn_in_length+rollout_length,:].numpy()
     x_pred = x_true.copy()
-    #rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()
-    rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
+    rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()
+    #rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
     x_pred[burn_in_length:,:] = rollout_x 
     
-    viz_dir = os.path.join(analysis_dir, 'results/viz_trajs',args.model_key)
-    if not os.path.exists(viz_dir):
-        os.mkdir(viz_dir)
+    viz_dir = os.path.join(args.analysis_dir, 'results/viz_trajs',args.model_key)
+    if not os.path.exists(viz_dir):        
+        os.makedirs(viz_dir)
         
     if args.trial_type == 'single_goal':
         save_file = os.path.join(viz_dir, 'traj_subplot'+'_sg_trial'+str(args.trial_num))

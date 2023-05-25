@@ -7,6 +7,7 @@ Created on Mon Feb  6 12:00:58 2023
 
 import json
 import os
+import torch
 import pickle
 import pandas as pd
 import matplotlib.pylab as plt
@@ -38,6 +39,31 @@ def get_highest_numbered_file(model_filename, directory):
     assert highest_number > -1,'No checkpoints found'
     return highest_numbered_file, highest_number
 
+
+
+def load_trained_model(model_info, config_dir, checkpoint_dir, device='cpu'):
+    model_class = model_info['class']
+    # load config and initialize model class
+    config_file = os.path.join(config_dir, model_info['config'])
+    config = load_config(config_file)
+    model = model_class(config)
+    # load checkpoint weights
+    # checkpoints are in folder named after model
+    model_dir = os.path.join(checkpoint_dir, 'models', model_info['model_dir'])
+    if 'epoch' in model_info:
+        model_file_name = os.path.join(model_dir, model_info['model_dir']+'_epoch'+model_info['epoch'])
+        model.load_state_dict(torch.load(model_file_name))
+        print('Loading model',model_file_name)
+    else:
+        latest_checkpoint, _ =  get_highest_numbered_file(model_info['model_dir'], model_dir)
+        print('Loading from last checkpoint',latest_checkpoint)
+        model.load_state_dict(torch.load(latest_checkpoint))
+
+    model.eval()
+    model.device = device
+    model.to(device)
+        
+    return model
 
 # @TODO plot functions here
 # @TODO will need more work depending on the evaluation type

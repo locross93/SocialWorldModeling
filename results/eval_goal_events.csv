@@ -1,2 +1,2 @@
 ,model,score,MSE
-0,Transformer Iris,0.0,6.124048709869385
+0,Transformer Iris Dropout 0.1,0.0,5.85368013381958
