@@ -69,7 +69,7 @@ DEFAULT_VALUES = {
     #'checkpoint_dir': '/data2/ziyxiang/social_world_model/checkpoint',
     # as of 5/26, the new models in nfs checkpoint path use the new data path
     'data_path': '/ccn2/u/ziyxiang/swm_data_and_results/data/dataset_5_25_23.pkl',
-    'checkpoint_path': '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint',
+    'checkpoint_dir': '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint',
     'model_config_dir': './model_configs',
     # general training parameters for all models
     'batch_size': 2048,
