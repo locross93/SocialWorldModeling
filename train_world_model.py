@@ -126,7 +126,7 @@ def main():
     train_dataset, test_dataset = loaded_dataset
     train_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     val_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
-    
+
     # initialize the replay buffer
     burn_in_length = args.burn_in_length
     rollout_length = args.rollout_length

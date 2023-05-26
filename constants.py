@@ -26,6 +26,27 @@ MODEL_DICT_VAL=  {
     # 'transformer_mp': {
     #     'class': TransformerMSPredictor, 'config': 'transformer_mp_default_config.json',
     #     'model_dir': 'transformer_mp_default', 'epoch': '5000', 'model_label': 'Transformer MP Default'},
+    'transformer_iris_mp_window_10': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_10_config.json',
+        'model_dir': 'transformer_iris_mp_window_10', 'epoch': '1000', 'model_label': 'Transformer Iris MP Window 10'},
+    'transformer_iris_mp_window_20': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_20_config.json',
+        'model_dir': 'transformer_iris_mp_window_20', 'epoch': '1000', 'model_label': 'Transformer Iris MP Window 20'},
+    'transformer_iris_mp_window_30': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_30_config.json',
+        'model_dir': 'transformer_iris_mp_window_30', 'epoch': '1000', 'model_label': 'Transformer Iris MP Window 30'},
+    'transformer_iris_mp_window_40': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_40_config.json',
+        'model_dir': 'transformer_iris_mp_window_40', 'epoch': '1000', 'model_label': 'Transformer Iris MP Window 40'},
+    'transformer_iris_mp_window_50': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_50_config.json',
+        'model_dir': 'transformer_iris_mp_window_50', 'epoch': '1000', 'model_label': 'Transformer Iris MP Window 50'},
+    'transformer_iris_mp_window_60': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_60_config.json',
+        'model_dir': 'transformer_iris_mp_window_60', 'epoch': '1000', 'model_label': 'Transformer Iris MP Window 60'},
+    'transformer_iris_mp_window_70': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_70_config.json',
+        'model_dir': 'transformer_iris_mp_window_70', 'epoch': '1000', 'model_label': 'Transformer Iris MP Window 70'},
 }
 
 
@@ -38,7 +59,7 @@ DEFAULT_VALUES = {
     # general training parameters for all models
     'batch_size': 2048,
     'lr': 1e-3,
-    'epochs': int(1e5),
+    'epochs': int(3e4),
     'save_every': 500,
     # eval parameters
     'model_keys': list(MODEL_DICT_VAL.keys()),

@@ -2124,7 +2124,7 @@ class SelfAttention(nn.Module):
         self.config = config
         embed_dim = config['embed_dim']
         assert embed_dim % config['num_heads'] == 0
-        assert config['attention'] in ['causal', 'window']
+        assert config['attention'] in ['causal', 'window', 'square']
         self.num_heads = config['num_heads']
         self.key = nn.Linear(embed_dim, embed_dim)
         self.query = nn.Linear(embed_dim, embed_dim)
@@ -2140,10 +2140,14 @@ class SelfAttention(nn.Module):
         if mask_type == 'causal':    # autoregressive mask, keeps diagonal and below
             mask = torch.tril(torch.ones(max_seq_len, max_seq_len))
         elif mask_type == 'window':
+            # slide window of 
             mask = torch.zeros(max_seq_len, max_seq_len)
             for i in range(self.config['max_seq_len']):
                 # can attend to previous window_size steps
-                mask[i, i: min(i + self.config['window_size'] + 1, max_seq_len)] = 1
+                mask[i, : min(i + self.config['window_size'] + 1, max_seq_len)] = 1
+        elif mask_type == 'square':
+            mask = torch.ones(max_seq_len, max_seq_len)
+            mask[:, :self.config['square_size']] = 1        
         self.register_buffer('mask', mask)
 
     def forward(self, x: torch.Tensor, kv_cache: Optional[KVCache] = None) -> torch.Tensor:
@@ -2162,7 +2166,7 @@ class SelfAttention(nn.Module):
             kv_cache.update(k, v)
             k, v = kv_cache.get()
 
-        att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
+        att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))        
         att = att.masked_fill(self.mask[L:L + T, :L + T] == 0, float('-inf'))
         att = F.softmax(att, dim=-1)
         att = self.attn_drop(att)
@@ -2232,6 +2236,7 @@ class EmbeddingModule(nn.Module):
         x = x.reshape(bs, ts, -1)
         return x
 
+
 class TransformerIrisWorldModel(nn.Module):
     def __init__(self, config: Dict) -> None:
         super().__init__()
@@ -2265,11 +2270,20 @@ class TransformerIrisWorldModel(nn.Module):
             # model can see up to T-window_size steps and predict the window_size steps
             assert self.config['window_size'] is not None, "window_size should be specified"
             assert self.config['window_size'] < obs.size(1), \
-                f"window_size should be less than the sequence length {obs.size(1)}"            
+                f"window_size should be at less than {obs.size(1)}"
             inputs = obs[:, :-self.config['window_size']]
-            labels = obs[:, self.config['window_size']:]            
-
+            labels = obs[:, self.config['window_size']:]
+        elif self.config['attention'] == 'square':
+            assert self.config['square_size'] >= obs.size(1) / 2, \
+                f"square_size should be at least {obs.size(1)/2}"
+            inputs = obs[:, : self.config['square_size']]
+            labels = obs[:, self.config['square_size'] :]
+                
         x, output_observations = self(inputs)
+        # sqaure mask input and labels won't be the same size
+        if self.config['attention'] == 'square':
+            output_observations = output_observations[:, :labels.size(1)]
+
         outputs = rearrange(output_observations, 'b t o -> (b t) o')        
         labels = rearrange(labels, 'b t o -> (b t) o')        
         loss = F.mse_loss(labels, outputs)
