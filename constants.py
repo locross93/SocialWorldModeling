@@ -1,10 +1,11 @@
-from models import DreamerV2, MultistepPredictor, \
+from models import DreamerV2, MultistepPredictor, MultistepDelta, \
     TransformerMSPredictor, TransformerIrisWorldModel, TransformerWorldModel
 
 
 MODEL_DICT_TRAIN = {
     'rssm_disc': DreamerV2,
-    'multistep_predictor': MultistepPredictor, 
+    'multistep_predictor': MultistepPredictor,
+    'multistep_delta':  MultistepDelta,
     'transformer_wm': TransformerWorldModel,   
     'transformer_mp': TransformerMSPredictor,
     'transformer_iris': TransformerIrisWorldModel
