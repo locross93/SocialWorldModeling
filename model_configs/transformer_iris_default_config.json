@@ -1,14 +1,17 @@
 {
     "model_type": "transformer_iris",
-    "obs_size": 23,
+    "obs_size": 35,
     "max_seq_len": 1000,
     "attention": "causal",
+
+    "num_encode_layers": 2,
+    "num_decode_layers": 2,
 
     "num_attn_layers": 4,
     "num_heads": 4,
     "embed_dim": 512,
 
-    "embed_pdrop": 0.6,
-    "resid_pdrop": 0.6,
-    "attn_pdrop": 0.6
+    "embed_pdrop": 0.2,
+    "resid_pdrop": 0.2,
+    "attn_pdrop": 0.2
 }

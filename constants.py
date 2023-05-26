@@ -12,15 +12,21 @@ MODEL_DICT_TRAIN = {
 }
 
 MODEL_DICT_VAL=  {
-    # 'rssm_disc': {
-    #     'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
-    #     'model_dir': 'rssm_disc', 'epoch': '1000', 'model_label': 'RSSM Discrete'},
-    # 'transformer_iris': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_config.json',
-    #     'model_dir': 'transformer_iris', 'epoch': '5000', 'model_label': 'Transformer Iris'},
-    'transformer_iris_dropout_0.1': {
-         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_dropout_0.1_config.json',
-         'model_dir': 'transformer_iris_dropout', 'epoch': '3000', 'model_label': 'Transformer Iris Dropout 0.1'},
+    'rssm_disc': {
+        'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
+        'model_dir': 'rssm_disc_default', 'epoch': '1000', 'model_label': 'RSSM Discrete'},
+    'multistep_predictor': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json',
+        'model_dir': 'multistep_predictor_default', 'epoch': '1000', 'model_label': 'Multistep Predictor'},
+    'multistep_delta': {
+        'class': MultistepDelta, 'config': 'multistep_delta_default_config.json',
+        'model_dir': 'multistep_delta_default', 'epoch': '1000', 'model_label': 'Multistep Delta'},
+    'transformer_iris': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
+        'model_dir': 'transformer_iris_default', 'epoch': '5000', 'model_label': 'Transformer Iris'},
+    # 'transformer_iris_dropout_0.1': {
+    #      'class': TransformerIrisWorldModel, 'config': 'transformer_iris_dropout_0.1_config.json',
+    #      'model_dir': 'transformer_iris_dropout', 'epoch': '3000', 'model_label': 'Transformer Iris Dropout 0.1'},
     # 'transformer_wm': {
     #     'class': TransformerWorldModel, 'config': 'transformer_wm_default_config.json',
     #     'model_dir': 'transformer_wm_default', 'epoch': '5000', 'model_label': 'Transformer WM Default'},
@@ -33,33 +39,33 @@ MODEL_DICT_VAL=  {
     # 'transformer_iris_mp_window_20': {
     #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_20_config.json',
     #     'model_dir': 'transformer_iris_mp_window_20', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 20'},
-    'transformer_iris_mp_window_30': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_30_config.json',
-        'model_dir': 'transformer_iris_mp_window_30', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 30'},
-    # 'transformer_iris_mp_window_40': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_40_config.json',
-    #     'model_dir': 'transformer_iris_mp_window_40', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 40'},
-    'transformer_iris_mp_window_50': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_50_config.json',
-        'model_dir': 'transformer_iris_mp_window_50', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 50'},
-    # 'transformer_iris_mp_window_60': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_60_config.json',
-    #     'model_dir': 'transformer_iris_mp_window_60', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 60'},
-    'transformer_iris_mp_window_70': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_70_config.json',
-        'model_dir': 'transformer_iris_mp_window_70', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 70'},
-    'transformer_iris_mp_square_40': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_square_40_config.json',
-        'model_dir': 'transformer_iris_mp_square_40', 'epoch': '3000', 'model_label': 'Transformer Iris MP Square 40'},
-    'transformer_iris_mp_square_50': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_square_50_config.json',
-        'model_dir': 'transformer_iris_mp_square_50', 'epoch': '3000', 'model_label': 'Transformer Iris MP Square 50'},
-    'transformer_iris_mp_square_60': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_square_60_config.json',
-        'model_dir': 'transformer_iris_mp_square_60', 'epoch': '3000', 'model_label': 'Transformer Iris MP Square 60'},
-    'transformer_iris_mp_square_70': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_square_70_config.json',
-        'model_dir': 'transformer_iris_mp_square_70', 'epoch': '3000', 'model_label': 'Transformer Iris MP Square 70'},
+    # 'transformer_iris_mp_window_30': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_30_config.json',
+    #     'model_dir': 'transformer_iris_mp_window_30', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 30'},
+    # # 'transformer_iris_mp_window_40': {
+    # #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_40_config.json',
+    # #     'model_dir': 'transformer_iris_mp_window_40', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 40'},
+    # 'transformer_iris_mp_window_50': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_50_config.json',
+    #     'model_dir': 'transformer_iris_mp_window_50', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 50'},
+    # # 'transformer_iris_mp_window_60': {
+    # #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_60_config.json',
+    # #     'model_dir': 'transformer_iris_mp_window_60', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 60'},
+    # 'transformer_iris_mp_window_70': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_70_config.json',
+    #     'model_dir': 'transformer_iris_mp_window_70', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 70'},
+    # 'transformer_iris_mp_square_40': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_square_40_config.json',
+    #     'model_dir': 'transformer_iris_mp_square_40', 'epoch': '3000', 'model_label': 'Transformer Iris MP Square 40'},
+    # 'transformer_iris_mp_square_50': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_square_50_config.json',
+    #     'model_dir': 'transformer_iris_mp_square_50', 'epoch': '3000', 'model_label': 'Transformer Iris MP Square 50'},
+    # 'transformer_iris_mp_square_60': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_square_60_config.json',
+    #     'model_dir': 'transformer_iris_mp_square_60', 'epoch': '3000', 'model_label': 'Transformer Iris MP Square 60'},
+    # 'transformer_iris_mp_square_70': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_square_70_config.json',
+    #     'model_dir': 'transformer_iris_mp_square_70', 'epoch': '3000', 'model_label': 'Transformer Iris MP Square 70'},
 }
 
 

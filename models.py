@@ -1396,6 +1396,8 @@ class MultistepDelta(nn.Module):
         return x_hat
     
     def loss(self, x, burn_in_length, rollout_length):
+        if x.dtype == torch.float64:
+            x = x.float()
         x_hat = self.forward_rollout(x, burn_in_length, rollout_length)
         t_end = burn_in_length + rollout_length
         x_supervise = x[:,burn_in_length:t_end,:]
@@ -2227,10 +2229,11 @@ class Transformer(nn.Module):
 
 " World model "
 class EmbeddingModule(nn.Module):
-    def __init__(self, feat_dim, emb_dim):
-        super().__init__()
-        self.linear = nn.Linear(feat_dim, emb_dim)
-        self.ln = nn.LayerNorm(emb_dim)
+    def __init__(self, feat_dim, emb_dim, num_layers=2):
+        super().__init__()        
+        self.embedding = self._build_mlp(feat_dim, emb_dim, num_layers)
+
+    
 
     def forward(self, x):
         bs, ts, fs = x.shape
@@ -2246,22 +2249,42 @@ class TransformerIrisWorldModel(nn.Module):
         super().__init__()
         self.config = config
         self.pos_emb = nn.Embedding(config['max_seq_len'], config['embed_dim'])
-        self.embedder = EmbeddingModule(config['obs_size'], config['embed_dim'])
+        self.embedder = self._build_encoder_mlp(self.config['num_encode_layers'])
         self.transformer = Transformer(config)
-        self.decoding_head = nn.Sequential(
-            nn.Linear(config['embed_dim'], config['obs_size']),
-            nn.ReLU(),)
+        self.decoding_head = self._build_decoder_mlp(self.config['num_decode_layers'])
         self.apply(init_weights)
 
     def __repr__(self) -> str:
         return "TranformerIrisWorldModel"
         
+    def _build_encoder_mlp(self, num_layers):
+        layers = [
+            nn.Linear(self.config['obs_size'], self.config['embed_dim']), 
+            nn.ReLU(),
+            nn.LayerNorm(self.config['embed_dim'])]
+        for _ in range(1, num_layers):
+            layers.append(nn.Linear(self.config['embed_dim'], self.config['embed_dim']))
+            layers.append(nn.ReLU())
+        return nn.Sequential(*layers)
+    
+    def _build_decoder_mlp(self, num_layers):
+        layers = [
+            nn.Linear(self.config['embed_dim'], self.config['embed_dim']),
+            nn.ReLU(),
+            nn.LayerNorm(self.config['embed_dim'])]
+        for _ in range(1, num_layers):
+            layers.append(nn.Linear(self.config['embed_dim'], self.config['obs_size']))
+            layers.append(nn.ReLU())
+        return nn.Sequential(*layers)
+
     def forward(self, obs: torch.FloatTensor, past_keys_values: Optional[KeysValues] = None):
         num_steps = obs.size(1)  # (B, T)
         assert num_steps <= self.config['max_seq_len'], "num_steps should be less than or equal to max_seq_len"
         prev_steps = 0 if past_keys_values is None else past_keys_values.size        
         embds = self.embedder(obs)
-        seq_emdbs = embds + self.pos_emb(prev_steps + torch.arange(num_steps, device=obs.device))
+        # @TODO: if adding MLP embedding doesn't work well, try to concat positional embedding
+        pos_embds = self.pos_emb(prev_steps + torch.arange(num_steps, device=obs.device))        
+        seq_emdbs = embds 
         x = self.transformer(seq_emdbs, past_keys_values)
         output_observations = self.decoding_head(x)
         return (x, output_observations)
