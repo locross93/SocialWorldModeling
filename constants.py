@@ -17,9 +17,9 @@ MODEL_DICT_VAL=  {
     # 'transformer_iris': {
     #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_config.json',
     #     'model_dir': 'transformer_iris', 'epoch': '5000', 'model_label': 'Transformer Iris'},
-    # 'transformer_iris_dropout_0.1': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_dropout_0.1_config.json',
-    #     'model_dir': 'transformer_iris_dropout', 'epoch': '3000', 'model_label': 'Transformer Iris Dropout 0.1'},
+    'transformer_iris_dropout_0.1': {
+         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_dropout_0.1_config.json',
+         'model_dir': 'transformer_iris_dropout', 'epoch': '3000', 'model_label': 'Transformer Iris Dropout 0.1'},
     # 'transformer_wm': {
     #     'class': TransformerWorldModel, 'config': 'transformer_wm_default_config.json',
     #     'model_dir': 'transformer_wm_default', 'epoch': '5000', 'model_label': 'Transformer WM Default'},
@@ -65,11 +65,11 @@ MODEL_DICT_VAL=  {
 DEFAULT_VALUES = {
     # general pipeline parameters
     'analysis_dir': './',
-    'data_path': '/data2/ziyxiang/social_world_model/data/train_test_splits_3D_dataset.pkl',
-    'checkpoint_dir': '/data2/ziyxiang/social_world_model/checkpoint',
+    #'data_path': '/data2/ziyxiang/social_world_model/data/train_test_splits_3D_dataset.pkl',
+    #'checkpoint_dir': '/data2/ziyxiang/social_world_model/checkpoint',
     # as of 5/26, the new models in nfs checkpoint path use the new data path
-    #'data_path': '/ccn2/u/ziyxiang/swm_data_and_results/data/dataset_5_25_23.pkl',
-    #'checkpoint_path': '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint',
+    'data_path': '/ccn2/u/ziyxiang/swm_data_and_results/data/dataset_5_25_23.pkl',
+    'checkpoint_path': '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint',
     'model_config_dir': './model_configs',
     # general training parameters for all models
     'batch_size': 2048,
