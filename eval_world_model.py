@@ -37,9 +37,8 @@ class Analysis(object):
     def __init__(self, args) -> None:        
         self.args = args
 
-    def load_data(self) -> None:
-        data_file = os.path.join(args.data_dir, 'train_test_splits_3D_dataset.pkl')        
-        self.loaded_dataset = pickle.load(open(data_file, 'rb'))        
+    def load_data(self) -> None:        
+        self.loaded_dataset = pickle.load(open(args.data_path, 'rb'))        
         _, test_dataset = self.loaded_dataset
         self.input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
         self.num_timepoints = self.input_data.size(1)
@@ -325,8 +324,8 @@ def load_args():
     parser.add_argument('--model_config_dir', type=str, action='store',
                         default=DEFAULT_VALUES['model_config_dir'],
                         help='Model config directory')   
-    parser.add_argument('--data_dir', type=str, action='store',
-                        default=DEFAULT_VALUES['data_dir'], 
+    parser.add_argument('--data_path', type=str, action='store',
+                        default=DEFAULT_VALUES['data_path'], 
                         help='Data directory')
     parser.add_argument('--checkpoint_dir', type=str, action='store',
                         default=DEFAULT_VALUES['checkpoint_dir'], 

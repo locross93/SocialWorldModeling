@@ -32,8 +32,8 @@ def load_args():
     parser.add_argument('--analysis_dir', type=str, action='store',
                         default=DEFAULT_VALUES['analysis_dir'], 
                         help='Analysis directory')
-    parser.add_argument('--data_dir', type=str,
-                         default=DEFAULT_VALUES['data_dir'], 
+    parser.add_argument('--data_path', type=str,
+                         default=DEFAULT_VALUES['data_path'], 
                          help='Data directory')
     parser.add_argument('--checkpoint_dir', type=str, 
                         default=DEFAULT_VALUES['checkpoint_dir'], 
@@ -154,8 +154,7 @@ if __name__ == '__main__':
     model = load_trained_model(model_info, args.model_config_dir, args.checkpoint_dir, args.device)
     
     # load data
-    data_file = os.path.join(args.data_dir, 'train_test_splits_3D_dataset.pkl')
-    loaded_dataset = pickle.load(open(data_file, 'rb'))
+    loaded_dataset = pickle.load(open(args.data_path, 'rb'))
     train_dataset, test_dataset = loaded_dataset
     if args.train_or_val == 'train':
         input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]

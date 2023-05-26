@@ -36,8 +36,8 @@ def load_args():
     parser.add_argument('--analysis_dir', type=str, action='store',
                         default=DEFAULT_VALUES['analysis_dir'], 
                         help='Analysis directory')
-    parser.add_argument('--data_dir', type=str,
-                         default=DEFAULT_VALUES['data_dir'], 
+    parser.add_argument('--data_path', type=str,
+                         default=DEFAULT_VALUES['data_path'], 
                          help='Data directory')
     parser.add_argument('--checkpoint_dir', type=str, 
                         default=DEFAULT_VALUES['checkpoint_dir'], 
@@ -120,9 +120,8 @@ def main():
     DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f'Using device: {DEVICE}')
 
-    # load data
-    data_file = os.path.join(args.data_dir, 'train_test_splits_3D_dataset.pkl')
-    loaded_dataset = pickle.load(open(data_file, 'rb'))
+    # load data    
+    loaded_dataset = pickle.load(open(args.data_path, 'rb'))
     train_dataset, test_dataset = loaded_dataset
     train_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     val_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
