@@ -1,5 +1,5 @@
 {
-    "model_type": "transformer_iris",
+    "model_type": "transformer_iris",    
     "obs_size": 23,
     "max_seq_len": 1000,
     "attention": "window",

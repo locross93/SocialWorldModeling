@@ -1008,6 +1008,8 @@ class DreamerV2(nn.Module):
         return x_hat
     
     def loss(self, x):
+        if x.dtype == torch.float64:
+            x = x.float()
         # Encoder
         prior, post = self.encoder(x)
         
@@ -1302,6 +1304,8 @@ class MultistepPredictor(nn.Module):
         return nn.Sequential(*model)
 
     def forward(self, x, hidden):
+        if x.dtype != torch.float32:
+            x = x.float()
         if self.input_embed_size is not None:
             x = self.input_embed(x)
         out, hidden = self.rnn(x, hidden)
@@ -2252,10 +2256,10 @@ class TransformerIrisWorldModel(nn.Module):
     def __repr__(self) -> str:
         return "TranformerIrisWorldModel"
         
-    def forward(self, obs: torch.LongTensor, past_keys_values: Optional[KeysValues] = None):
+    def forward(self, obs: torch.FloatTensor, past_keys_values: Optional[KeysValues] = None):
         num_steps = obs.size(1)  # (B, T)
         assert num_steps <= self.config['max_seq_len'], "num_steps should be less than or equal to max_seq_len"
-        prev_steps = 0 if past_keys_values is None else past_keys_values.size
+        prev_steps = 0 if past_keys_values is None else past_keys_values.size        
         embds = self.embedder(obs)
         seq_emdbs = embds + self.pos_emb(prev_steps + torch.arange(num_steps, device=obs.device))
         x = self.transformer(seq_emdbs, past_keys_values)
@@ -2263,6 +2267,9 @@ class TransformerIrisWorldModel(nn.Module):
         return (x, output_observations)
     
     def loss(self, obs: torch.LongTensor) -> torch.FloatTensor:
+        # somehow new data has dtype float64
+        if obs.dtype == torch.float64:
+            obs = obs.float()
         if self.config['attention'] == 'causal':
             inputs = obs[:, :-1]
             labels = obs[:, 1:]

@@ -1,9 +1,10 @@
 ,model,g2_acc,g2_goal_num,g2_mse,acc_g3,g3_goal_num,g3_mse
-0,Transformer Iris MP Window 10,0.0,2nd Goal,6.47123384475708,0.0,3rd Goal,6.47123384475708
-1,Transformer Iris MP Window 30,0.0,2nd Goal,6.452232360839844,0.0,3rd Goal,6.452232360839844
-2,Transformer Iris MP Window 50,0.0,2nd Goal,6.202950477600098,0.0,3rd Goal,6.202950477600098
-3,Transformer Iris MP Window 70,0.0,2nd Goal,6.21142578125,0.0,3rd Goal,6.21142578125
-4,Transformer Iris MP Square 40,0.0,2nd Goal,6.604928016662598,0.0,3rd Goal,6.604928016662598
-5,Transformer Iris MP Square 50,0.0,2nd Goal,6.755141735076904,0.0,3rd Goal,6.755141735076904
-6,Transformer Iris MP Square 60,0.0,2nd Goal,7.342789173126221,0.0,3rd Goal,7.342789173126221
-7,Transformer Iris MP Square 70,0.0,2nd Goal,6.667571544647217,0.0,3rd Goal,6.667571544647217
+0,Transformer Iris Dropout 0.1,0.0,2nd Goal,8.607162475585938,0.0,3rd Goal,8.607162475585938
+1,Transformer Iris MP Window 10,0.0,2nd Goal,6.47123384475708,0.0,3rd Goal,6.47123384475708
+2,Transformer Iris MP Window 30,0.0,2nd Goal,6.452232360839844,0.0,3rd Goal,6.452232360839844
+3,Transformer Iris MP Window 50,0.0,2nd Goal,6.202950477600098,0.0,3rd Goal,6.202950477600098
+4,Transformer Iris MP Window 70,0.0,2nd Goal,6.21142578125,0.0,3rd Goal,6.21142578125
+5,Transformer Iris MP Square 40,0.0,2nd Goal,6.604928016662598,0.0,3rd Goal,6.604928016662598
+6,Transformer Iris MP Square 50,0.0,2nd Goal,6.755141735076904,0.0,3rd Goal,6.755141735076904
+7,Transformer Iris MP Square 60,0.0,2nd Goal,7.342789173126221,0.0,3rd Goal,7.342789173126221
+8,Transformer Iris MP Square 70,0.0,2nd Goal,6.667571544647217,0.0,3rd Goal,6.667571544647217

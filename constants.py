@@ -3,7 +3,7 @@ from models import DreamerV2, MultistepPredictor, \
 
 
 MODEL_DICT_TRAIN = {
-    'dreamerv2': DreamerV2,
+    'rssm_disc': DreamerV2,
     'multistep_predictor': MultistepPredictor, 
     'transformer_wm': TransformerWorldModel,   
     'transformer_mp': TransformerMSPredictor,

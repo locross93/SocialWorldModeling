@@ -1,2 +1,10 @@
 ,model,score,MSE
-0,Transformer Iris Dropout 0.1,0.0,5.85368013381958
+0,Transformer Iris Dropout 0.1,0.0,5.711338520050049
+1,Transformer Iris MP Window 10,0.0,5.408973693847656
+2,Transformer Iris MP Window 30,0.0,5.528217315673828
+3,Transformer Iris MP Window 50,0.0,5.642744541168213
+4,Transformer Iris MP Window 70,0.0,4.663412570953369
+5,Transformer Iris MP Square 40,0.0,6.179484844207764
+6,Transformer Iris MP Square 50,0.0,5.9681854248046875
+7,Transformer Iris MP Square 60,0.0,6.459283828735352
+8,Transformer Iris MP Square 70,0.0,4.3933587074279785
