@@ -39,6 +39,9 @@ def load_args():
     parser.add_argument('--data_dir', type=str,
                          default=DEFAULT_VALUES['data_dir'], 
                          help='Data directory')
+    parser.add_argument('--dataset', type=str,
+                         default='dataset_5_25_23.pkl', 
+                         help='Data directory')
     parser.add_argument('--checkpoint_dir', type=str, 
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
@@ -108,7 +111,7 @@ def main():
     print(DEVICE)
 
     # load data
-    data_file = os.path.join(args.data_dir, 'train_test_splits_3D_dataset.pkl')
+    data_file = os.path.join(args.data_dir, args.dataset)
     loaded_dataset = pickle.load(open(data_file, 'rb'))
     train_dataset, test_dataset = loaded_dataset
     train_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]

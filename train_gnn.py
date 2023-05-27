@@ -37,7 +37,7 @@ def load_args():
                          default=DEFAULT_VALUES['data_dir'], 
                          help='Data directory')
     parser.add_argument('--dataset', type=str,
-                         default='train_test_splits_3D_dataset.pkl', 
+                         default='dataset_5_25_23.pkl', 
                          help='Data directory')
     parser.add_argument('--checkpoint_dir', type=str, 
                         default=DEFAULT_VALUES['checkpoint_dir'], 
@@ -61,7 +61,6 @@ def load_args():
     parser.add_argument('--hidden_dim', type=int, default=512, help='Hidden dimension')
     parser.add_argument('--plt', type=int, default=0, help='Progressive Layer Training')
     parser.add_argument('--burn_in', type=int, default=0, help='Burn-in flag')
-    parser.add_argument('--model_type', type=str, default="imma", help='Model type')
 
     return parser.parse_args()
     
