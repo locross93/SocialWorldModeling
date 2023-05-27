@@ -85,7 +85,7 @@ for exp_name in dir_folders:
     print(exp_name)
     
 input_tensor = np.stack(all_trial_data, axis=0)
-dataset = TensorDataset(torch.tensor(input_tensor))
+dataset = TensorDataset(torch.tensor(input_tensor).float())
 
 # make training and test splits
 # only take trials with logs for validation data
