@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from torch.nn.functional import softmax, relu
 from torch.nn import Parameter
-from models.modules import mlp
+from gnn_models.modules import mlp
 
 class GAT(nn.Module):
     def __init__(self, args):
@@ -78,3 +78,21 @@ class GAT(nn.Module):
             ret.append([[pred_graph], pred_obs])
             batch_data = torch.cat([batch_data[:, 1:, ...], pred_obs.unsqueeze(1)], dim=1)
         return ret
+
+    def loss(self, batch_x, burn_in_length, rollout_length):
+        loss_fn = torch.nn.MSELoss()
+        
+        batch_context = batch_x[:,:burn_in_length,:,:]
+        true_rollout_x = batch_x[:,-rollout_length:,:,:]
+        batch_graph = None
+        
+        preds = self.multistep_forward(batch_context, batch_graph, rollout_length)
+        
+        losses = 0.
+        for idx in range(rollout_length):
+            pred = preds[idx][-1]
+            label = true_rollout_x[:, idx, :self.num_humans, :self.human_state_dim]
+            loss = loss_fn(pred, label)
+            losses += loss
+            
+        return losses

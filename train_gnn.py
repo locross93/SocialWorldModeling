@@ -47,6 +47,8 @@ def load_args():
     parser.add_argument('--config', type=str, required=True, help='Config JSON file')
     parser.add_argument('--model_filename', type=str, default=None, help='Filename for saving model')
     parser.add_argument('--lr', type=float, default=1e-6, help='Learning Rate')
+    parser.add_argument('--env', type=str, default='tdw', help='Environment')
+    parser.add_argument('--gt', default=False, action='store_true', help='use ground truth graph')
     parser.add_argument('--epochs', type=int, default=int(1e5), help='Epochs')
     parser.add_argument('--save_every', type=int, default=500, help='Epoch Save Interval')
     parser.add_argument('--batch_size', type=int, help='Epoch Save Interval')

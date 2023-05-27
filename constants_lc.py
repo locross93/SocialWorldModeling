@@ -1,6 +1,7 @@
 from models import DreamerV2, MultistepPredictor, \
     TransformerMSPredictor, MultistepDelta, TransformerWorldModel
 from gnn_models.imma import IMMA
+from gnn_models.gat import GAT
 import platform
 
 
@@ -9,7 +10,8 @@ MODEL_DICT_TRAIN = {
     'multistep_predictor': MultistepPredictor,    
     'transformer_mp': TransformerMSPredictor,
     'transformer_wm': TransformerWorldModel,
-    'imma': IMMA
+    'imma': IMMA,
+    'gat': GAT
 }
 MODEL_DICT_VAL=  {
     # 'rssm_cont': {
