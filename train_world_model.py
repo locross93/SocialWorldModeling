@@ -53,6 +53,7 @@ def load_args():
     parser.add_argument('--epochs', type=int, default=int(1e5), help='Epochs')
     parser.add_argument('--save_every', type=int, default=500, help='Epoch Save Interval')
     parser.add_argument('--batch_size', type=int, help='Epoch Save Interval')
+    parser.add_argument('--input_size', type=int, help='Input size')
     # rssm parameters
     parser.add_argument('--deter_size', type=int, help='Deterministic size')
     parser.add_argument('--dec_hidden_size', type=int, help='Decoder hidden size')
