@@ -125,10 +125,10 @@ def main():
     replay_buffer.upload_training_set(train_data)
     if args.batch_size:
         batch_size = args.batch_size
-    if platform.system() == 'Windows':
+    elif platform.system() == 'Windows':
         batch_size = 32
     elif platform.system() == 'Linux':
-        batch_size = 256
+        batch_size = 512
     print(f'Batch size: {batch_size}')
     batches_per_epoch = replay_buffer.buffer_size // batch_size
     
@@ -139,6 +139,7 @@ def main():
     val_batch_size = val_data.size(0)
     val_trajs = val_buffer.sample(val_batch_size, random_seed=seed)
     val_trajs = val_trajs.to(DEVICE)
+    val_trajs = val_trajs.to(torch.float32)
         
     print('Starting', model_filename)
     
@@ -169,6 +170,7 @@ def main():
         nsamples = 0
         for i in range(batches_per_epoch):
             batch_x = replay_buffer.sample(batch_size)
+            batch_x = batch_x.to(torch.float32)
             batch_x = batch_x.to(DEVICE)
             nsamples += batch_x.shape[0]
             opt.zero_grad()
