@@ -1,0 +1,9 @@
+{
+  "input_size": 35,
+  "deter_size": 1024,
+  "dec_hidden_size": 1024,
+  "rssm_type": "continuous",
+  "rnn_type": "GRU",
+  "stoch_size": 1024,
+  "model_type": "rssm_cont"
+}
