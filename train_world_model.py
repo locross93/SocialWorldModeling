@@ -41,7 +41,7 @@ def load_args():
                          help='Data directory')
     parser.add_argument('--dataset', type=str,
                          default='dataset_5_25_23.pkl', 
-                         help='Data directory')
+                         help='Dataset name')
     parser.add_argument('--checkpoint_dir', type=str, 
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
@@ -51,7 +51,7 @@ def load_args():
     parser.add_argument('--model_filename', type=str, default=None, help='Filename for saving model')
     parser.add_argument('--lr', type=float, default=1e-4, help='Learning Rate')
     parser.add_argument('--epochs', type=int, default=int(1e5), help='Epochs')
-    parser.add_argument('--save_every', type=int, default=500, help='Epoch Save Interval')
+    parser.add_argument('--save_every', type=int, default=250, help='Epoch Save Interval')
     parser.add_argument('--batch_size', type=int, help='Epoch Save Interval')
     parser.add_argument('--input_size', type=int, help='Input size')
     # rssm parameters

@@ -14,9 +14,10 @@ from scipy.spatial import distance
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from functools import reduce
 from annotate_goal_timepoints import eval_recon_goals
+from analysis_utils import get_data_columns
 
 
-def annotate_pickup_timepoints(loaded_dataset, train_or_val='val', pickup_or_move='move'):
+def annotate_pickup_timepoints(loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=2):
     # load train and val dataset
     train_dataset, test_dataset = loaded_dataset
     
@@ -26,11 +27,7 @@ def annotate_pickup_timepoints(loaded_dataset, train_or_val='val', pickup_or_mov
         input_matrices = test_dataset.dataset.tensors[0][test_dataset.indices,:,:].numpy()
     scores, y_val, y_recon = eval_recon_goals(input_matrices, input_matrices)
 
-    data_columns = ['obj0_x', 'obj0_y', 'obj0_z', 'obj1_x', 'obj1_y', 'obj1_z', 'obj2_x',
-           'obj2_y', 'obj2_z', 'agent0_x', 'agent0_y', 'agent0_z', 'agent0_rot_x',
-           'agent0_rot_y', 'agent0_rot_z', 'agent0_rot_w', 'agent1_x', 'agent1_y',
-           'agent1_z', 'agent1_rot_x', 'agent1_rot_y', 'agent1_rot_z',
-           'agent1_rot_w']    
+    data_columns = get_data_columns(ds_num)    
     dims = ['x', 'y', 'z']
 
     # for every goal find the timepoint where object was delivered to goal location

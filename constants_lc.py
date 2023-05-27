@@ -25,6 +25,9 @@ MODEL_DICT_VAL=  {
     'multistep_pred': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json', 
         'model_dir': 'mp_input_embed_h1024_l2_mlp1024_l2', 'model_label': 'Multistep Predictor'},
+    'mp_ds2': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json', 
+        'model_dir': 'multistep_predictor', 'model_label': 'Multistep Predictor'},
     'multistep_delta': {
         'class': MultistepDelta, 'config': 'multistep_delta_default_config.json', 
         'model_dir': 'multistep_delta_h1024_l2_mlp1024_l2', 'model_label': 'Multistep Delta'},

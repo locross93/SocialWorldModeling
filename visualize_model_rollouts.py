@@ -170,7 +170,7 @@ if __name__ == '__main__':
         input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
     
     # select trajectory where goal occurred
-    pickup_timepoints = annotate_pickup_timepoints(loaded_dataset, args.train_or_val, pickup_or_move='move')
+    pickup_timepoints = annotate_pickup_timepoints(loaded_dataset, args.train_or_val, pickup_or_move='move', ds_num=DATASET_NUMS[args.dataset])
     single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
     multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
     
