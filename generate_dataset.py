@@ -56,7 +56,9 @@ for exp_name in dir_folders:
     trial_data = trial_data.drop(cols2remove, axis=1)
     trial_array = trial_data.to_numpy()
     
-    assert trial_array.shape[1] == 35
+    print(trial_data.columns)
+    
+    assert trial_array.shape[1] == 36
     
     #check for outlier values and skip if found
     max_trial_vals = np.max(np.abs(trial_array), axis=0)

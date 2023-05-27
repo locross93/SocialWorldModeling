@@ -14,12 +14,24 @@ import seaborn as sns
 import torch
 
 from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL
-    
-data_columns = ['obj0_x', 'obj0_y', 'obj0_z', 'obj1_x', 'obj1_y', 'obj1_z', 'obj2_x',
-       'obj2_y', 'obj2_z', 'agent0_x', 'agent0_y', 'agent0_z', 'agent0_rot_x',
-       'agent0_rot_y', 'agent0_rot_z', 'agent0_rot_w', 'agent1_x', 'agent1_y',
-       'agent1_z', 'agent1_rot_x', 'agent1_rot_y', 'agent1_rot_z',
-       'agent1_rot_w'] 
+
+def get_data_columns(ds_num):
+    if ds_num == 1:
+        data_columns = ['obj0_x', 'obj0_y', 'obj0_z', 'obj1_x', 'obj1_y', 'obj1_z', 'obj2_x',
+               'obj2_y', 'obj2_z', 'agent0_x', 'agent0_y', 'agent0_z', 'agent0_rot_x',
+               'agent0_rot_y', 'agent0_rot_z', 'agent0_rot_w', 'agent1_x', 'agent1_y',
+               'agent1_z', 'agent1_rot_x', 'agent1_rot_y', 'agent1_rot_z',
+               'agent1_rot_w'] 
+    elif ds_num == 2:
+        data_columns = ['obj0_x', 'obj0_y', 'obj0_z', 'obj0_rot_x', 'obj0_rot_y', 'obj0_rot_z',
+               'obj0_rot_w', 'obj1_x', 'obj1_y', 'obj1_z', 'obj1_rot_x', 'obj1_rot_y',
+               'obj1_rot_z', 'obj1_rot_w', 'obj2_x', 'obj2_y', 'obj2_z', 'obj2_rot_x',
+               'obj2_rot_y', 'obj2_rot_z', 'obj2_rot_w', 'agent0_x', 'agent0_y',
+               'agent0_z', 'agent0_rot_x', 'agent0_rot_y', 'agent0_rot_z',
+               'agent0_rot_w', 'agent1_x', 'agent1_y', 'agent1_z', 'agent1_rot_x',
+               'agent1_rot_y', 'agent1_rot_z', 'agent1_rot_w']
+        
+    return data_columns
 
 def load_config(file):
     with open(file) as f:

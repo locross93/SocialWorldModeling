@@ -17,11 +17,11 @@ import matplotlib.pyplot as plt
 import moviepy.editor as mpy
 from moviepy.video.io.bindings import mplfig_to_npimage
 
-from analysis_utils import load_trained_model, data_columns
+from analysis_utils import load_trained_model, get_data_columns
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import annotate_goal_timepoints
 
-from constants_lc import MODEL_DICT_VAL
+from constants_lc import MODEL_DICT_VAL, DEFAULT_VALUES, DATASET_NUMS
 
 if platform.system() == 'Windows':
     # We are running on Windows
@@ -40,6 +40,12 @@ def load_args():
     parser.add_argument('--model_key', type=str, required=True, help='Model to use for visualization')
     parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--device', type=str, default='cpu', help='Device')
+    parser.add_argument('--data_dir', type=str,
+                         default=DEFAULT_VALUES['data_dir'], 
+                         help='Data directory')
+    parser.add_argument('--dataset', type=str,
+                         default='train_test_splits_3D_dataset.pkl', 
+                         help='Data directory')
     # which trial to visualize
     parser.add_argument('--trial_type', type=str, default='single_goal', help='Trial Type') # single_goal, multi_goal, all
     parser.add_argument('--trial_num', type=int, default=0, help='Trial Type')
@@ -55,7 +61,7 @@ def load_config(file):
         config = json.load(f)
     return config
 
-def make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file):
+def make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_columns):
     # ie subplot_dims = (3,3)
     fig, ax = plt.subplots(subplot_dims[0], subplot_dims[1], figsize=(15, 15))
     colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
@@ -153,8 +159,8 @@ if __name__ == '__main__':
     model = load_trained_model(model_info, args.device)
     
     # load data
-    #data_file = os.path.join(data_dir, 'train_test_splits_3D_dataset.pkl')
-    data_file = os.path.join(data_dir, 'dataset_5_25_23.pkl')
+    data_columns = get_data_columns(DATASET_NUMS[args.dataset])
+    data_file = os.path.join(data_dir, args.dataset)
     loaded_dataset = pickle.load(open(data_file, 'rb'))
     train_dataset, test_dataset = loaded_dataset
     if args.train_or_val == 'train':
@@ -185,8 +191,10 @@ if __name__ == '__main__':
     x = input_data[traj_ind,:,:].unsqueeze(0)
     x_true = x[0,:burn_in_length+rollout_length,:].numpy()
     x_pred = x_true.copy()
-    #rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()
-    rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
+    if args.model_key == 'transformer_wm':
+        rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
+    else:
+        rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()
     x_pred[burn_in_length:,:] = rollout_x 
     
     viz_dir = os.path.join(analysis_dir, 'results/viz_trajs',args.model_key)
@@ -206,7 +214,7 @@ if __name__ == '__main__':
         num_frames = x_true.shape[0]
         num_steps = subplot_dims[0] * subplot_dims[1]
         steps = np.linspace(0, num_frames-1, num_steps, endpoint=True).astype(int)
-        fig, ax = make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file)
+        fig, ax = make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_columns)
     
     # make video - compare real and reconstructed traj side by side
     if args.make_video:

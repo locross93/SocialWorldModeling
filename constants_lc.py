@@ -41,3 +41,7 @@ DEFAULT_VALUES = {
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
 }
+DATASET_NUMS = {
+    'train_test_splits_3D_dataset.pkl': 1,
+    'dataset_5_25_23.pkl': 2,
+}

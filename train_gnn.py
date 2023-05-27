@@ -131,7 +131,7 @@ if __name__ == '__main__':
     val_trajs = val_trajs.to(torch.float32)
     val_trajs = val_trajs.reshape(-1, sequence_length, 5, 7)
         
-    print('Starting', model_filename)
+    print('Starting', model_filename, 'On DS', args.dataset)
     
     # log to tensorboard
     log_dir = os.path.join(args.checkpoint_dir, 'models/training_info/tensorboard/', model_filename)
