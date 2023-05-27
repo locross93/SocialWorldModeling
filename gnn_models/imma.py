@@ -10,7 +10,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from modules import *
+from gnn_models.modules import *
 
 
 class IMMA(nn.Module):
