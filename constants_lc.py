@@ -34,6 +34,15 @@ MODEL_DICT_VAL=  {
     'transformer_wm': {
        'class': TransformerWorldModel, 'config': 'transformer_wm_default_config.json', 
        'model_dir': 'transformer_wm', 'model_label': 'Transformer'},
+    'gat': {
+       'class': GAT, 'config': 'gat_default_config.json', 
+       'model_dir': 'gat', 'model_label': 'GAT'},
+    'imma': {
+       'class': IMMA, 'config': 'imma_default_config.json', 
+       'model_dir': 'imma', 'model_label': 'IMMA'},
+    'rfm': {
+       'class': RFM, 'config': 'rfm_default_config.json', 
+       'model_dir': 'rfm', 'model_label': 'RFM'},
 }
 DEFAULT_VALUES = {
     'analysis_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/',

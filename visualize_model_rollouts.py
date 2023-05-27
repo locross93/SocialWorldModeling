@@ -46,6 +46,7 @@ def load_args():
     parser.add_argument('--dataset', type=str,
                          default='train_test_splits_3D_dataset.pkl', 
                          help='Data directory')
+    parser.add_argument('--gnn_model', type=bool, default=False, help='GNN Model')
     # which trial to visualize
     parser.add_argument('--trial_type', type=str, default='single_goal', help='Trial Type') # single_goal, multi_goal, all
     parser.add_argument('--trial_num', type=int, default=0, help='Trial Type')
@@ -156,7 +157,7 @@ if __name__ == '__main__':
     
     model_info = MODEL_DICT_VAL[args.model_key]
     model_name = model_info['model_label']
-    model = load_trained_model(model_info, args.device)
+    model = load_trained_model(model_info, args.device, args.gnn_model)
     
     # load data
     data_columns = get_data_columns(DATASET_NUMS[args.dataset])
@@ -193,6 +194,11 @@ if __name__ == '__main__':
     x_pred = x_true.copy()
     if args.model_key == 'transformer_wm':
         rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
+    elif args.gnn_model:
+        x = x.reshape(-1, x.size(1), 5, 7)
+        x_context = x[:,:steps2pickup,:,:]
+        batch_graph = None
+        rollout_x = model.multistep_forward(x_context, batch_graph, rollout_length)
     else:
         rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()
     x_pred[burn_in_length:,:] = rollout_x 

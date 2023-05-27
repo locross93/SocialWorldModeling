@@ -84,7 +84,10 @@ class RFM(nn.Module):
         batch_size = batch_data.shape[0]
         batch_data = batch_data.permute(0, 2, 1, 3)
 
-        node_embeddings, logits = self.encoder(batch_data.contiguous(), self.rel_rec, self.rel_send)
+        if args.encoder == 'rnn':
+            node_embeddings, logits, x_all = self.encoder(batch_data.contiguous(), self.rel_rec, self.rel_send)
+        else:
+            node_embeddings, logits = self.encoder(batch_data.contiguous(), self.rel_rec, self.rel_send)
         edges = F.softmax(logits, dim=-1)
         num_layers = edges.shape[-1]
         pred_graphs = [edges[..., i].reshape(edges.shape[0], self.num_humans, self.num_humans-1) for i in range(num_layers)]

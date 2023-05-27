@@ -15,12 +15,6 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 
 def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_location=True, plot=True):
-    if input_matrices.shape[1:] != (300, 23):
-        input_matrices = input_matrices.reshape(-1, 300, 23)
-        
-    if recon_matrices.shape[1:] != (300, 23):
-        recon_matrices = recon_matrices.reshape(-1, 300, 23)
-        
     if hasattr(recon_matrices, 'requires_grad') and recon_matrices.requires_grad:
         recon_matrices = recon_matrices.detach().numpy()
         

@@ -5,6 +5,7 @@ Created on Mon Feb  6 12:00:58 2023
 @author: locro
 """
 
+import argparse
 import json
 import os
 import pickle
@@ -39,14 +40,24 @@ def load_config(file):
     return config
 
 
-def load_trained_model(model_info, device='cpu'):
+def load_trained_model(model_info, device='cpu', gnn_model=False):
     model_class = model_info['class']
     # load config and initialize model class
     analysis_dir = DEFAULT_VALUES['analysis_dir']
     checkpoint_dir = DEFAULT_VALUES['checkpoint_dir']
     config_file = os.path.join(analysis_dir, 'model_configs/',model_info['config'])
     config = load_config(config_file)
-    model = model_class(config)
+    if gnn_model:
+        args = argparse.Namespace()
+        for key in config.keys():
+            setattr(args, key, config[key])
+        # set default values
+        setattr(args, 'env', 'tdw')
+        setattr(args, 'gt', False)
+        setattr(args, 'device', device)
+        model = model_class(args)
+    else:
+        model = model_class(config)
     # load checkpoint weights
     # checkpoints are in folder named after model
     model_dir = os.path.join(checkpoint_dir, 'models', model_info['model_dir'])
