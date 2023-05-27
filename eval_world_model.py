@@ -171,19 +171,14 @@ class Analysis(object):
         acc_g2 = np.mean(goals_obj2)
         acc_g3 = np.mean(goals_obj3)
         
-        result = [
-            {'Model': self.model_name, 'Accuracy': acc_g2, 'Goal Num': '2nd Goal', 'MSE': mse},
-            {'Model': self.model_name, 'Accuracy': acc_g3, 'Goal Num': '3rd Goal', 'MSE': mse},
-            ]
-        
-        # result = {
-        #     'model': self.model_name,
-        #     'g2_acc': acc_g2,
-        #     'g2_goal_num': '2nd Goal',
-        #     'g2_mse': mse,
-        #     'g3_acc': acc_g3,
-        #     'g3_goal_num': '3rd Goal',
-        #     'g3_mse': mse}
+        result = {
+            'model': self.model_name,
+            'g2_acc': acc_g2,
+            'g2_goal_num': '2nd Goal',
+            'g2_mse': mse,
+            'g3_acc': acc_g3,
+            'g3_goal_num': '3rd Goal',
+            'g3_mse': mse}
         
         return result
     

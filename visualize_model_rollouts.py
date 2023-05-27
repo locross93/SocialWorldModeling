@@ -21,7 +21,7 @@ from analysis_utils import load_trained_model, data_columns
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import annotate_goal_timepoints
 
-from constants import MODEL_DICT_VAL
+from constants_lc import MODEL_DICT_VAL
 
 if platform.system() == 'Windows':
     # We are running on Windows
@@ -162,7 +162,7 @@ if __name__ == '__main__':
         input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
     
     # select trajectory where goal occurred
-    pickup_timepoints = annotate_pickup_timepoints(args.train_or_val, pickup_or_move='move')
+    pickup_timepoints = annotate_pickup_timepoints(loaded_dataset, args.train_or_val, pickup_or_move='move')
     single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
     multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
     

@@ -1,5 +1,6 @@
 from models import DreamerV2, MultistepPredictor, \
-    TransformerMSPredictor, MultistepDelta
+    TransformerMSPredictor, MultistepDelta, TransformerWorldModel
+from gnn_models.imma import IMMA
 import platform
 
 
@@ -7,7 +8,8 @@ MODEL_DICT_TRAIN = {
     'dreamerv2': DreamerV2,
     'multistep_predictor': MultistepPredictor,    
     'transformer_mp': TransformerMSPredictor,
-    #'transformer_wm': TransformerWorldModel
+    'transformer_wm': TransformerWorldModel,
+    'imma': IMMA
 }
 MODEL_DICT_VAL=  {
     # 'rssm_cont': {
@@ -25,9 +27,9 @@ MODEL_DICT_VAL=  {
     # 'transformer': {
     #     'class': TransformerMSPredictor, 'config': 'transformer_default_config.json', 
     #     'model_dir': 'transformer_mp', 'model_label': 'Transformer MP'},
-    #'transformer_wm': {
-    #    'class': TransformerWorldModel, 'config': 'transformer_wm_default_config.json', 
-    #    'model_dir': 'transformer_wm', 'model_label': 'Transformer'},
+    'transformer_wm': {
+       'class': TransformerWorldModel, 'config': 'transformer_wm_default_config.json', 
+       'model_dir': 'transformer_wm', 'model_label': 'Transformer'},
 }
 DEFAULT_VALUES = {
     'analysis_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/',
