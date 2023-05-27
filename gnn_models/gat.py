@@ -65,7 +65,7 @@ class GAT(nn.Module):
             return normalized_A, prev_state + self.final_layer(torch.cat((H, next_H), dim=-1))
 
     def multistep_forward(self, batch_data, batch_graph, rollouts):
-
+        
         ret = []
         for step in range(rollouts):
             tmp_graph, pred_obs = self.forward(batch_data, batch_graph)
@@ -74,7 +74,7 @@ class GAT(nn.Module):
                 for i in range(self.num_humans):
                     pred_graph[:, i, 0:i] = tmp_graph[:, i, 0:i].detach()
                     pred_graph[:, i, i:self.num_humans] = tmp_graph[:, i, i+1:self.num_humans].detach()
-
+            
             ret.append([[pred_graph], pred_obs])
             batch_data = torch.cat([batch_data[:, 1:, ...], pred_obs.unsqueeze(1)], dim=1)
         return ret

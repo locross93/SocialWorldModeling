@@ -50,7 +50,7 @@ def load_args():
     parser.add_argument('--env', type=str, default='tdw', help='Environment')
     parser.add_argument('--gt', default=False, action='store_true', help='use ground truth graph')
     parser.add_argument('--epochs', type=int, default=int(1e5), help='Epochs')
-    parser.add_argument('--save_every', type=int, default=500, help='Epoch Save Interval')
+    parser.add_argument('--save_every', type=int, default=200, help='Epoch Save Interval')
     parser.add_argument('--batch_size', type=int, help='Epoch Save Interval')
     parser.add_argument('--burn_in_length', type=int, default=50, help='Amount of frames to burn into RNN')
     parser.add_argument('--rollout_length', type=int, default=30, help='Forward rollout length') 
@@ -63,6 +63,7 @@ def load_args():
     parser.add_argument('--hidden_dim', type=int, default=512, help='Hidden dimension')
     parser.add_argument('--plt', type=int, default=0, help='Progressive Layer Training')
     parser.add_argument('--burn_in', type=int, default=0, help='Burn-in flag')
+    parser.add_argument('--encoder', default='mlp', choices=['mlp', 'rnn', 'cnn'])
 
     return parser.parse_args()
     
@@ -126,7 +127,7 @@ if __name__ == '__main__':
     if args.batch_size:
         batch_size = args.batch_size
     elif platform.system() == 'Windows':
-        batch_size = 32
+        batch_size = 8
     elif platform.system() == 'Linux':
         batch_size = 256
     print(f'Batch size: {batch_size}')
