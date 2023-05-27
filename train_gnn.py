@@ -125,7 +125,7 @@ if __name__ == '__main__':
     replay_buffer.upload_training_set(train_data)
     if args.batch_size:
         batch_size = args.batch_size
-    if platform.system() == 'Windows':
+    elif platform.system() == 'Windows':
         batch_size = 32
     elif platform.system() == 'Linux':
         batch_size = 256
