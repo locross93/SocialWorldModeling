@@ -126,11 +126,13 @@ class Analysis(object):
         if ds == 'First':
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move')
+            # @TODO multi_goal_trajs are empty for new datasets because there is no event in which 
+            # three events have happened
             multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
         else:
             # use event log for new datasets - TO DO
             pickup_timepoints = []
-                    
+                                        
         num_multi_goal_trajs = len(multi_goal_trajs)
         imagined_trajs = np.zeros([num_multi_goal_trajs, input_data.shape[1], input_data.shape[2]])
         real_trajs = []
