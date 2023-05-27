@@ -40,18 +40,21 @@ class RFM(nn.Module):
         self.factor = True
 
         if args.encoder == 'cnn':
+            self.encoder_type = 'cnn'
             self.encoder = CNNEncoder(self.input_human_state_dim,
                                       self.encoder_hidden,
                                       self.edge_types,
                                       self.encoder_dropout,
                                       self.factor)
         elif args.encoder == 'rnn':
+            self.encoder_type = 'rnn'
             self.encoder = RNNEncoder(self.input_human_state_dim,
                                       self.encoder_hidden,
                                       self.edge_types,
                                       self.encoder_dropout,
                                       self.factor)
         else:
+            self.encoder_type = 'mlp'
             self.encoder = MLPEncoder(self.obs_frames * self.input_human_state_dim,
                                       self.encoder_hidden,
                                       self.edge_types,
@@ -84,7 +87,7 @@ class RFM(nn.Module):
         batch_size = batch_data.shape[0]
         batch_data = batch_data.permute(0, 2, 1, 3)
 
-        if args.encoder == 'rnn':
+        if self.encoder_type == 'rnn':
             node_embeddings, logits, x_all = self.encoder(batch_data.contiguous(), self.rel_rec, self.rel_send)
         else:
             node_embeddings, logits = self.encoder(batch_data.contiguous(), self.rel_rec, self.rel_send)
