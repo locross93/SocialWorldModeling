@@ -153,7 +153,8 @@ if __name__ == '__main__':
     model = load_trained_model(model_info, args.device)
     
     # load data
-    data_file = os.path.join(data_dir, 'train_test_splits_3D_dataset.pkl')
+    #data_file = os.path.join(data_dir, 'train_test_splits_3D_dataset.pkl')
+    data_file = os.path.join(data_dir, 'dataset_5_25_23.pkl')
     loaded_dataset = pickle.load(open(data_file, 'rb'))
     train_dataset, test_dataset = loaded_dataset
     if args.train_or_val == 'train':
