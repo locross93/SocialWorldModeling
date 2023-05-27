@@ -14,16 +14,16 @@ MODEL_DICT_TRAIN = {
 MODEL_DICT_VAL=  {
     'rssm_disc': {
         'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
-        'model_dir': 'rssm_disc_default', 'epoch': '1000', 'model_label': 'RSSM Discrete'},
+        'model_dir': 'rssm_disc_default', 'epoch': '3000', 'model_label': 'RSSM Discrete'},
     'multistep_predictor': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json',
-        'model_dir': 'multistep_predictor_default', 'epoch': '1000', 'model_label': 'Multistep Predictor'},
+        'model_dir': 'multistep_predictor_default', 'epoch': '3000', 'model_label': 'Multistep Predictor'},
     'multistep_delta': {
         'class': MultistepDelta, 'config': 'multistep_delta_default_config.json',
-        'model_dir': 'multistep_delta_default', 'epoch': '1000', 'model_label': 'Multistep Delta'},
+        'model_dir': 'multistep_delta_default', 'epoch': '3000', 'model_label': 'Multistep Delta'},
     'transformer_iris': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
-        'model_dir': 'transformer_iris_default', 'epoch': '5000', 'model_label': 'Transformer Iris'},
+        'model_dir': 'transformer_iris_default', 'epoch': '3000', 'model_label': 'Transformer Iris'},
     # 'transformer_iris_dropout_0.1': {
     #      'class': TransformerIrisWorldModel, 'config': 'transformer_iris_dropout_0.1_config.json',
     #      'model_dir': 'transformer_iris_dropout', 'epoch': '3000', 'model_label': 'Transformer Iris Dropout 0.1'},
@@ -82,7 +82,7 @@ DEFAULT_VALUES = {
     'batch_size': 2048,
     'lr': 1e-3,
     'epochs': int(3e4),
-    'save_every': 500,
+    'save_every': 200,
     # eval parameters
     'model_keys': list(MODEL_DICT_VAL.keys()),
     'eval_types': ['goal_events', 'multigoal_events', 'move_events'],

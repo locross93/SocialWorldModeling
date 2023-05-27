@@ -2228,28 +2228,18 @@ class Transformer(nn.Module):
 
 
 " World model "
-class EmbeddingModule(nn.Module):
-    def __init__(self, feat_dim, emb_dim, num_layers=2):
-        super().__init__()        
-        self.embedding = self._build_mlp(feat_dim, emb_dim, num_layers)
-
-    
-
-    def forward(self, x):
-        bs, ts, fs = x.shape
-        x = x.reshape(-1, fs)
-        x = self.linear(x)
-        x = self.ln(x)
-        x = x.reshape(bs, ts, -1)
-        return x
-
-
 class TransformerIrisWorldModel(nn.Module):
     def __init__(self, config: Dict) -> None:
         super().__init__()
-        self.config = config
-        self.pos_emb = nn.Embedding(config['max_seq_len'], config['embed_dim'])
-        self.embedder = self._build_encoder_mlp(self.config['num_encode_layers'])
+        self.config = config        
+        self.embedder = self._build_encoder_mlp(self.config['num_encode_layers'])        
+        if self.config['pos_encode_aggregation'] == 'concat': 
+            assert 'pos_embed_dim' in self.config, \
+                "pos_embed_dim must be specified in config if pos_encode_aggregation is concat"
+            self.pos_emb = nn.Embedding(config['max_seq_len'], config['pos_embed_dim'])
+            self.pos_emb_proj = nn.Linear(config['embed_dim'] + config['pos_embed_dim'], config['embed_dim'])
+        else:
+            self.pos_emb = nn.Embedding(config['max_seq_len'], config['embed_dim']) 
         self.transformer = Transformer(config)
         self.decoding_head = self._build_decoder_mlp(self.config['num_decode_layers'])
         self.apply(init_weights)
@@ -2281,10 +2271,13 @@ class TransformerIrisWorldModel(nn.Module):
         num_steps = obs.size(1)  # (B, T)
         assert num_steps <= self.config['max_seq_len'], "num_steps should be less than or equal to max_seq_len"
         prev_steps = 0 if past_keys_values is None else past_keys_values.size        
-        embds = self.embedder(obs)
-        # @TODO: if adding MLP embedding doesn't work well, try to concat positional embedding
-        pos_embds = self.pos_emb(prev_steps + torch.arange(num_steps, device=obs.device))        
-        seq_emdbs = embds 
+        embds = self.embedder(obs)  
+        pos_embds = self.pos_emb(prev_steps + torch.arange(num_steps, device=obs.device))
+        if self.config['pos_encode_aggregation'] == 'concat':            
+            pos_embds = pos_embds[:, :num_steps].unsqueeze(0).expand(embds.size(0), -1, -1) # (B, T, E)           
+            seq_emdbs = self.pos_emb_proj(torch.cat([embds, pos_embds], dim=-1))
+        else:
+            seq_emdbs = embds + pos_embds
         x = self.transformer(seq_emdbs, past_keys_values)
         output_observations = self.decoding_head(x)
         return (x, output_observations)

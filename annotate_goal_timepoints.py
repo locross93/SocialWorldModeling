@@ -9,18 +9,11 @@ import matplotlib.pylab as plt
 import os
 import pickle
 import numpy as np
-import platform
 from scipy.spatial import distance
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 
-def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_location=True, plot=True):
-    if input_matrices.shape[1:] != (300, 23):
-        input_matrices = input_matrices.reshape(-1, 300, 23)
-        
-    if recon_matrices.shape[1:] != (300, 23):
-        recon_matrices = recon_matrices.reshape(-1, 300, 23)
-        
+def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_location=True, plot=True):        
     if hasattr(recon_matrices, 'requires_grad') and recon_matrices.requires_grad:
         recon_matrices = recon_matrices.detach().numpy()
         
@@ -127,7 +120,7 @@ def annotate_goal_timepoints(loaded_dataset, train_or_val='val'):
     elif train_or_val == 'val':
         input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:].numpy()
     
-    input_matrices = input_data.reshape(-1, 300, 23)
+    input_matrices = input_data#input_data.reshape(-1, 300, 23)
     scores, y_val, y_recon = eval_recon_goals(input_matrices, input_matrices)
     
     data_columns = ['obj0_x', 'obj0_y', 'obj0_z', 'obj1_x', 'obj1_y', 'obj1_z', 'obj2_x',

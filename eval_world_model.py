@@ -97,6 +97,9 @@ class Analysis(object):
             imagined_trajs[i,:steps2pickup,:] = x[:,:steps2pickup,:].cpu()
             # rollout model for the rest of the trajectory
             rollout_length = self.num_timepoints - steps2pickup
+            # new dataset x contains float64, but model expects float32
+            if x.dtype == torch.float64:
+                x = x.float()
             rollout_x = model.forward_rollout(x.cuda(), steps2pickup, rollout_length).cpu().detach()
             # get end portion of true trajectory to compare to rollout
             real_traj = x[:,steps2pickup:,:].to("cpu")
@@ -127,7 +130,7 @@ class Analysis(object):
         else:
             # use event log for new datasets - TO DO
             pickup_timepoints = []
-            
+                    
         num_multi_goal_trajs = len(multi_goal_trajs)
         imagined_trajs = np.zeros([num_multi_goal_trajs, input_data.shape[1], input_data.shape[2]])
         real_trajs = []
@@ -144,11 +147,12 @@ class Analysis(object):
             rollout_length = self.num_timepoints - steps2pickup
             rollout_x = model.forward_rollout(x.cuda(), steps2pickup, rollout_length).cpu().detach()
             # get end portion of true trajectory to compare to rollout
-            real_traj = x[:,steps2pickup:,:].to("cpu")
+            real_traj = x[:,steps2pickup:,:].to("cpu")                
             assert rollout_x.size() == real_traj.size()
             real_trajs.append(real_traj)
             imag_trajs.append(rollout_x)
             imagined_trajs[i,steps2pickup:,:] = rollout_x
+        
         x_true = torch.cat(real_trajs, dim=1)
         x_hat = torch.cat(imag_trajs, dim=1)
         mse = ((x_true - x_hat)**2).mean().item()
@@ -263,6 +267,8 @@ class Analysis(object):
             imagined_trajs[i,:burn_in_length,:] = x[:,:burn_in_length,:].cpu()
             # rollout model for the rest of the trajectory
             rollout_length = self.num_timepoints - burn_in_length
+            if x.dtype == torch.float64:
+                x = x.float()
             rollout_x = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu().detach()
             # store the steps after pick up with predicted frames in imagined_trajs
             imagined_trajs[i,burn_in_length:,:] = rollout_x
