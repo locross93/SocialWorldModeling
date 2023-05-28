@@ -131,7 +131,7 @@ def main():
     sequence_length = burn_in_length + rollout_length
     replay_buffer = ReplayBuffer(sequence_length)
     replay_buffer.upload_training_set(train_data)
-    breakpoint()    
+    #breakpoint()    
     batch_size = args.batch_size
     
     print(f'Batch size: {batch_size}')

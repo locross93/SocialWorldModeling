@@ -1008,8 +1008,6 @@ class DreamerV2(nn.Module):
         return x_hat
     
     def loss(self, x):
-        if x.dtype == torch.float64:
-            x = x.float()
         # Encoder
         prior, post = self.encoder(x)
         
@@ -1396,8 +1394,6 @@ class MultistepDelta(nn.Module):
         return x_hat
     
     def loss(self, x, burn_in_length, rollout_length):
-        if x.dtype == torch.float64:
-            x = x.float()
         x_hat = self.forward_rollout(x, burn_in_length, rollout_length)
         t_end = burn_in_length + rollout_length
         x_supervise = x[:,burn_in_length:t_end,:]
@@ -2098,7 +2094,17 @@ from typing import Optional
 
 from einops import rearrange
 from kv_caching import KeysValues, KVCache
-from constants import DISCRETIZATION_DICT_SMALL
+"""Valus for discretization data"""
+DISCRETIZATION_DICT_SMALL = {
+    'max': [
+        6.7625, 1.8597, 6.8753, 6.7313, 1.6808, 6.8558, 6.3460, 1.0356, 
+        6.8317, 6.8851, 0.3761, 6.8929, 0.7643, 1.0000, 0.7607, 1.0000, 
+        6.8764, 0.3719, 6.8717, 0.7659, 1.0000, 0.7655, 1.0000],
+    'min': [
+        -6.7398, -0.0123, -6.8303, -6.8838, -0.0220, -6.7574, -6.8617, -0.0117, 
+        -6.7947, -6.8901, -0.0426, -6.8758, -0.7560, -1.0000, -0.7604, -1.0000,
+        -6.8851, -0.0326, -6.8671, -0.7600, -1.0000, -0.7641, -1.0000]
+}
 
 " Some util functions for the world model "
 def init_weights(module):
@@ -2241,11 +2247,12 @@ class TransformerIrisWorldModel(nn.Module):
                 "pos_embed_dim must be specified in config if pos_encode_aggregation is concat"
             self.pos_emb = nn.Embedding(config['max_seq_len'], config['pos_embed_dim'])
             self.pos_emb_proj = nn.Linear(config['embed_dim'] + config['pos_embed_dim'], config['embed_dim'])
-        
-            
+                    
         self.transformer = Transformer(config)
         self.decoder = self._build_decoder_mlp(self.config['num_decode_layers'])
         self.apply(init_weights)
+        self.boundaries = self._generate_boundaries(
+            DISCRETIZATION_DICT_SMALL['min'], DISCRETIZATION_DICT_SMALL['max'], config['num_bins'])
 
     def __repr__(self) -> str:
         return "TranformerIrisWorldModel"
@@ -2268,6 +2275,23 @@ class TransformerIrisWorldModel(nn.Module):
         layers.append(nn.Linear(self.config['embed_dim'], self.config['obs_size']))
         return nn.Sequential(*layers)
     
+    def _generate_boundaries(self, min_values: list, max_values: list, bin_size: int) -> torch.Tensor:
+        boundaries = []
+        for min_val, max_val in zip(min_values, max_values):
+            boundary = torch.linspace(min_val, max_val, bin_size + 1)[1:-1]
+            boundaries.append(boundary)
+        return torch.stack(boundaries)
+    
+    def discretize_obs(self, obs: torch.Tensor, boundaries: torch.Tensor):
+        # Create an array to store the discretized values
+        boundaries = boundaries.to(obs.device)
+        discretized = torch.zeros_like(obs).to(obs.device)
+        labels = torch.zeros_like(obs, dtype=torch.long).to(obs.device)        
+        for i in range(obs.size(-1)):
+            discretized[..., i] = torch.bucketize(obs[..., i], boundaries[i])
+            labels[..., i] = torch.searchsorted(boundaries[i], obs[..., i])
+        return discretized, labels
+    
     def forward(self, obs: torch.FloatTensor, past_keys_values: Optional[KeysValues] = None):
         num_steps = obs.size(1)  # (B, T)
         assert num_steps <= self.config['max_seq_len'], "num_steps should be less than or equal to max_seq_len"
@@ -2286,24 +2310,22 @@ class TransformerIrisWorldModel(nn.Module):
         return (x, output_observations)
     
     def loss(self, obs: torch.LongTensor) -> torch.FloatTensor:
-        # somehow new data has dtype float64
-        if obs.dtype == torch.float64:
-            obs = obs.float()
+        obs, labels = self.discretize_obs(obs, self.boundaries)
         if self.config['attention'] == 'causal':
             inputs = obs[:, :-1]
-            labels = obs[:, 1:]
+            labels = labels[:, 1:]
         elif self.config['attention'] == 'window':
             # model can see up to T-window_size steps and predict the window_size steps
             assert self.config['window_size'] is not None, "window_size should be specified"
             assert self.config['window_size'] < obs.size(1), \
                 f"window_size should be at less than {obs.size(1)}"
             inputs = obs[:, :-self.config['window_size']]
-            labels = obs[:, self.config['window_size']:]
+            labels = labels[:, self.config['window_size']:]
         elif self.config['attention'] == 'square':
             assert self.config['square_size'] >= obs.size(1) / 2, \
                 f"square_size should be at least {obs.size(1)/2}"
             inputs = obs[:, : self.config['square_size']]
-            labels = obs[:, self.config['square_size'] :]
+            labels = labels[:, self.config['square_size'] :]
                 
         x, output_observations = self(inputs)
         # sqaure mask input and labels won't be the same size
@@ -2311,8 +2333,10 @@ class TransformerIrisWorldModel(nn.Module):
             output_observations = output_observations[:, :labels.size(1)]
 
         outputs = rearrange(output_observations, 'b t o -> (b t) o')        
-        labels = rearrange(labels, 'b t o -> (b t) o')        
-        loss = F.mse_loss(labels, outputs)
+        labels = rearrange(labels, 'b t o -> (b t) o').to(torch.float32)      
+        #loss = F.mse_loss(labels, outputs)
+        breakpoint()
+        loss = F.cross_entropy(outputs, labels)        
         return loss
     
     def forward_rollout(self, x, burn_in_length, rollout_length):

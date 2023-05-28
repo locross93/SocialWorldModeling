@@ -2,7 +2,8 @@
     "model_type": "transformer_iris",
     "obs_size": 23,
     "max_seq_len": 1000,
-    "attention": "causal",    
+    "attention": "causal", 
+    "num_bins": 50,
 
     "num_encode_layers": 4,
     "embed_dim": 512,
