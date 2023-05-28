@@ -2093,12 +2093,12 @@ class RND(nn.Module):
 
 
 """ Tranformer world model adapted from IRIS(https://github.com/eloialonso/iris/blob/main/src/models/world_model.py) """
-from dataclasses import dataclass
 import math
 from typing import Optional
 
 from einops import rearrange
 from kv_caching import KeysValues, KVCache
+from constants import DISCRETIZATION_DICT_SMALL
 
 " Some util functions for the world model "
 def init_weights(module):
@@ -2207,15 +2207,15 @@ class Block(nn.Module):
 
 class Transformer(nn.Module):
     def __init__(self, config: Dict) -> None:
-        super().__init__()        
+        super().__init__()
         self.config = config
         self.drop = nn.Dropout(config["embed_pdrop"])
         self.blocks = nn.ModuleList([Block(config) for _ in range(config['num_attn_layers'])])
         self.ln_f = nn.LayerNorm(config['embed_dim'])
 
-    def generate_empty_keys_values(self, n: int, max_seq_len: int) -> KeysValues:
-        device = self.ln_f.weight.device  # Assumption that all submodules are on the same device
-        return KeysValues(n, self.config['num_heads'], max_seq_len, self.config['embed_dim'], self.config['num_attn_layers'], device)
+    # def generate_empty_keys_values(self, n: int, max_seq_len: int) -> KeysValues:
+    #     device = self.ln_f.weight.device  # Assumption that all submodules are on the same device
+    #     return KeysValues(n, self.config['num_heads'], max_seq_len, self.config['embed_dim'], self.config['num_attn_layers'], device)
 
     def forward(self, sequences: torch.Tensor, past_keys_values: Optional[KeysValues] = None) -> torch.Tensor:
         assert past_keys_values is None or len(past_keys_values) == len(self.blocks)        
@@ -2232,16 +2232,19 @@ class TransformerIrisWorldModel(nn.Module):
     def __init__(self, config: Dict) -> None:
         super().__init__()
         self.config = config        
-        self.embedder = self._build_encoder_mlp(self.config['num_encode_layers'])        
-        if self.config['pos_encode_aggregation'] == 'concat': 
+        self.embedder = self._build_encoder_mlp(self.config['num_encode_layers'])
+        if 'pos_encode_aggregation' not in self.config:
+            self.pos_emb = nn.Embedding(config['max_seq_len'], config['embed_dim']) 
+        else:
+            #self.config['pos_encode_aggregation'] == 'concat': 
             assert 'pos_embed_dim' in self.config, \
                 "pos_embed_dim must be specified in config if pos_encode_aggregation is concat"
             self.pos_emb = nn.Embedding(config['max_seq_len'], config['pos_embed_dim'])
             self.pos_emb_proj = nn.Linear(config['embed_dim'] + config['pos_embed_dim'], config['embed_dim'])
-        else:
-            self.pos_emb = nn.Embedding(config['max_seq_len'], config['embed_dim']) 
+        
+            
         self.transformer = Transformer(config)
-        self.decoding_head = self._build_decoder_mlp(self.config['num_decode_layers'])
+        self.decoder = self._build_decoder_mlp(self.config['num_decode_layers'])
         self.apply(init_weights)
 
     def __repr__(self) -> str:
@@ -2250,36 +2253,36 @@ class TransformerIrisWorldModel(nn.Module):
     def _build_encoder_mlp(self, num_layers):
         layers = [
             nn.Linear(self.config['obs_size'], self.config['embed_dim']), 
-            nn.ReLU(),
+            nn.GELU(),
             nn.LayerNorm(self.config['embed_dim'])]
         for _ in range(1, num_layers):
             layers.append(nn.Linear(self.config['embed_dim'], self.config['embed_dim']))
-            layers.append(nn.ReLU())
+            layers.append(nn.GELU())
         return nn.Sequential(*layers)
     
     def _build_decoder_mlp(self, num_layers):
-        layers = [
-            nn.Linear(self.config['embed_dim'], self.config['embed_dim']),
-            nn.ReLU(),
-            nn.LayerNorm(self.config['embed_dim'])]
-        for _ in range(1, num_layers):
-            layers.append(nn.Linear(self.config['embed_dim'], self.config['obs_size']))
-            layers.append(nn.ReLU())
+        layers = []
+        for _ in range(num_layers-1):
+            layers.append(nn.Linear(self.config['embed_dim'], self.config['embed_dim']))
+            layers.append(nn.GELU())
+        layers.append(nn.Linear(self.config['embed_dim'], self.config['obs_size']))
         return nn.Sequential(*layers)
-
+    
     def forward(self, obs: torch.FloatTensor, past_keys_values: Optional[KeysValues] = None):
         num_steps = obs.size(1)  # (B, T)
         assert num_steps <= self.config['max_seq_len'], "num_steps should be less than or equal to max_seq_len"
         prev_steps = 0 if past_keys_values is None else past_keys_values.size        
-        embds = self.embedder(obs)  
-        pos_embds = self.pos_emb(prev_steps + torch.arange(num_steps, device=obs.device))
-        if self.config['pos_encode_aggregation'] == 'concat':            
-            pos_embds = pos_embds[:, :num_steps].unsqueeze(0).expand(embds.size(0), -1, -1) # (B, T, E)           
-            seq_emdbs = self.pos_emb_proj(torch.cat([embds, pos_embds], dim=-1))
+        embds = self.embedder(obs)
+        self.embds = embds
+        self.pos_embds = self.pos_emb(prev_steps + torch.arange(num_steps, device=obs.device))
+        if 'pos_encode_aggregation' not in self.config:
+            seq_emdbs = embds + self.pos_embds        
         else:
-            seq_emdbs = embds + pos_embds
-        x = self.transformer(seq_emdbs, past_keys_values)
-        output_observations = self.decoding_head(x)
+            #if self.config['pos_encode_aggregation'] == 'concat':            
+            pos_embds = self.pos_embds.unsqueeze(0).expand(embds.size(0), -1, -1) # (B, T, E)
+            seq_emdbs = self.pos_emb_proj(torch.cat([embds, pos_embds], dim=-1))        
+        x = self.transformer(seq_emdbs, past_keys_values)        
+        output_observations = self.decoder(x)
         return (x, output_observations)
     
     def loss(self, obs: torch.LongTensor) -> torch.FloatTensor:

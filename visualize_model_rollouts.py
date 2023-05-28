@@ -11,7 +11,7 @@ import argparse
 import json
 import pandas as pd
 import pickle
-import platform
+import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import moviepy.editor as mpy
@@ -182,6 +182,8 @@ if __name__ == '__main__':
         
     rollout_length = input_data.size(1) - burn_in_length
     x = input_data[traj_ind,:,:].unsqueeze(0)
+    if x.dtype == torch.float64:
+        x = x.float()
     x_true = x[0,:burn_in_length+rollout_length,:].numpy()
     x_pred = x_true.copy()
     rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()

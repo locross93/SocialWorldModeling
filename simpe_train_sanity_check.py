@@ -130,9 +130,10 @@ def main():
     rollout_length = args.rollout_length
     sequence_length = burn_in_length + rollout_length
     replay_buffer = ReplayBuffer(sequence_length)
-    replay_buffer.upload_training_set(train_data)    
+    replay_buffer.upload_training_set(train_data)
+    breakpoint()    
     batch_size = args.batch_size
-    breakpoint()
+    
     print(f'Batch size: {batch_size}')
     batches_per_epoch = replay_buffer.buffer_size // batch_size
     
@@ -164,58 +165,49 @@ def main():
     
     model.to(DEVICE)
     start_time = time.time()
+    batch_x = replay_buffer.sample(batch_size)
+    batch_x = batch_x.to(DEVICE)
+
     for epoch in tqdm(range(args.epochs)):
         model.train()
         batch_loss = []
         if config['model_type'][:4] == 'rssm':
             batch_recon_loss = []
-            batch_kl_loss = []
-        nsamples = 0
-        for i in range(batches_per_epoch):
-            batch_x = replay_buffer.sample(batch_size)
-            batch_x = batch_x.to(DEVICE)
-            nsamples += batch_x.shape[0]
+            batch_kl_loss = []            
             opt.zero_grad()
-            if batch_x.dtype == torch.int64:
-                batch_x = batch_x.float()
-            if config['model_type'][:4] == 'rssm' or \
-                config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
-                loss = model.loss(batch_x)
-            elif config['model_type'] in ['multistep_predictor', 'multistep_delta']:
-                loss = model.loss(batch_x, burn_in_length, rollout_length)
-            elif config['model_type'] == 'transformer_mp':
-                loss = model.loss(batch_x, burn_in_length, rollout_length, mask_type='triangular')
-            loss.backward()
-            opt.step()
-            
-            batch_loss.append(loss.item())
-            if config['model_type'][:4] == 'rssm':
-                batch_recon_loss.append(model.recon_loss.item())
-                batch_kl_loss.append(model.kl.item())
+        if batch_x.dtype == torch.int64:
+            batch_x = batch_x.float()
+        if config['model_type'][:4] == 'rssm' or \
+            config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
+            loss = model.loss(batch_x)
+        elif config['model_type'] in ['multistep_predictor', 'multistep_delta']:
+            loss = model.loss(batch_x, burn_in_length, rollout_length)
+        elif config['model_type'] == 'transformer_mp':
+            loss = model.loss(batch_x, burn_in_length, rollout_length, mask_type='triangular')
+        loss.backward()
+        opt.step()        
+        batch_loss.append(loss.item())
+        if config['model_type'][:4] == 'rssm':
+            batch_recon_loss.append(model.recon_loss.item())
+            batch_kl_loss.append(model.kl.item())        
         epoch_loss = np.sum(batch_loss)
         loss_dict['train'].append(epoch_loss)
         loss_dict['epoch_times'].append(time.time()-start_time)
         if config['model_type'][:4] == 'rssm':
             loss_dict['recon_loss'].append(np.sum(batch_recon_loss))
             loss_dict['kl_loss'].append(np.sum(batch_kl_loss))
-        # test on validation set
-        with torch.no_grad():
-            model.eval()
-            if config['model_type'][:4] == 'rssm' or \
-                config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
-                val_loss = model.loss(val_trajs)
-            elif config['model_type'] in ['multistep_predictor', 'multistep_delta']:
-                val_loss = model.loss(val_trajs, burn_in_length, rollout_length)
-            elif config['model_type'] == 'transformer_mp':
-                val_loss = model.loss(val_trajs, burn_in_length, rollout_length, mask_type='triangular')
-            val_loss = val_loss.item()
-            loss_dict['val'].append(val_loss)
+        elif config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
+            loss_dict
+        
         # log to tensorboard
         writer.add_scalar('Train Loss/loss', epoch_loss, epoch)
-        writer.add_scalar('Val Loss/val', val_loss, epoch)
         if config['model_type'][:4] == 'rssm':
             writer.add_scalar('Train_Loss/recon_loss', np.sum(batch_recon_loss), epoch)
             writer.add_scalar('Train_Loss/kl_loss', np.sum(batch_kl_loss), epoch)
+        elif config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
+            writer.add_embedding(model.pos_embds, global_step=epoch, tag='pos_embds')
+            one_sample_time_embds = model.embds[0,:,:]
+            writer.add_embedding(one_sample_time_embds, global_step=epoch, tag='one_sample_time_embds')
         if epoch % args.save_every == 0 or epoch == (args.epochs-1):
             # save checkpoints in checkpoint directory with plenty of storage
             save_dir = os.path.join(args.checkpoint_dir, 'models', model_filename)            
@@ -223,7 +215,7 @@ def main():
                 os.makedirs(save_dir)
             model_name = os.path.join(save_dir, f'{model_filename}_epoch{epoch}')
             torch.save(model.state_dict(), model_name)
-        print(f'Epoch {epoch}, Train Loss {epoch_loss}, Validation Loss {val_loss}')
+        print(f'Epoch {epoch}, Train Loss {epoch_loss}')
 
 
 if __name__ == '__main__':    

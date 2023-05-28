@@ -4,11 +4,14 @@
     "max_seq_len": 1000,    
     "attention": "causal",
 
+    "num_encode_layers": 2,
+    "num_decode_layers": 2,
+
     "num_attn_layers": 4,
     "num_heads": 4,
     "embed_dim": 512,
 
-    "embed_pdrop": 0.1,
-    "resid_pdrop": 0.1,
-    "attn_pdrop": 0.1
+    "embed_pdrop": 0.7,
+    "resid_pdrop": 0.7,
+    "attn_pdrop": 0.7
 }

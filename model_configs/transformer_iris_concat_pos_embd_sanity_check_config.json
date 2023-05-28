@@ -4,9 +4,9 @@
     "max_seq_len": 1000,
     "attention": "causal",    
 
-    "num_encode_layers": 2,
+    "num_encode_layers": 4,
     "embed_dim": 512,
-    "num_decode_layers": 2,
+    "num_decode_layers": 4,    
 
     "pos_encode_aggregation": "concat",
     "pos_embed_dim": 35,    

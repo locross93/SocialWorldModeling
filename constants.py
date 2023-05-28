@@ -2,6 +2,20 @@ from models import DreamerV2, MultistepPredictor, MultistepDelta, \
     TransformerMSPredictor, TransformerIrisWorldModel, TransformerWorldModel
 
 
+"""Valus for discretization data"""
+DISCRETIZATION_DICT_SMALL = {
+    'max': [
+        6.7625, 1.8597, 6.8753, 6.7313, 1.6808, 6.8558, 6.3460, 1.0356, 
+        6.8317, 6.8851, 0.3761, 6.8929, 0.7643, 1.0000, 0.7607, 1.0000, 
+        6.8764, 0.3719, 6.8717, 0.7659, 1.0000, 0.7655, 1.0000],
+    'min': [
+        -6.7398, -0.0123, -6.8303, -6.8838, -0.0220, -6.7574, -6.8617, -0.0117, 
+        -6.7947, -6.8901, -0.0426, -6.8758, -0.7560, -1.0000, -0.7604, -1.0000,
+        -6.8851, -0.0326, -6.8671, -0.7600, -1.0000, -0.7641, -1.0000]
+}
+DISCRETIZATION_DICT_BIG = {}
+
+"""Values for training"""
 MODEL_DICT_TRAIN = {
     'rssm_disc': DreamerV2,
     'multistep_predictor': MultistepPredictor,
@@ -10,7 +24,7 @@ MODEL_DICT_TRAIN = {
     'transformer_mp': TransformerMSPredictor,
     'transformer_iris': TransformerIrisWorldModel
 }
-
+"""Values for validation"""
 MODEL_DICT_VAL=  {
     'rssm_disc': {
         'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
@@ -24,6 +38,9 @@ MODEL_DICT_VAL=  {
     'transformer_iris': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
         'model_dir': 'transformer_iris_default', 'epoch': '3000', 'model_label': 'Transformer Iris'},
+    'transformer_iris_concat_pos_embd': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
+        'model_dir': 'transformer_iris_concat_pos_embd_default', 'epoch': '1600', 'model_label': 'Transformer Iris Concat Pos Embd'},
     # 'transformer_iris_dropout_0.1': {
     #      'class': TransformerIrisWorldModel, 'config': 'transformer_iris_dropout_0.1_config.json',
     #      'model_dir': 'transformer_iris_dropout', 'epoch': '3000', 'model_label': 'Transformer Iris Dropout 0.1'},
@@ -68,14 +85,13 @@ MODEL_DICT_VAL=  {
     #     'model_dir': 'transformer_iris_mp_square_70', 'epoch': '3000', 'model_label': 'Transformer Iris MP Square 70'},
 }
 
-
 DEFAULT_VALUES = {
     # general pipeline parameters
-    'analysis_dir': './',
-    #'data_path': '/data2/ziyxiang/social_world_model/data/train_test_splits_3D_dataset.pkl',
+    'analysis_dir': './',    
     #'checkpoint_dir': '/data2/ziyxiang/social_world_model/checkpoint',
     # as of 5/26, the new models in nfs checkpoint path use the new data path
-    'data_path': '/ccn2/u/ziyxiang/swm_data_and_results/data/dataset_5_25_23.pkl',
+    #'data_path': '/ccn2/u/ziyxiang/swm_data_and_results/data/dataset_5_25_23.pkl',
+    'data_path': '/data2/ziyxiang/social_world_model/data/train_test_splits_3D_dataset.pkl',
     'checkpoint_dir': '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint',
     'model_config_dir': './model_configs',
     # general training parameters for all models
