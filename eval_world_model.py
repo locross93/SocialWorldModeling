@@ -22,6 +22,7 @@ from analysis_utils import load_config, get_highest_numbered_file
 from models import DreamerV2
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
+from plot_eval_world_model import plot_eval_wm_results
 
 
 #@typechecked
@@ -318,7 +319,9 @@ class Analysis(object):
             save_file = save_file+'_train'
         save_path = os.path.join(self.args.analysis_dir, 'results', f'{save_file}.csv')
         df_results = pd.DataFrame(self.results)
-        df_results.to_csv(save_path)                             
+        df_results.to_csv(save_path)
+        if self.args.plot:
+            plot_eval_wm_results(df_results, self.args, save_file)                             
 
 
     def run(self) -> None:
@@ -355,6 +358,7 @@ def load_args():
                         choices=DEFAULT_VALUES['eval_types'], 
                         default='goal_events', 
                         help='Type of evaluation to perform')
+    parser.add_argument('--plot', type=bool, default=True, help='Plot Results')
     parser.add_argument('--move_threshold', action='store',
                         default=DEFAULT_VALUES['move_threshold'],
                         help='Threshold for move event evaluation')
