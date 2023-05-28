@@ -25,9 +25,6 @@ MODEL_DICT_VAL=  {
     'multistep_pred': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json', 
         'model_dir': 'mp_input_embed_h1024_l2_mlp1024_l2', 'model_label': 'Multistep Predictor'},
-    'mp_ds2': {
-        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json', 
-        'model_dir': 'multistep_predictor', 'model_label': 'Multistep Predictor'},
     'multistep_delta': {
         'class': MultistepDelta, 'config': 'multistep_delta_default_config.json', 
         'model_dir': 'multistep_delta_h1024_l2_mlp1024_l2', 'model_label': 'Multistep Delta'},
@@ -46,13 +43,23 @@ MODEL_DICT_VAL=  {
     'rfm': {
        'class': RFM, 'config': 'rfm_default_config.json', 
        'model_dir': 'rfm', 'model_label': 'RFM'},
+    'mp_ds2': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json', 
+        'model_dir': 'multistep_predictor', 'model_label': 'Multistep Predictor'},
+    'rssm_disc_ds2': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
+        'model_dir': 'rssm_ds2', 'model_label': 'RSSM Discrete'},
+    'rssm_cont_ds2': {
+        'class': DreamerV2, 'config': 'rssm_cont_ds2.json', 
+        'model_dir': 'rssm_cont_ds2', 'model_label': 'RSSM Continuous'},
 }
 DEFAULT_VALUES = {
     'analysis_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/',
     'data_dir': '/Users/locro/Documents/Stanford/analysis/data/' if platform.system() == 'Windows' else  '/mnt/fs2/locross/analysis/data/',
     'checkpoint_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/mnt/fs2/locross/analysis/',
     'model_config_dir': './model_configs',
-    'model_keys': list(MODEL_DICT_VAL.keys()),
+    #'model_keys': list(MODEL_DICT_VAL.keys()),
+    'model_keys': ['mp_ds2', 'rssm_disc_ds2', 'rssm_cont_ds2'],
     'eval_types': ['goal_events', 'multigoal_events', 'move_events'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,

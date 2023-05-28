@@ -313,6 +313,9 @@ class Analysis(object):
 
     def save_results(self) -> None:
         save_file = f'eval_{self.args.eval_type}'
+        # if a training set eval, add suffix
+        if self.args.train_or_val == 'train':
+            save_file = save_file+'_train'
         save_path = os.path.join(self.args.analysis_dir, 'results', f'{save_file}.csv')
         df_results = pd.DataFrame(self.results)
         df_results.to_csv(save_path)                             
@@ -344,6 +347,7 @@ def load_args():
     parser.add_argument('--dataset', type=str,
                          default='dataset_5_25_23.pkl', 
                          help='Dataset')
+    parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--model_keys', nargs='+', action='store',
                         default=DEFAULT_VALUES['model_keys'], 
                         help='A list of keys, seperate by spaces, for all model to evaluate')
