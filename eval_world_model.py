@@ -312,16 +312,17 @@ class Analysis(object):
         if self.args.train_or_val == 'train':
             save_file = save_file+'_train'
         save_path = os.path.join(self.args.analysis_dir, 'results', f'{save_file}.csv')
-        df_results = pd.DataFrame(self.results)
-        df_results.to_csv(save_path)
+        #df_results = pd.DataFrame(self.results)
+        #df_results.to_csv(save_path)
         if self.args.plot:
             plot_save_file = os.path.join(self.args.analysis_dir, 'results', 'figures', save_file)
+            print(plot_save_file)
             plot_eval_wm_results(df_results, self.args, plot_save_file)                             
 
 
     def run(self) -> None:
         self.load_data()
-        self.eval_all_models()
+        #self.eval_all_models()
         self.save_results()
 
 

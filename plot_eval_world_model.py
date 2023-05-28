@@ -20,9 +20,9 @@ def plot_goal_events(df_results, save_file):
     plt.xlabel('Model Name', fontsize=16) 
     plt.ylabel('Accuracy', fontsize=16)
     plt.ylim([0, 1])
-    plt.show()
     if save_file is not None:
         plt.savefig(save_file, dpi=300)
+    plt.show()
         
 def plot_multigoal_events(df_results, save_file):
     df_plot = pd.melt(df_results, id_vars="model", value_vars=["g2_acc", "acc_g3"], var_name="Goal Num", value_name="Accuracy")
@@ -35,9 +35,9 @@ def plot_multigoal_events(df_results, save_file):
     plt.ylabel('Accuracy', fontsize=16)
     plt.ylim([0, 1])
     plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
-    plt.show()
     if save_file is not None:
         plt.savefig(save_file, dpi=300)
+    plt.show()
         
 def plot_move_events(df_results, save_file):
     df_plot = pd.melt(df_results, id_vars="model", value_vars=["accuracy", "precision", "recall"], var_name="Metric", value_name="Score")
@@ -49,9 +49,9 @@ def plot_move_events(df_results, save_file):
     plt.ylabel('Score', fontsize=16)
     plt.ylim([0, 1])
     plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
-    plt.show()
     if save_file is not None:
         plt.savefig(save_file, dpi=300)
+    plt.show()
 
 def plot_eval_wm_results(df_results, args, save_file=None):
     if args.eval_type == 'goal_events':
