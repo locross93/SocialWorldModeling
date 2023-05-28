@@ -3,5 +3,6 @@
   "num_humans": 5,
   "feat_dim": 7,
   "hidden_dim": 512,
+  "encoder": "mlp",
   "model_type": "gat"
 }
