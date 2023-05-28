@@ -30,6 +30,79 @@ def get_trialtype_inds(names_dict):
     
     return names_dict
 
+def postprocess_events(exp_info_dict):
+    dwn_sample = 5
+    dwn_timepoints = np.arange(0, 1500, dwn_sample)
+    for train_or_val in ['train', 'val']:
+        event_logs = exp_info_dict[train_or_val]['event_logs']
+        num_goals = 3
+        num_trials = len(exp_info_dict[train_or_val]['indices'])
+        pickup_timepoints = np.ones([num_trials, num_goals])*-1
+        goal_timepoints = np.ones([num_trials, num_goals])*-1
+        for i in range(num_trials):
+            event_log = event_logs[i]
+            if event_log is False:
+                # trial has no event log (ie. ds 1)
+                # make all timepoints -99
+                pickup_timepoints[i,:] = np.array([-99, -99, -99])
+                goal_timepoints[i,:] = np.array([-99, -99, -99])
+                continue
+            # Filter rows where Event starts with 'pickup'
+            pickup_rows = event_log[event_log['Event'].str.startswith('pickup')]
+            # Split the Event string on underscore and get the number part
+            pickup_rows['obj_num'] = pickup_rows['Event'].str.split('_').str[1].astype(int)
+            for index, row in pickup_rows.iterrows():
+                obj_num = int(row['obj_num'])
+                pickup_t = int(row['Frame'])
+                # transform to the correct inds from downsampling
+                pickup_t = np.searchsorted(dwn_timepoints, pickup_t)
+                # if this is the first pickup for this object, store the pickup timepoint
+                if pickup_timepoints[i,obj_num] == -1:
+                   pickup_timepoints[i,obj_num] = pickup_t 
+            # Filter rows where Event starts with 'pickup'
+            goal_rows = event_log[event_log['Event'].str.startswith('goal')]
+            # Split the Event string on underscore and get the number part
+            goal_rows['obj_num'] = goal_rows['Event'].str.split('_').str[1].astype(int)
+            for index, row in goal_rows.iterrows():
+                obj_num = int(row['obj_num'])
+                goal_t = int(row['Frame'])
+                # transform to the correct inds from downsampling
+                goal_t = np.searchsorted(dwn_timepoints, goal_t)
+                # if this is the first pickup for this object, store the pickup timepoint
+                if goal_timepoints[i,obj_num] == -1:
+                   goal_timepoints[i,obj_num] = goal_t
+                   
+        single_goal_keys = ['gathering_random','random_gathering','static_gathering','gathering_static']
+        sg_inds = []
+        for key in single_goal_keys:
+            sg_inds = sg_inds+exp_info_dict[train_or_val][key]
+        sg_inds.sort()
+        sg_inds = np.array(sg_inds)
+        single_pickup_inds = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
+        single_goal_inds = np.where((np.sum(goal_timepoints > -1, axis=1) == 1))[0]
+        # Find inds where it was supposed to be single goal, and pickup and goal happened
+        intersection_arr = np.intersect1d(sg_inds, single_pickup_inds)
+        single_goal_trajs = np.intersect1d(intersection_arr, single_goal_inds)
+        
+        multi_goal_keys = ['multistep_static', 'multistep_random', 'static_multistep', 'random_multistep', 'leader_follower'] 
+        mg_inds = []
+        for key in multi_goal_keys:
+            mg_inds = mg_inds+exp_info_dict[train_or_val][key]
+        mg_inds.sort()
+        mg_inds = np.array(mg_inds)
+        multi_pickup_inds = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
+        multi_goal_inds = np.where((np.sum(goal_timepoints > -1, axis=1) == 3))[0]
+        # Find inds where it was supposed to be single goal, and pickup and goal happened
+        intersection_arr = np.intersect1d(mg_inds, multi_pickup_inds)
+        multi_goal_trajs = np.intersect1d(intersection_arr, multi_goal_inds)
+        
+        exp_info_dict[train_or_val]['pickup_timepoints'] = pickup_timepoints
+        exp_info_dict[train_or_val]['goal_timepoints'] = goal_timepoints
+        exp_info_dict[train_or_val]['single_goal_trajs'] = single_goal_trajs
+        exp_info_dict[train_or_val]['multi_goal_trajs'] = multi_goal_trajs
+        
+    return exp_info_dict
+
 def load_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--tdw_data_dir', type=str,
@@ -131,6 +204,9 @@ if __name__ == '__main__':
     exp_info_dict['val'] = get_trialtype_inds(exp_info_dict['val'])
     exp_info_dict['train']['event_logs'] = [event_logs[i] for i in train_idx]
     exp_info_dict['val']['event_logs'] = [event_logs[i] for i in val_idx]
+    
+    # annotate pickup and goal timepoints and sg mg triajs
+    exp_info_dict = postprocess_events(exp_info_dict)
     
     exp_info_file = os.path.join(args.data_dir, 'dataset_5_25_23_exp_info.pkl')
     with open(exp_info_file, 'wb') as handle:

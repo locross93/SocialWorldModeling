@@ -44,8 +44,8 @@ def load_args():
                          default=DEFAULT_VALUES['data_dir'], 
                          help='Data directory')
     parser.add_argument('--dataset', type=str,
-                         default='train_test_splits_3D_dataset.pkl', 
-                         help='Data directory')
+                         default='dataset_5_25_23.pkl', 
+                         help='Dataset')
     parser.add_argument('--gnn_model', type=bool, default=False, help='GNN Model')
     # which trial to visualize
     parser.add_argument('--trial_type', type=str, default='single_goal', help='Trial Type') # single_goal, multi_goal, all
@@ -117,7 +117,6 @@ def find_nearest(array, value):
 def make_frame_compare(t):
     t_ind = find_nearest(timepoints, t)
     
-    # TO DO - MAKE IT CLEAR WHEN BURN IN ENDS
     # clear
     ax[0].clear()
     ax[1].clear()
@@ -149,6 +148,24 @@ def make_frame_compare(t):
     ax[1].plot(0.0, -6.0, marker='s', markersize=12)
     ax[1].set_title('Reconstructed Trajectory')
     
+    # if the current time index is less than the burn-in time, add the red border and 'BURN IN' text
+    if t_ind < burn_in_length:
+        for axis in ax:
+            for spine in axis.spines.values():
+                spine.set_edgecolor('red')
+                spine.set_linewidth(2.5)  # adjust as needed for your desired thickness
+
+        # add 'BURN IN' text and keep its handle
+        burn_in_text = fig.suptitle('BURN IN', fontsize=20, color='red')
+        #fig.text(0.5, 0.9, 'BURN IN', ha='center', va='center', fontsize=20, color='red')
+    else:
+        for axis in ax:
+            for spine in axis.spines.values():
+                spine.set_edgecolor('black')
+                spine.set_linewidth(1.0)  # set back to default values
+
+        no_text = fig.suptitle('', fontsize=20)
+    
     # returning numpy image
     return mplfig_to_npimage(fig)
 
@@ -168,11 +185,22 @@ if __name__ == '__main__':
         input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     else:
         input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
-    
-    # select trajectory where goal occurred
-    pickup_timepoints = annotate_pickup_timepoints(loaded_dataset, args.train_or_val, pickup_or_move='move', ds_num=DATASET_NUMS[args.dataset])
-    single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
-    multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
+    # load dataset info
+    exp_info_file = data_file[:-4]+'_exp_info.pkl'
+    if os.path.isfile(exp_info_file):
+        exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
+        
+    if DATASET_NUMS[args.dataset] == 1:
+        # first dataset use states to define events
+        # select trajectory where goal occurred
+        pickup_timepoints = annotate_pickup_timepoints(loaded_dataset, args.train_or_val, pickup_or_move='move', ds_num=DATASET_NUMS[args.dataset])
+        single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
+        multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
+    elif DATASET_NUMS[args.dataset] > 1:
+        # second dataset use event logger to define events
+        pickup_timepoints = exp_info_dict[args.train_or_val]['pickup_timepoints']
+        single_goal_trajs = exp_info_dict[args.train_or_val]['single_goal_trajs']
+        multi_goal_trajs = exp_info_dict[args.train_or_val]['multi_goal_trajs']
     
     if args.trial_type == 'single_goal':
         traj_ind = single_goal_trajs[args.trial_num]
@@ -208,11 +236,14 @@ if __name__ == '__main__':
         os.mkdir(viz_dir)
         
     if args.trial_type == 'single_goal':
-        save_file = os.path.join(viz_dir, 'traj_subplot'+'_sg_trial'+str(args.trial_num))
+        save_file = os.path.join(viz_dir, 'traj_sg_trial'+str(args.trial_num))
     elif args.trial_type == 'multi_goal':
-        save_file = os.path.join(viz_dir, 'traj_subplot'+'_mg_trial'+str(args.trial_num))
+        save_file = os.path.join(viz_dir, 'traj_mg_trial'+str(args.trial_num))
     elif args.trial_type == 'all':
-        save_file = os.path.join(viz_dir, 'traj_subplot'+'_trial'+str(args.trial_num))
+        save_file = os.path.join(viz_dir, 'traj_trial'+str(args.trial_num))
+    # if a training set trial, add suffix
+    if args.train_or_val == 'train':
+        save_file = save_file+'_train'
         
     # make subplot of true vs predicted trajectory
     if args.plot_traj_subplots:

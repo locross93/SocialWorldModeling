@@ -17,7 +17,7 @@ from typing import List, Tuple, Dict, Any
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 
-from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL
+from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
 from analysis_utils import load_config, get_highest_numbered_file
 from models import DreamerV2
 from annotate_pickup_timepoints import annotate_pickup_timepoints
@@ -38,11 +38,18 @@ class Analysis(object):
         self.args = args
 
     def load_data(self) -> None:
-        data_file = os.path.join(args.data_dir, 'train_test_splits_3D_dataset.pkl')        
+        data_file = os.path.join(self.args.data_dir, self.args.dataset)        
+        self.ds_num = DATASET_NUMS[self.args.dataset]
         self.loaded_dataset = pickle.load(open(data_file, 'rb'))        
         _, test_dataset = self.loaded_dataset
         self.input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
         self.num_timepoints = self.input_data.size(1)
+        # if 2+ dataset, load event log
+        if self.ds_num > 1:
+            # load dataset info
+            exp_info_file = data_file[:-4]+'_exp_info.pkl'
+            if os.path.isfile(exp_info_file):
+                self.exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
 
 
     def load_model(self, model_key) -> torch.nn.Module:
@@ -75,13 +82,14 @@ class Analysis(object):
 
 
     def eval_goal_events_in_rollouts(self, model, input_data, ds='First') -> Dict[str, typing.Any]:
-        if ds == 'First':
+        if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move')
             single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
-        else:
-            # use event log for new datasets - TO DO
-            pickup_timepoints = []
+        elif self.ds_num > 1:
+            # 2+ dataset use event logger to define events
+            pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
+            single_goal_trajs = self.exp_info_dict[self.args.train_or_val]['single_goal_trajs']
         
         num_single_goal_trajs = len(single_goal_trajs)
         imagined_trajs = np.zeros([num_single_goal_trajs, input_data.shape[1], input_data.shape[2]])        
@@ -126,8 +134,9 @@ class Analysis(object):
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move')
             multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
         else:
-            # use event log for new datasets - TO DO
-            pickup_timepoints = []
+            # 2+ dataset use event logger to define events
+            pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
+            multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
             
         num_multi_goal_trajs = len(multi_goal_trajs)
         imagined_trajs = np.zeros([num_multi_goal_trajs, input_data.shape[1], input_data.shape[2]])
@@ -332,6 +341,9 @@ def load_args():
     parser.add_argument('--checkpoint_dir', type=str, action='store',
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
+    parser.add_argument('--dataset', type=str,
+                         default='dataset_5_25_23.pkl', 
+                         help='Dataset')
     parser.add_argument('--model_keys', nargs='+', action='store',
                         default=DEFAULT_VALUES['model_keys'], 
                         help='A list of keys, seperate by spaces, for all model to evaluate')
