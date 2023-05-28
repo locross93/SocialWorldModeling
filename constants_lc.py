@@ -43,6 +43,9 @@ MODEL_DICT_VAL=  {
     'rfm': {
        'class': RFM, 'config': 'rfm_default_config.json', 
        'model_dir': 'rfm', 'model_label': 'RFM'},
+    'rfm_rnn': {
+       'class': RFM, 'config': 'rfm_rnn_config.json', 
+       'model_dir': 'rfm_rnn', 'model_label': 'RFM RNN'},
     'mp_ds2': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json', 
         'model_dir': 'multistep_predictor', 'model_label': 'Multistep Predictor'},
@@ -60,7 +63,8 @@ DEFAULT_VALUES = {
     'results_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/results/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/results',
     'model_config_dir': './model_configs',
     #'model_keys': list(MODEL_DICT_VAL.keys()),
-    'model_keys': ['mp_ds2', 'rssm_disc_ds2', 'rssm_cont_ds2'],
+    'model_keys': ['rfm_rnn'],
+    #'model_keys': ['mp_ds2', 'rssm_disc_ds2', 'rssm_cont_ds2'],
     'eval_types': ['goal_events', 'multigoal_events', 'move_events'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,

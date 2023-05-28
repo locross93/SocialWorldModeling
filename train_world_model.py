@@ -129,9 +129,9 @@ def main():
     elif platform.system() == 'Windows':
         batch_size = 32
     elif platform.system() == 'Linux':
-        batch_size = 256
+        batch_size = 512
     print(f'Batch size: {batch_size}')
-    batches_per_epoch = replay_buffer.buffer_size // batch_size
+    batches_per_epoch = 50
     
     # make validation data
     val_buffer = ReplayBuffer(sequence_length)

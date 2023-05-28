@@ -63,7 +63,16 @@ class Analysis(object):
         model_class = model_info['class']
         config_file = os.path.join(self.args.model_config_dir, model_info['config'])
         config = load_config(config_file)
-        model = model_class(config)
+        if self.args.gnn_model:
+            for key in config.keys():
+                setattr(self.args, key, config[key])
+            # set default values
+            setattr(self.args, 'env', 'tdw')
+            setattr(self.args, 'gt', False)
+            setattr(self.args, 'device', DEVICE)
+            model = model_class(self.args)
+        else:
+            model = model_class(config)
         # load checkpoint weights
         # checkpoints are in folder named after model
         model_dir = os.path.join(self.args.checkpoint_dir, 'models', model_info['model_dir'])
@@ -345,6 +354,7 @@ def load_args():
     parser.add_argument('--dataset', type=str,
                          default='dataset_5_25_23.pkl', 
                          help='Dataset')
+    parser.add_argument('--gnn_model', type=bool, default=False, help='GNN Model')
     parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--model_keys', nargs='+', action='store',
                         default=DEFAULT_VALUES['model_keys'], 

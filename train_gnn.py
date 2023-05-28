@@ -81,9 +81,6 @@ if __name__ == '__main__':
     args = load_args()
     config = load_config(os.path.join(args.model_config_dir, args.config))
     
-    for key in config.keys():
-        setattr(args, key, config[key])
-    
     # Update config with args and keep track of overridden parameters
     overridden_parameters = []
     for k, v in vars(args).items():
@@ -91,6 +88,10 @@ if __name__ == '__main__':
             config[k] = v
             overridden_parameters.append(f"{k}_{v}")
             print(f"{k}_{v}")
+            
+    # set config params in args
+    for key in config.keys():
+        setattr(args, key, config[key])
             
     # Check that we are using GPU
     DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -129,9 +130,9 @@ if __name__ == '__main__':
     elif platform.system() == 'Windows':
         batch_size = 8
     elif platform.system() == 'Linux':
-        batch_size = 256
+        batch_size = 512
     print(f'Batch size: {batch_size}')
-    batches_per_epoch = replay_buffer.buffer_size // batch_size
+    batches_per_epoch = 50
     
     # make validation data
     val_buffer = ReplayBuffer(sequence_length)
