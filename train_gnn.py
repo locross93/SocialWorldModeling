@@ -183,7 +183,7 @@ if __name__ == '__main__':
             opt.step()
             
             batch_loss.append(loss.item())
-        epoch_loss = np.sum(batch_loss)
+        epoch_loss = np.mean(batch_loss)
         loss_dict['train'].append(epoch_loss)
         loss_dict['epoch_times'].append(time.time()-start_time)
         # test on validation set

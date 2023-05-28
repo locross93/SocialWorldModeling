@@ -188,7 +188,7 @@ def main():
             if config['model_type'][:4] == 'rssm':
                 batch_recon_loss.append(model.recon_loss.item())
                 batch_kl_loss.append(model.kl.item())
-        epoch_loss = np.sum(batch_loss)
+        epoch_loss = np.mean(batch_loss)
         loss_dict['train'].append(epoch_loss)
         loss_dict['epoch_times'].append(time.time()-start_time)
         if config['model_type'][:4] == 'rssm':
