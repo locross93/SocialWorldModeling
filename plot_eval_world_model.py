@@ -23,10 +23,43 @@ def plot_goal_events(df_results, save_file):
     plt.show()
     if save_file is not None:
         plt.savefig(save_file, dpi=300)
+        
+def plot_multigoal_events(df_results, save_file):
+    df_plot = pd.melt(df_results, id_vars="model", value_vars=["g2_acc", "acc_g3"], var_name="Goal Num", value_name="Accuracy")
+    df_plot["Goal Num"] = df_plot["Goal Num"].replace({"g2_acc": "2nd Goal", "acc_g3": "3rd Goal"})
+
+    plt.figure()
+    sns.barplot(x='model', y='Accuracy', hue='Goal Num', data=df_plot) 
+    plt.title('Evaluate Multistep Goal Events From Forward Rollouts', fontsize=14)
+    plt.xlabel('Model Name', fontsize=16) 
+    plt.ylabel('Accuracy', fontsize=16)
+    plt.ylim([0, 1])
+    plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
+    plt.show()
+    if save_file is not None:
+        plt.savefig(save_file, dpi=300)
+        
+def plot_move_events(df_results, save_file):
+    df_plot = pd.melt(df_results, id_vars="model", value_vars=["accuracy", "precision", "recall"], var_name="Metric", value_name="Score")
+    
+    plt.figure()
+    sns.barplot(x='Metric', y='Score', hue='model', data=df_plot) 
+    plt.title('Evaluate Move Events From Forward Rollouts', fontsize=14)
+    plt.xlabel('Metric', fontsize=16) 
+    plt.ylabel('Score', fontsize=16)
+    plt.ylim([0, 1])
+    plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
+    plt.show()
+    if save_file is not None:
+        plt.savefig(save_file, dpi=300)
 
 def plot_eval_wm_results(df_results, args, save_file=None):
     if args.eval_type == 'goal_events':
         plot_goal_events(df_results, save_file)
+    elif args.eval_type == 'multi_goal_events':
+        plot_multigoal_events(df_results, save_file)
+    elif args.eval_type == 'move_events':
+        plot_move_events(df_results, save_file)
         
 def load_args():
     parser = argparse.ArgumentParser()

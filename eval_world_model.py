@@ -18,7 +18,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 
 from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
-from analysis_utils import load_config, get_highest_numbered_file
+from analysis_utils import load_config, get_highest_numbered_file, get_data_columns
 from models import DreamerV2
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
@@ -87,7 +87,7 @@ class Analysis(object):
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move')
             single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
-        elif self.ds_num > 1:
+        else:
             # 2+ dataset use event logger to define events
             pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
             single_goal_trajs = self.exp_info_dict[self.args.train_or_val]['single_goal_trajs']
@@ -130,7 +130,7 @@ class Analysis(object):
     
 
     def eval_multigoal_events_in_rollouts(self, model, input_data, ds='First') -> Dict[str, Any]:        
-        if ds == 'First':
+        if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move')
             multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
@@ -203,22 +203,12 @@ class Analysis(object):
             else:
                 return 0
             
-        if input_matrices.shape[1:] != (300, 23):
-            input_matrices = input_matrices.reshape(-1, 300, 23)
-            
-        if recon_matrices.shape[1:] != (300, 23):
-            recon_matrices = recon_matrices.reshape(-1, 300, 23)
-            
         if hasattr(recon_matrices, 'requires_grad') and recon_matrices.requires_grad:
             recon_matrices = recon_matrices.detach().numpy()
             
         scores = {}
         
-        data_columns = ['obj0_x', 'obj0_y', 'obj0_z', 'obj1_x', 'obj1_y', 'obj1_z', 'obj2_x',
-            'obj2_y', 'obj2_z', 'agent0_x', 'agent0_y', 'agent0_z', 'agent0_rot_x',
-            'agent0_rot_y', 'agent0_rot_z', 'agent0_rot_w', 'agent1_x', 'agent1_y',
-            'agent1_z', 'agent1_rot_x', 'agent1_rot_y', 'agent1_rot_z',
-            'agent1_rot_w'] 
+        data_columns = get_data_columns(DATASET_NUMS[args.dataset])
         dims = ['x', 'y', 'z']
 
         num_trials = input_matrices.shape[0]
@@ -241,6 +231,8 @@ class Analysis(object):
                 trial_obj_pos = trial_x[:,pos_inds]
                 recon_moved_flag[i,j] = detect_object_move(trial_obj_pos, move_thr)
                 
+        # TO DO - DON'T COUNT TRIALS WERE OBJECT MOVED FROM UNPREDICTABLE COLLISION
+                
         scores['accuracy'] = accuracy_score(obj_moved_flag.reshape(-1), recon_moved_flag.reshape(-1))
         scores['precision'] = precision_score(obj_moved_flag.reshape(-1), recon_moved_flag.reshape(-1))
         scores['recall'] = recall_score(obj_moved_flag.reshape(-1), recon_moved_flag.reshape(-1))        
@@ -254,8 +246,11 @@ class Analysis(object):
             single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
             multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
         else:
-            # use event log for new datasets - TO DO
-            pickup_timepoints = []
+            # 2+ dataset use event logger to define events
+            pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
+            goal_timepoints = self.exp_info_dict[self.args.train_or_val]['goal_timepoints']
+            single_goal_trajs = self.exp_info_dict[self.args.train_or_val]['single_goal_trajs']
+            multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
         
         imagined_trajs = np.zeros(input_data.shape)
         for i in range(input_data.shape[0]):
@@ -321,7 +316,8 @@ class Analysis(object):
         df_results = pd.DataFrame(self.results)
         df_results.to_csv(save_path)
         if self.args.plot:
-            plot_eval_wm_results(df_results, self.args, save_file)                             
+            plot_save_file = os.path.join(self.args.analysis_dir, 'results', 'figures', save_file)
+            plot_eval_wm_results(df_results, self.args, plot_save_file)                             
 
 
     def run(self) -> None:
