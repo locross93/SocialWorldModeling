@@ -138,7 +138,7 @@ if __name__ == '__main__':
     val_buffer = ReplayBuffer(sequence_length)
     val_buffer.upload_training_set(val_data)
     seed = 100 # set seed so every model sees the same randomization
-    val_batch_size = val_data.size(0)
+    val_batch_size = 1000
     val_trajs = val_buffer.sample(val_batch_size, random_seed=seed)
     val_trajs = val_trajs.to(DEVICE)
     val_trajs = val_trajs.to(torch.float32)
