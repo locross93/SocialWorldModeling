@@ -19,7 +19,6 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
 from analysis_utils import load_config, get_highest_numbered_file, get_data_columns
-from models import DreamerV2
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
 from plot_eval_world_model import plot_eval_wm_results
