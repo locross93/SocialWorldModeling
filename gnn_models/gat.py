@@ -14,11 +14,15 @@ class GAT(nn.Module):
         self.num_humans = args.num_humans
         self.obs_frames = args.obs_frames
         self.human_state_dim = args.feat_dim
+        self.encoder = args.encoder
 
         # architecture settings 
         self.hidden_dim = args.hidden_dim
-        self.wh_dims = [4*args.hidden_dim, 2*args.hidden_dim, args.hidden_dim]
-        self.w_h = mlp(self.obs_frames*self.human_state_dim, self.wh_dims, last_relu=True)
+        if self.encoder == 'mlp':
+            self.wh_dims = [4*args.hidden_dim, 2*args.hidden_dim, args.hidden_dim]
+            self.w_h = mlp(self.obs_frames*self.human_state_dim, self.wh_dims, last_relu=True)
+        elif self.encoder == 'rnn':
+            self.w_h = nn.GRU(self.human_state_dim, self.hidden_dim , num_layers=3, batch_first=True)
 
         if args.gt:
             self.final_layer = mlp(2*self.hidden_dim, [self.hidden_dim, self.hidden_dim//2, self.human_state_dim])
@@ -31,15 +35,30 @@ class GAT(nn.Module):
         # for visualization
 
     def get_embeddings(self, human_states):
-        return self.encoder(human_states)
+        return self.embedding(human_states)
 
-    def encoder(self, human_states):
-        # encoder
+    def embedding(self, human_states):
+        # formerly called encoder
         batch_size = human_states.shape[0]
+        num_ts = human_states.shape[1]
         num_humans = human_states.shape[2]
+        num_feats = human_states.shape[3]
+        # put number of entities in 2nd dim to compute encodings indepenently for every entity
         human_states = human_states.permute(0, 2, 1, 3)
-        human_states = human_states.reshape(batch_size, num_humans, -1)
-        embeddings = self.w_h(human_states)
+        if self.encoder == 'mlp':
+            # flatten time and feature dimensions
+            human_states = human_states.reshape(batch_size, num_humans, -1)
+            # get an embedding for every entity with an mlp encoding
+            embeddings = self.w_h(human_states)
+        elif self.encoder == 'rnn':
+            # flatten batch and entity dimensions to process entities indepenently 
+            human_states = human_states.reshape(batch_size* num_humans, num_ts, num_feats)
+            # get an embedding for every entity with an rnn encoding
+            embeddings = self.w_h(human_states)
+            # get rnn output and take the last timepoint of rnn processing
+            embeddings = embeddings[0][:,-1,:]
+            # reshape to separate batch and entity dimensions again
+            embeddings = embeddings.reshape(batch_size, num_humans, self.hidden_dim)
         return embeddings
 
     def dynamical(self, embeddings):
@@ -51,7 +70,7 @@ class GAT(nn.Module):
 
     def forward(self, human_states, batch_graph):
         # encoder
-        embeddings = self.encoder(human_states)
+        embeddings = self.embedding(human_states)
         # dynamical
         normalized_A, next_H = self.dynamical(embeddings)
 
@@ -76,7 +95,12 @@ class GAT(nn.Module):
                     pred_graph[:, i, i:self.num_humans] = tmp_graph[:, i, i+1:self.num_humans].detach()
             
             ret.append([[pred_graph], pred_obs])
-            batch_data = torch.cat([batch_data[:, 1:, ...], pred_obs.unsqueeze(1)], dim=1)
+            if self.encoder == 'mlp':
+                # fixed length encoding - take last T-1 from batch_data and append new pred_obs
+                batch_data = torch.cat([batch_data[:, 1:, ...], pred_obs.unsqueeze(1)], dim=1)
+            elif self.encoder == 'rnn':
+                # variable length encoding - take all batch_data and append new pred_obs
+                batch_data = torch.cat([batch_data[:, 1:, ...], pred_obs.unsqueeze(1)], dim=1)
         return ret
 
     def loss(self, batch_x, burn_in_length, rollout_length):

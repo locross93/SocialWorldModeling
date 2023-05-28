@@ -131,13 +131,13 @@ def main():
     elif platform.system() == 'Linux':
         batch_size = 512
     print(f'Batch size: {batch_size}')
-    batches_per_epoch = 50
+    batches_per_epoch = np.min([replay_buffer.buffer_size // batch_size, 50])
     
     # make validation data
     val_buffer = ReplayBuffer(sequence_length)
     val_buffer.upload_training_set(val_data)
     seed = 100 # set seed so every model sees the same randomization
-    val_batch_size = 1000
+    val_batch_size = np.min([val_data.size(0), 1000])
     val_trajs = val_buffer.sample(val_batch_size, random_seed=seed)
     val_trajs = val_trajs.to(DEVICE)
     val_trajs = val_trajs.to(torch.float32)
