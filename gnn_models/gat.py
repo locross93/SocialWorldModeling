@@ -22,7 +22,7 @@ class GAT(nn.Module):
             self.wh_dims = [4*args.hidden_dim, 2*args.hidden_dim, args.hidden_dim]
             self.w_h = mlp(self.obs_frames*self.human_state_dim, self.wh_dims, last_relu=True)
         elif self.encoder == 'rnn':
-            self.w_h = nn.GRU(self.human_state_dim, self.hidden_dim , num_layers=2, batch_first=True)
+            self.w_h = nn.GRU(self.human_state_dim, self.hidden_dim , num_layers=1, batch_first=True)
 
         if args.gt:
             self.final_layer = mlp(2*self.hidden_dim, [self.hidden_dim, self.hidden_dim//2, self.human_state_dim])
@@ -100,7 +100,7 @@ class GAT(nn.Module):
                 batch_data = torch.cat([batch_data[:, 1:, ...], pred_obs.unsqueeze(1)], dim=1)
             elif self.encoder == 'rnn':
                 # variable length encoding - take all batch_data and append new pred_obs
-                batch_data = torch.cat([batch_data[:, 1:, ...], pred_obs.unsqueeze(1)], dim=1)
+                batch_data = torch.cat([batch_data, pred_obs.unsqueeze(1)], dim=1)
         return ret
 
     def loss(self, batch_x, burn_in_length, rollout_length):
