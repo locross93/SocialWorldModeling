@@ -93,7 +93,7 @@ class Analysis(object):
     def eval_goal_events_in_rollouts(self, model, input_data, ds='First') -> Dict[str, typing.Any]:
         if self.ds_num == 1:
             # first dataset
-            pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move')
+            pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
             single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
         else:
             # 2+ dataset use event logger to define events
@@ -140,7 +140,7 @@ class Analysis(object):
     def eval_multigoal_events_in_rollouts(self, model, input_data, ds='First') -> Dict[str, Any]:        
         if self.ds_num == 1:
             # first dataset
-            pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move')
+            pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
             multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
         else:
             # 2+ dataset use event logger to define events
@@ -249,8 +249,8 @@ class Analysis(object):
     def eval_move_events_in_rollouts(self, model, input_data, ds='First') -> Dict[str, Any]:
         if ds == 'First':
             # first dataset
-            pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move')
-            goal_timepoints = annotate_goal_timepoints(self.loaded_dataset, train_or_val='val')
+            pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
+            goal_timepoints = annotate_goal_timepoints(self.loaded_dataset, train_or_val='val', ds_num=self.ds_num)
             single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
             multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
         else:
