@@ -99,8 +99,10 @@ class GAT(nn.Module):
                 # fixed length encoding - take last T-1 from batch_data and append new pred_obs
                 batch_data = torch.cat([batch_data[:, 1:, ...], pred_obs.unsqueeze(1)], dim=1)
             elif self.encoder == 'rnn':
-                # variable length encoding - take all batch_data and append new pred_obs
-                batch_data = torch.cat([batch_data, pred_obs.unsqueeze(1)], dim=1)
+                # fixed length encoding - take last T-1 from batch_data and append new pred_obs
+                batch_data = torch.cat([batch_data[:, 1:, ...], pred_obs.unsqueeze(1)], dim=1)
+                # # variable length encoding - take all batch_data and append new pred_obs
+                # batch_data = torch.cat([batch_data, pred_obs.unsqueeze(1)], dim=1)
         return ret
 
     def loss(self, batch_x, burn_in_length, rollout_length):
