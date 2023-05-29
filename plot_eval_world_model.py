@@ -28,7 +28,6 @@ def plot_multigoal_events(df_results, save_file):
     df_plot = pd.melt(df_results, id_vars="model", value_vars=["g2_acc", "acc_g3"], var_name="Goal Num", value_name="Accuracy")
     df_plot["Goal Num"] = df_plot["Goal Num"].replace({"g2_acc": "2nd Goal", "acc_g3": "3rd Goal"})
 
-    print(save_file)
     plt.figure()
     sns.barplot(x='model', y='Accuracy', hue='Goal Num', data=df_plot) 
     plt.title('Evaluate Multistep Goal Events From Forward Rollouts', fontsize=14)
@@ -57,7 +56,7 @@ def plot_move_events(df_results, save_file):
 def plot_eval_wm_results(df_results, args, save_file=None):
     if args.eval_type == 'goal_events':
         plot_goal_events(df_results, save_file)
-    elif args.eval_type == 'multi_goal_events':
+    elif args.eval_type == 'multigoal_events':
         plot_multigoal_events(df_results, save_file)
     elif args.eval_type == 'move_events':
         plot_move_events(df_results, save_file)
