@@ -17,7 +17,7 @@ from typing import List, Tuple, Dict, Any
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 
-from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
+from constants import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
 from analysis_utils import load_config, get_highest_numbered_file, get_data_columns
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
@@ -38,9 +38,9 @@ class Analysis(object):
         self.args = args
 
     def load_data(self) -> None:
-        data_file = os.path.join(self.args.data_dir, self.args.dataset)        
-        self.ds_num = DATASET_NUMS[self.args.dataset]
-        self.loaded_dataset = pickle.load(open(data_file, 'rb'))        
+        data_file = os.path.basename(args.data_path)        
+        self.ds_num = DATASET_NUMS[data_file]
+        self.loaded_dataset = pickle.load(open(args.data_path, 'rb'))        
         _, test_dataset = self.loaded_dataset
         self.input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
         self.num_timepoints = self.input_data.size(1)
@@ -315,6 +315,7 @@ class Analysis(object):
         for model_key in self.args.model_keys:
             print(f'Currently evaluating model {model_key}')
             result = self.eval_one_model(model_key)
+            print(f'result: {result}')
             self.results.append(result)
     
 
@@ -323,10 +324,16 @@ class Analysis(object):
         # if a training set eval, add suffix
         if self.args.train_or_val == 'train':
             save_file = save_file+'_train'
-        save_path = os.path.join(self.args.analysis_dir, 'results', f'{save_file}.csv')
+        result_save_dir = os.path.join(self.args.analysis_dir, 'results')
+        if not os.path.exists(result_save_dir):
+            os.makedirs(result_save_dir)
+        save_path = os.path.join(result_save_dir, f'{save_file}.csv')
         df_results = pd.DataFrame(self.results)
         df_results.to_csv(save_path)
         if self.args.plot:
+            figure_save_dir = os.path.join(self.args.analysis_dir, 'results', 'figures')
+            if not os.path.exists(figure_save_dir):
+                os.makedirs(figure_save_dir)                
             plot_save_file = os.path.join(self.args.analysis_dir, 'results', 'figures', save_file)
             plot_eval_wm_results(df_results, self.args, plot_save_file)                             
 
@@ -354,9 +361,6 @@ def load_args():
     parser.add_argument('--checkpoint_dir', type=str, action='store',
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
-    parser.add_argument('--dataset', type=str,
-                         default='dataset_5_25_23.pkl', 
-                         help='Dataset')
     parser.add_argument('--gnn_model', type=bool, default=False, help='GNN Model')
     parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--model_keys', nargs='+', action='store',
