@@ -20,7 +20,7 @@ from tqdm import tqdm
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
-from constants_lc import DEFAULT_VALUES, MODEL_DICT_TRAIN
+from constants import DEFAULT_VALUES, MODEL_DICT_TRAIN
 from models import ReplayBuffer
 
 
@@ -103,13 +103,12 @@ def main():
             overridden_parameters.append(f"{k}_{v}")
             print(f"{k}_{v}")
     
-    #model_class = model_dict[args.model]
     model_class = model_dict[config['model_type']]
     model = model_class(config)
     
     # filename same as cofnig makes it easier for identifying different parameters
     if args.model_filename is None:
-        model_filename = '_'.join(args.config.split('.')[0].split('_')[:-1])       
+        model_filename = '_'.join(args.config.split('.')[0].split('_')[:-1])
     else:
         model_filename = args.model_filename
     print(f"model will be saved to {model_filename}")

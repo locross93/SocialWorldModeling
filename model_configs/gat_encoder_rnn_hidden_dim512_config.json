@@ -1,10 +1,9 @@
 {
-    "obs_frames": 50,
+    "obs_frames": 20,
     "num_humans": 5,
     "feat_dim": 7,
     "hidden_dim": 512,
-    "edge_types": 2,
-    "skip_first": 0,
     "encoder": "rnn",
-    "model_type": "rfm"
+    "num_enc_layers": 1,
+    "model_type": "gat"
 }

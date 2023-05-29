@@ -1,5 +1,8 @@
 from models import DreamerV2, MultistepPredictor, MultistepDelta, \
     TransformerMSPredictor, TransformerIrisWorldModel, TransformerWorldModel
+from gnn_models.imma import IMMA
+from gnn_models.gat import GAT
+from gnn_models.rfm import RFM
 
 
 """Valus for discretization data"""
@@ -22,7 +25,10 @@ MODEL_DICT_TRAIN = {
     'multistep_delta':  MultistepDelta,
     'transformer_wm': TransformerWorldModel,   
     'transformer_mp': TransformerMSPredictor,
-    'transformer_iris': TransformerIrisWorldModel
+    'transformer_iris': TransformerIrisWorldModel,
+    'imma': IMMA,
+    'gat': GAT,
+    'rfm': RFM
 }
 """Values for validation"""
 MODEL_DICT_VAL=  {
@@ -47,15 +53,24 @@ MODEL_DICT_VAL=  {
     'transformer_iris_concat_pos_embd_lr1e-5': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_config.json',
         'model_dir': 'transformer_iris_concat_pos_embd_lr1e-5', 'epoch': '1800', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-5'},
+    'rfm_rnn': {
+       'class': RFM, 'config': 'rfm_rnn_config.json', 
+       'model_dir': 'rfm_rnn', 'model_label': 'RFM RNN'},
+    'gat': {
+       'class': GAT, 'config': 'gat_default_config.json', 
+       'model_dir': 'gat', 'model_label': 'GAT'},
+    'imma': {
+       'class': IMMA, 'config': 'imma_default_config.json', 
+       'model_dir': 'imma', 'model_label': 'IMMA'},
 }
 
 DEFAULT_VALUES = {
     # general pipeline parameters
-    'analysis_dir': './',    
+    'analysis_dir': './', 
     #'checkpoint_dir': '/data2/ziyxiang/social_world_model/checkpoint',
     # as of 5/26, the new models in nfs checkpoint path use the new data path
-    #'data_path': '/ccn2/u/ziyxiang/swm_data_and_results/data/dataset_5_25_23.pkl',
-    'data_path': '/data2/ziyxiang/social_world_model/data/train_test_splits_3D_dataset.pkl',
+    'data_path': '/ccn2/u/ziyxiang/swm_data_and_results/data/dataset_5_25_23.pkl',
+    #'data_path': '/data2/ziyxiang/social_world_model/data/train_test_splits_3D_dataset.pkl',
     'checkpoint_dir': '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint',
     'model_config_dir': './model_configs',
     # general training parameters for all models
@@ -68,4 +83,9 @@ DEFAULT_VALUES = {
     'eval_types': ['goal_events', 'multigoal_events', 'move_events'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
+}
+
+DATASET_NUMS = {
+    'train_test_splits_3D_dataset.pkl': 1,
+    'dataset_5_25_23.pkl': 2,
 }

@@ -5,7 +5,7 @@ Created on Thu May 25 18:38:01 2023
 @author: locro
 """
 
-# example usage: python train_gnn.py --model imma --config imma_default_config.json
+# example usage: python train_gnn.py --config imma_default_config.json
 
 import os
 import json
@@ -18,7 +18,7 @@ import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
-from constants_lc import DEFAULT_VALUES, MODEL_DICT_TRAIN
+from constants import DEFAULT_VALUES, MODEL_DICT_TRAIN
 from models import ReplayBuffer
 
 """Global variables"""
@@ -33,8 +33,8 @@ def load_args():
     parser.add_argument('--analysis_dir', type=str, action='store',
                         default=DEFAULT_VALUES['analysis_dir'], 
                         help='Analysis directory')
-    parser.add_argument('--data_dir', type=str,
-                         default=DEFAULT_VALUES['data_dir'], 
+    parser.add_argument('--data_path', type=str,
+                         default=DEFAULT_VALUES['data_path'], 
                          help='Data directory')
     parser.add_argument('--dataset', type=str,
                          default='dataset_5_25_23.pkl', 
@@ -43,15 +43,26 @@ def load_args():
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
     # general training parameters
-    parser.add_argument('--model', type=str, required=True, help='Model to use for training')
-    parser.add_argument('--config', type=str, required=True, help='Config JSON file')
-    parser.add_argument('--model_filename', type=str, default=None, help='Filename for saving model')
-    parser.add_argument('--lr', type=float, default=1e-6, help='Learning Rate')
+    parser.add_argument('--config', type=str,
+                        required=True, help='Config JSON file')
+    parser.add_argument('--batch_size', type=int, action='store',
+                        default=DEFAULT_VALUES['batch_size'],
+                        help='Batch size')
+    parser.add_argument('--model_filename', type=str,
+                        default=None, 
+                        help='Filename for saving model')
+    parser.add_argument('--lr', type=float, action='store',
+                        default=DEFAULT_VALUES['lr'], 
+                        help='Learning Rate')
+    parser.add_argument('--epochs', type=int, action='store',
+                        default=DEFAULT_VALUES['epochs'], 
+                        help='Epochs')
+    parser.add_argument('--save_every', type=int, action='store',
+                        default=DEFAULT_VALUES['save_every'], 
+                        help='Epoch Save Interval')
+    parser.add_argument('--input_size', type=int, help='Input size')
     parser.add_argument('--env', type=str, default='tdw', help='Environment')
-    parser.add_argument('--gt', default=False, action='store_true', help='use ground truth graph')
-    parser.add_argument('--epochs', type=int, default=int(1e5), help='Epochs')
-    parser.add_argument('--save_every', type=int, default=200, help='Epoch Save Interval')
-    parser.add_argument('--batch_size', type=int, help='Epoch Save Interval')
+    parser.add_argument('--gt', default=False, action='store_true', help='use ground truth graph')    
     parser.add_argument('--burn_in_length', type=int, default=50, help='Amount of frames to burn into RNN')
     parser.add_argument('--rollout_length', type=int, default=30, help='Forward rollout length') 
     # model parameters
@@ -98,12 +109,12 @@ if __name__ == '__main__':
     print(DEVICE)
     setattr(args, 'device', DEVICE)
     
-    model_class = model_dict[args.model]
+    model_class = model_dict[config['model_type']]
     model = model_class(args)
     
-    # filename for saving
+    # filename same as cofnig makes it easier for identifying different parameters
     if args.model_filename is None:
-        model_filename = config['model_type']
+        model_filename = '_'.join(args.config.split('.')[0].split('_')[:-1])
     else:
         model_filename = args.model_filename
     
@@ -112,9 +123,8 @@ if __name__ == '__main__':
         new_config_filename = os.path.join(args.model_config_dir, f"{model_filename}_{'_'.join(overridden_parameters)}.json")
         save_config(config, new_config_filename)
 
-    # load data
-    data_file = os.path.join(args.data_dir, args.dataset)
-    loaded_dataset = pickle.load(open(data_file, 'rb'))
+    # load data    
+    loaded_dataset = pickle.load(open(args.data_path, 'rb'))
     train_dataset, test_dataset = loaded_dataset
     train_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     val_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
@@ -124,15 +134,9 @@ if __name__ == '__main__':
     rollout_length = args.rollout_length
     sequence_length = burn_in_length + rollout_length
     replay_buffer = ReplayBuffer(sequence_length)
-    replay_buffer.upload_training_set(train_data)
-    if args.batch_size:
-        batch_size = args.batch_size
-    elif platform.system() == 'Windows':
-        batch_size = 8
-    elif platform.system() == 'Linux':
-        batch_size = 512
-    print(f'Batch size: {batch_size}')
-    batches_per_epoch = np.min([replay_buffer.buffer_size // batch_size, 50])
+    replay_buffer.upload_training_set(train_data)    
+    print(f'Batch size: {args.batch_size}')
+    batches_per_epoch = np.min([replay_buffer.buffer_size // args.batch_size, 50])
     
     # make validation data
     val_buffer = ReplayBuffer(sequence_length)
@@ -172,7 +176,7 @@ if __name__ == '__main__':
             batch_kl_loss = []
         nsamples = 0
         for i in range(batches_per_epoch):
-            batch_x = replay_buffer.sample(batch_size)
+            batch_x = replay_buffer.sample(args.batch_size)
             batch_x = batch_x.to(torch.float32)
             batch_x = batch_x.to(DEVICE)
             batch_x = batch_x.reshape(-1, sequence_length, 5, 7)
