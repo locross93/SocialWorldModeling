@@ -1577,13 +1577,13 @@ class TransformerWorldModel(nn.Module):
         
         return out
     
-    def forward_rollout(self, x):
+    def forward_rollout_train(self, x):
         src = x[:,:self.context_length,:]
         x_hat = self.forward(src)
         
         return x_hat
     
-    def variable_length_rollout(self, x, context_length, rollout_length):
+    def forward_rollout(self, x, context_length, rollout_length):
         sequence_length = context_length + rollout_length
         # only input obs from x up to context_length
         src = x[:,:context_length,:]
@@ -1609,7 +1609,7 @@ class TransformerWorldModel(nn.Module):
         return x_hat
     
     def loss(self, x):
-        x_hat = self.forward_rollout(x)  
+        x_hat = self.forward_rollout_train(x)  
         t_end = self.context_length + self.rollout_length
         x_supervise = x[:,self.context_length:t_end,:]
         
