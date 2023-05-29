@@ -116,7 +116,7 @@ def annotate_goal_timepoints(loaded_dataset, train_or_val='val', ds_num=2):
         input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:].numpy()
     
     input_matrices = input_data.reshape(-1, 300, 23)
-    scores, y_val, y_recon = eval_recon_goals(input_matrices, input_matrices)
+    scores, y_val, y_recon = eval_recon_goals(input_matrices, input_matrices, ds_num=ds_num)
     
     data_columns = get_data_columns(ds_num)    
     dims = ['x', 'y', 'z']

@@ -24,7 +24,7 @@ MODEL_DICT_VAL=  {
         'model_dir': 'rssm_disc', 'model_label': 'RSSM Discrete'},
     'multistep_pred': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json', 
-        'model_dir': 'mp_input_embed_h1024_l2_mlp1024_l2', 'model_label': 'Multistep Predictor'},
+        'model_dir': 'multistep_predictor_ds1', 'model_label': 'Multistep Predictor'},
     'multistep_delta': {
         'class': MultistepDelta, 'config': 'multistep_delta_default_config.json', 
         'model_dir': 'multistep_delta_h1024_l2_mlp1024_l2', 'model_label': 'Multistep Delta'},
@@ -63,7 +63,7 @@ DEFAULT_VALUES = {
     'results_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/results/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/results',
     'model_config_dir': './model_configs',
     #'model_keys': list(MODEL_DICT_VAL.keys()),
-    'model_keys': ['rfm_rnn'],
+    'model_keys': ['multistep_pred'],
     #'model_keys': ['mp_ds2', 'rssm_disc_ds2', 'rssm_cont_ds2'],
     'eval_types': ['goal_events', 'multigoal_events', 'move_events'],
     'move_threshold': 4.0,
