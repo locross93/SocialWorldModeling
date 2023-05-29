@@ -132,7 +132,6 @@ def main():
     replay_buffer = ReplayBuffer(sequence_length)
     replay_buffer.upload_training_set(train_data)    
     batch_size = args.batch_size
-    breakpoint()
     print(f'Batch size: {batch_size}')
     batches_per_epoch = replay_buffer.buffer_size // batch_size
     

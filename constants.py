@@ -26,63 +26,27 @@ MODEL_DICT_TRAIN = {
 }
 """Values for validation"""
 MODEL_DICT_VAL=  {
-    'rssm_disc': {
-        'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
-        'model_dir': 'rssm_disc_default', 'epoch': '3000', 'model_label': 'RSSM Discrete'},
-    'multistep_predictor': {
-        'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json',
-        'model_dir': 'multistep_predictor_default', 'epoch': '3000', 'model_label': 'Multistep Predictor'},
-    'multistep_delta': {
-        'class': MultistepDelta, 'config': 'multistep_delta_default_config.json',
-        'model_dir': 'multistep_delta_default', 'epoch': '3000', 'model_label': 'Multistep Delta'},
-    'transformer_iris': {
+    # 'rssm_disc': {
+    #     'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
+    #     'model_dir': 'rssm_disc_default', 'epoch': '3000', 'model_label': 'RSSM Discrete'},
+    # 'multistep_predictor': {
+    #     'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json',
+    #     'model_dir': 'multistep_predictor_default', 'epoch': '3000', 'model_label': 'Multistep Predictor'},
+    # 'multistep_delta': {
+    #     'class': MultistepDelta, 'config': 'multistep_delta_default_config.json',
+    #     'model_dir': 'multistep_delta_default', 'epoch': '3000', 'model_label': 'Multistep Delta'},
+    'transformer_iris_default': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
-        'model_dir': 'transformer_iris_default', 'epoch': '3000', 'model_label': 'Transformer Iris'},
-    'transformer_iris_concat_pos_embd': {
+        'model_dir': 'transformer_iris_default', 'epoch': '200', 'model_label': 'Transformer Iris'},
+    'transformer_iris_concat_pos_embd_default': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_default', 'epoch': '1600', 'model_label': 'Transformer Iris Concat Pos Embd'},
-    # 'transformer_iris_dropout_0.1': {
-    #      'class': TransformerIrisWorldModel, 'config': 'transformer_iris_dropout_0.1_config.json',
-    #      'model_dir': 'transformer_iris_dropout', 'epoch': '3000', 'model_label': 'Transformer Iris Dropout 0.1'},
-    # 'transformer_wm': {
-    #     'class': TransformerWorldModel, 'config': 'transformer_wm_default_config.json',
-    #     'model_dir': 'transformer_wm_default', 'epoch': '5000', 'model_label': 'Transformer WM Default'},
-    # 'transformer_mp': {
-    #     'class': TransformerMSPredictor, 'config': 'transformer_mp_default_config.json',
-    #     'model_dir': 'transformer_mp_default', 'epoch': '5000', 'model_label': 'Transformer MP Default'},
-    'transformer_iris_mp_window_10': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_10_config.json',
-        'model_dir': 'transformer_iris_mp_window_10', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 10'},
-    # 'transformer_iris_mp_window_20': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_20_config.json',
-    #     'model_dir': 'transformer_iris_mp_window_20', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 20'},
-    # 'transformer_iris_mp_window_30': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_30_config.json',
-    #     'model_dir': 'transformer_iris_mp_window_30', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 30'},
-    # # 'transformer_iris_mp_window_40': {
-    # #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_40_config.json',
-    # #     'model_dir': 'transformer_iris_mp_window_40', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 40'},
-    # 'transformer_iris_mp_window_50': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_50_config.json',
-    #     'model_dir': 'transformer_iris_mp_window_50', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 50'},
-    # # 'transformer_iris_mp_window_60': {
-    # #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_60_config.json',
-    # #     'model_dir': 'transformer_iris_mp_window_60', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 60'},
-    # 'transformer_iris_mp_window_70': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_window_70_config.json',
-    #     'model_dir': 'transformer_iris_mp_window_70', 'epoch': '3000', 'model_label': 'Transformer Iris MP Window 70'},
-    # 'transformer_iris_mp_square_40': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_square_40_config.json',
-    #     'model_dir': 'transformer_iris_mp_square_40', 'epoch': '3000', 'model_label': 'Transformer Iris MP Square 40'},
-    # 'transformer_iris_mp_square_50': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_square_50_config.json',
-    #     'model_dir': 'transformer_iris_mp_square_50', 'epoch': '3000', 'model_label': 'Transformer Iris MP Square 50'},
-    # 'transformer_iris_mp_square_60': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_square_60_config.json',
-    #     'model_dir': 'transformer_iris_mp_square_60', 'epoch': '3000', 'model_label': 'Transformer Iris MP Square 60'},
-    # 'transformer_iris_mp_square_70': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_mp_square_70_config.json',
-    #     'model_dir': 'transformer_iris_mp_square_70', 'epoch': '3000', 'model_label': 'Transformer Iris MP Square 70'},
+        'model_dir': 'transformer_iris_concat_pos_embd_default', 'epoch': '200', 'model_label': 'Transformer Iris Concat Pos Embd'},
+    'transformer_iris_concat_pos_embd_lr1e-4': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_config.json',
+        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'epoch': '200', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
+    'transformer_iris_concat_pos_embd_lr1e-5': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_config.json',
+        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-5', 'epoch': '200', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-5'},
 }
 
 DEFAULT_VALUES = {
@@ -95,8 +59,8 @@ DEFAULT_VALUES = {
     'checkpoint_dir': '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint',
     'model_config_dir': './model_configs',
     # general training parameters for all models
-    'batch_size': 512,
-    'lr': 3e-5,
+    'batch_size': 2048,
+    'lr': 1e-5,
     'epochs': int(3e4),
     'save_every': 200,
     # eval parameters

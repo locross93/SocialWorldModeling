@@ -9,7 +9,8 @@
     "num_decode_layers": 2,
 
     "pos_encode_aggregation": "concat",
-    "pos_embed_dim": 35,    
+    "pos_embed_dim": 35,
+     
     "num_attn_layers": 4,
     "num_heads": 4,
 
