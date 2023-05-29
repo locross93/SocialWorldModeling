@@ -17,11 +17,11 @@ import matplotlib.pyplot as plt
 import moviepy.editor as mpy
 from moviepy.video.io.bindings import mplfig_to_npimage
 
-from analysis_utils import load_trained_model, data_columns
+from analysis_utils import load_trained_model, get_data_columns
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import annotate_goal_timepoints
 
-from constants import MODEL_DICT_VAL, DEFAULT_VALUES
+from constants_lc import MODEL_DICT_VAL, DEFAULT_VALUES, DATASET_NUMS
     
     
 def load_args():
@@ -41,6 +41,13 @@ def load_args():
     parser.add_argument('--model_key', type=str, required=True, help='Model to use for visualization')
     parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--device', type=str, default='cpu', help='Device')
+    parser.add_argument('--data_dir', type=str,
+                         default=DEFAULT_VALUES['data_dir'], 
+                         help='Data directory')
+    parser.add_argument('--dataset', type=str,
+                         default='dataset_5_25_23.pkl', 
+                         help='Dataset')
+    parser.add_argument('--gnn_model', type=bool, default=False, help='GNN Model')
     # which trial to visualize
     parser.add_argument('--trial_type', type=str, default='single_goal', help='Trial Type') # single_goal, multi_goal, all
     parser.add_argument('--trial_num', type=int, default=0, help='Trial Type')
@@ -56,7 +63,7 @@ def load_config(file):
         config = json.load(f)
     return config
 
-def make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file):
+def make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_columns):
     # ie subplot_dims = (3,3)
     fig, ax = plt.subplots(subplot_dims[0], subplot_dims[1], figsize=(15, 15))
     colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
@@ -111,7 +118,6 @@ def find_nearest(array, value):
 def make_frame_compare(t):
     t_ind = find_nearest(timepoints, t)
     
-    # TO DO - MAKE IT CLEAR WHEN BURN IN ENDS
     # clear
     ax[0].clear()
     ax[1].clear()
@@ -143,6 +149,24 @@ def make_frame_compare(t):
     ax[1].plot(0.0, -6.0, marker='s', markersize=12)
     ax[1].set_title('Reconstructed Trajectory')
     
+    # if the current time index is less than the burn-in time, add the red border and 'BURN IN' text
+    if t_ind < burn_in_length:
+        for axis in ax:
+            for spine in axis.spines.values():
+                spine.set_edgecolor('red')
+                spine.set_linewidth(2.5)  # adjust as needed for your desired thickness
+
+        # add 'BURN IN' text and keep its handle
+        burn_in_text = fig.suptitle('BURN IN', fontsize=20, color='red')
+        #fig.text(0.5, 0.9, 'BURN IN', ha='center', va='center', fontsize=20, color='red')
+    else:
+        for axis in ax:
+            for spine in axis.spines.values():
+                spine.set_edgecolor('black')
+                spine.set_linewidth(1.0)  # set back to default values
+
+        no_text = fig.suptitle('', fontsize=20)
+    
     # returning numpy image
     return mplfig_to_npimage(fig)
 
@@ -151,20 +175,33 @@ if __name__ == '__main__':
     
     model_info = MODEL_DICT_VAL[args.model_key]
     model_name = model_info['model_label']
-    model = load_trained_model(model_info, args.model_config_dir, args.checkpoint_dir, args.device)
+    model = load_trained_model(model_info, args.device, args.gnn_model)
     
     # load data
-    loaded_dataset = pickle.load(open(args.data_path, 'rb'))
+    data_columns = get_data_columns(DATASET_NUMS[args.dataset])
+    data_file = os.path.join(data_dir, args.dataset)
+    loaded_dataset = pickle.load(open(data_file, 'rb'))
     train_dataset, test_dataset = loaded_dataset
     if args.train_or_val == 'train':
         input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     else:
         input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
-    
-    # select trajectory where goal occurred
-    pickup_timepoints = annotate_pickup_timepoints(loaded_dataset, args.train_or_val, pickup_or_move='move')
-    single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
-    multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
+    # load dataset info
+    exp_info_file = data_file[:-4]+'_exp_info.pkl'
+    if os.path.isfile(exp_info_file):
+        exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
+        
+    if DATASET_NUMS[args.dataset] == 1:
+        # first dataset use states to define events
+        # select trajectory where goal occurred
+        pickup_timepoints = annotate_pickup_timepoints(loaded_dataset, args.train_or_val, pickup_or_move='move', ds_num=DATASET_NUMS[args.dataset])
+        single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
+        multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
+    elif DATASET_NUMS[args.dataset] > 1:
+        # second dataset use event logger to define events
+        pickup_timepoints = exp_info_dict[args.train_or_val]['pickup_timepoints']
+        single_goal_trajs = exp_info_dict[args.train_or_val]['single_goal_trajs']
+        multi_goal_trajs = exp_info_dict[args.train_or_val]['multi_goal_trajs']
     
     if args.trial_type == 'single_goal':
         traj_ind = single_goal_trajs[args.trial_num]
@@ -180,14 +217,24 @@ if __name__ == '__main__':
         traj_ind = args.trial_num
         burn_in_length = args.burn_in_length
         
+    # EXTREMELY TEMP
+    burn_in_length = 50
+    
     rollout_length = input_data.size(1) - burn_in_length
     x = input_data[traj_ind,:,:].unsqueeze(0)
     if x.dtype == torch.float64:
         x = x.float()
     x_true = x[0,:burn_in_length+rollout_length,:].numpy()
     x_pred = x_true.copy()
-    rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()
-    #rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
+    if args.model_key == 'transformer_wm':
+        rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
+    # elif args.gnn_model:
+    #     x = x.reshape(-1, x.size(1), 5, 7)
+    #     x_context = x[:,:steps2pickup,:,:]
+    #     batch_graph = None
+    #     rollout_x = model.multistep_forward(x_context, batch_graph, rollout_length)
+    else:
+        rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()
     x_pred[burn_in_length:,:] = rollout_x 
     
     viz_dir = os.path.join(args.analysis_dir, 'results/viz_trajs',args.model_key)
@@ -195,11 +242,14 @@ if __name__ == '__main__':
         os.makedirs(viz_dir)
         
     if args.trial_type == 'single_goal':
-        save_file = os.path.join(viz_dir, 'traj_subplot'+'_sg_trial'+str(args.trial_num))
+        save_file = os.path.join(viz_dir, 'traj_sg_trial'+str(args.trial_num))
     elif args.trial_type == 'multi_goal':
-        save_file = os.path.join(viz_dir, 'traj_subplot'+'_mg_trial'+str(args.trial_num))
+        save_file = os.path.join(viz_dir, 'traj_mg_trial'+str(args.trial_num))
     elif args.trial_type == 'all':
-        save_file = os.path.join(viz_dir, 'traj_subplot'+'_trial'+str(args.trial_num))
+        save_file = os.path.join(viz_dir, 'traj_trial'+str(args.trial_num))
+    # if a training set trial, add suffix
+    if args.train_or_val == 'train':
+        save_file = save_file+'_train'
         
     # make subplot of true vs predicted trajectory
     if args.plot_traj_subplots:
@@ -207,7 +257,8 @@ if __name__ == '__main__':
         num_frames = x_true.shape[0]
         num_steps = subplot_dims[0] * subplot_dims[1]
         steps = np.linspace(0, num_frames-1, num_steps, endpoint=True).astype(int)
-        fig, ax = make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file)
+        data_columns = get_data_columns()
+        fig, ax = make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_columns)
     
     # make video - compare real and reconstructed traj side by side
     if args.make_video:

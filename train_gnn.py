@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue May  9 14:06:24 2023
+Created on Thu May 25 18:38:01 2023
 
 @author: locro
 """
 
-# example usage: python train_world_model.py --model dreamerv2 --config rssm_disc_default_config.json --dec_hidden_size 512
-# python train_world_model.py --model multistep_predictor --config multistep_predictor_default_config.json --mlp_hidden_size 512
-# python train_world_model.py --model transformer_wm --config transformer_wm_default_config.json
+# example usage: python train_gnn.py --model imma --config imma_default_config.json
 
 import os
 import json
 import time
 import pickle
+import platform
 import argparse
 import numpy as np
-from tqdm import tqdm
 
 import torch
 from torch.utils.tensorboard import SummaryWriter
@@ -23,61 +21,49 @@ from torch.utils.tensorboard import SummaryWriter
 from constants_lc import DEFAULT_VALUES, MODEL_DICT_TRAIN
 from models import ReplayBuffer
 
-
 """Global variables"""
 model_dict = MODEL_DICT_TRAIN
 
 def load_args():
     parser = argparse.ArgumentParser()
-    
+    # general pipeline parameters
     parser.add_argument('--model_config_dir', type=str, action='store',
                         default=DEFAULT_VALUES['model_config_dir'],
                         help='Model config directory')
     parser.add_argument('--analysis_dir', type=str, action='store',
                         default=DEFAULT_VALUES['analysis_dir'], 
                         help='Analysis directory')
-    parser.add_argument('--data_path', type=str,
-                         default=DEFAULT_VALUES['data_path'], 
+    parser.add_argument('--data_dir', type=str,
+                         default=DEFAULT_VALUES['data_dir'], 
                          help='Data directory')
     parser.add_argument('--dataset', type=str,
                          default='dataset_5_25_23.pkl', 
-                         help='Dataset name')
+                         help='Data directory')
     parser.add_argument('--checkpoint_dir', type=str, 
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
-    # general training parameters    
-    parser.add_argument('--config', type=str,
-                        required=True, help='Config JSON file')
-    parser.add_argument('--batch_size', type=int, action='store',
-                        default=DEFAULT_VALUES['batch_size'],
-                        help='Batch size')
-    parser.add_argument('--model_filename', type=str,
-                        default=None, 
-                        help='Filename for saving model')
-    parser.add_argument('--lr', type=float, action='store',
-                        default=DEFAULT_VALUES['lr'], 
-                        help='Learning Rate')
-    parser.add_argument('--epochs', type=int, action='store',
-                        default=DEFAULT_VALUES['epochs'], 
-                        help='Epochs')
-    parser.add_argument('--save_every', type=int, action='store',
-                        default=DEFAULT_VALUES['save_every'], 
-                        help='Epoch Save Interval')
-    parser.add_argument('--input_size', type=int, help='Input size')
-    # rssm parameters
-    parser.add_argument('--deter_size', type=int, help='Deterministic size')
-    parser.add_argument('--dec_hidden_size', type=int, help='Decoder hidden size')
-    parser.add_argument('--rssm_type', type=str, help='RSSM type')
-    parser.add_argument('--rnn_type', type=str, help='RNN type')
-    parser.add_argument('--category_size', type=int, help='Category size')
-    parser.add_argument('--class_size', type=int, help='Class size')
-    # multistep predictor parameters
-    parser.add_argument('--mlp_hidden_size', type=int, help='MLP hidden size')
-    parser.add_argument('--num_mlp_layers', type=int, help='Number of MLP layers')
-    parser.add_argument('--rnn_hidden_size', type=int, help='RNN hidden size')
-    parser.add_argument('--num_rnn_layers', type=int, help='Number of RNN layers')
+    # general training parameters
+    parser.add_argument('--model', type=str, required=True, help='Model to use for training')
+    parser.add_argument('--config', type=str, required=True, help='Config JSON file')
+    parser.add_argument('--model_filename', type=str, default=None, help='Filename for saving model')
+    parser.add_argument('--lr', type=float, default=1e-6, help='Learning Rate')
+    parser.add_argument('--env', type=str, default='tdw', help='Environment')
+    parser.add_argument('--gt', default=False, action='store_true', help='use ground truth graph')
+    parser.add_argument('--epochs', type=int, default=int(1e5), help='Epochs')
+    parser.add_argument('--save_every', type=int, default=200, help='Epoch Save Interval')
+    parser.add_argument('--batch_size', type=int, help='Epoch Save Interval')
     parser.add_argument('--burn_in_length', type=int, default=50, help='Amount of frames to burn into RNN')
-    parser.add_argument('--rollout_length', type=int, default=30, help='Forward rollout length')    
+    parser.add_argument('--rollout_length', type=int, default=30, help='Forward rollout length') 
+    # model parameters
+    parser.add_argument('--obs_frames', type=int, help='Number of observation frames')
+    parser.add_argument('--num_humans', type=int, default=5, help='Number of humans')
+    parser.add_argument('--feat_dim', type=int, default=7, help='Feature dimension')
+    parser.add_argument('--skip_first', type=int, default=0, help='Skip the first frame')
+    parser.add_argument('--edge_types', type=int, default=2, help='Number of edge types')
+    parser.add_argument('--hidden_dim', type=int, help='Hidden dimension')
+    parser.add_argument('--plt', type=int, default=0, help='Progressive Layer Training')
+    parser.add_argument('--burn_in', type=int, default=0, help='Burn-in flag')
+    parser.add_argument('--encoder', choices=['mlp', 'rnn'])
 
     return parser.parse_args()
     
@@ -91,7 +77,7 @@ def save_config(config, filename):
     with open(filename, 'w') as f:
         json.dump(config, f, indent=4)
 
-def main():
+if __name__ == '__main__':    
     args = load_args()
     config = load_config(os.path.join(args.model_config_dir, args.config))
     
@@ -102,40 +88,49 @@ def main():
             config[k] = v
             overridden_parameters.append(f"{k}_{v}")
             print(f"{k}_{v}")
+            
+    # set config params in args
+    for key in config.keys():
+        setattr(args, key, config[key])
+            
+    # Check that we are using GPU
+    DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+    print(DEVICE)
+    setattr(args, 'device', DEVICE)
     
-    #model_class = model_dict[args.model]
-    model_class = model_dict[config['model_type']]
-    model = model_class(config)
+    model_class = model_dict[args.model]
+    model = model_class(args)
     
-    # filename same as cofnig makes it easier for identifying different parameters
+    # filename for saving
     if args.model_filename is None:
-        model_filename = '_'.join(args.config.split('.')[0].split('_')[:-1])       
+        model_filename = config['model_type']
     else:
         model_filename = args.model_filename
-    print(f"model will be saved to {model_filename}")
     
     # If parameters overwritte, save updated config to new file
     if len(overridden_parameters) > 0:
         new_config_filename = os.path.join(args.model_config_dir, f"{model_filename}_{'_'.join(overridden_parameters)}.json")
         save_config(config, new_config_filename)
-    
-    # Check that we are using GPU
-    DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print(f'Using device: {DEVICE}')
 
-    # load data    
-    loaded_dataset = pickle.load(open(args.data_path, 'rb'))
+    # load data
+    data_file = os.path.join(args.data_dir, args.dataset)
+    loaded_dataset = pickle.load(open(data_file, 'rb'))
     train_dataset, test_dataset = loaded_dataset
     train_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     val_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
-
+    
     # initialize the replay buffer
     burn_in_length = args.burn_in_length
     rollout_length = args.rollout_length
     sequence_length = burn_in_length + rollout_length
     replay_buffer = ReplayBuffer(sequence_length)
-    replay_buffer.upload_training_set(train_data)    
-    batch_size = args.batch_size
+    replay_buffer.upload_training_set(train_data)
+    if args.batch_size:
+        batch_size = args.batch_size
+    elif platform.system() == 'Windows':
+        batch_size = 8
+    elif platform.system() == 'Linux':
+        batch_size = 512
     print(f'Batch size: {batch_size}')
     batches_per_epoch = np.min([replay_buffer.buffer_size // batch_size, 50])
     
@@ -147,8 +142,9 @@ def main():
     val_trajs = val_buffer.sample(val_batch_size, random_seed=seed)
     val_trajs = val_trajs.to(DEVICE)
     val_trajs = val_trajs.to(torch.float32)
+    val_trajs = val_trajs.reshape(-1, sequence_length, 5, 7)
         
-    print('Starting', model_filename)
+    print('Starting', model_filename, 'On DS', args.dataset)
     
     # log to tensorboard
     log_dir = os.path.join(args.checkpoint_dir, 'models/training_info/tensorboard/', model_filename)
@@ -168,69 +164,43 @@ def main():
     
     model.to(DEVICE)
     start_time = time.time()
-    for epoch in tqdm(range(args.epochs)):
+    for epoch in range(args.epochs):
         model.train()
         batch_loss = []
         if config['model_type'][:4] == 'rssm':
             batch_recon_loss = []
             batch_kl_loss = []
         nsamples = 0
-        for i in tqdm(range(batches_per_epoch)):
+        for i in range(batches_per_epoch):
             batch_x = replay_buffer.sample(batch_size)
             batch_x = batch_x.to(torch.float32)
             batch_x = batch_x.to(DEVICE)
+            batch_x = batch_x.reshape(-1, sequence_length, 5, 7)
             nsamples += batch_x.shape[0]
             opt.zero_grad()
-            if batch_x.dtype == torch.int64:
-                batch_x = batch_x.float()
-            if config['model_type'][:4] == 'rssm' or \
-                config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
-                loss = model.loss(batch_x)
-            elif config['model_type'] in ['multistep_predictor', 'multistep_delta']:
-                loss = model.loss(batch_x, burn_in_length, rollout_length)
-            elif config['model_type'] == 'transformer_mp':
-                loss = model.loss(batch_x, burn_in_length, rollout_length, mask_type='triangular')
+            loss = model.loss(batch_x, burn_in_length, rollout_length)
             loss.backward()
             opt.step()
             
             batch_loss.append(loss.item())
-            if config['model_type'][:4] == 'rssm':
-                batch_recon_loss.append(model.recon_loss.item())
-                batch_kl_loss.append(model.kl.item())
         epoch_loss = np.mean(batch_loss)
         loss_dict['train'].append(epoch_loss)
         loss_dict['epoch_times'].append(time.time()-start_time)
-        if config['model_type'][:4] == 'rssm':
-            loss_dict['recon_loss'].append(np.sum(batch_recon_loss))
-            loss_dict['kl_loss'].append(np.sum(batch_kl_loss))
         # test on validation set
         with torch.no_grad():
             model.eval()
-            if config['model_type'][:4] == 'rssm' or \
-                config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
-                val_loss = model.loss(val_trajs)
-            elif config['model_type'] in ['multistep_predictor', 'multistep_delta']:
-                val_loss = model.loss(val_trajs, burn_in_length, rollout_length)
-            elif config['model_type'] == 'transformer_mp':
-                val_loss = model.loss(val_trajs, burn_in_length, rollout_length, mask_type='triangular')
+            val_loss = model.loss(val_trajs, burn_in_length, rollout_length)
             val_loss = val_loss.item()
             loss_dict['val'].append(val_loss)
         # log to tensorboard
         writer.add_scalar('Train Loss/loss', epoch_loss, epoch)
         writer.add_scalar('Val Loss/val', val_loss, epoch)
-        if config['model_type'][:4] == 'rssm':
-            writer.add_scalar('Train_Loss/recon_loss', np.sum(batch_recon_loss), epoch)
-            writer.add_scalar('Train_Loss/kl_loss', np.sum(batch_kl_loss), epoch)
         if epoch % args.save_every == 0 or epoch == (args.epochs-1):
             # save checkpoints in checkpoint directory with plenty of storage
-            save_dir = os.path.join(args.checkpoint_dir, 'models', model_filename)            
+            save_dir = os.path.join(args.checkpoint_dir, 'models', model_filename)
             if not os.path.exists(save_dir):
                 os.makedirs(save_dir)
             model_name = os.path.join(save_dir, f'{model_filename}_epoch{epoch}')
             torch.save(model.state_dict(), model_name)
         print(f'Epoch {epoch}, Train Loss {epoch_loss}, Validation Loss {val_loss}')
-
-
-if __name__ == '__main__':    
-    main()
 

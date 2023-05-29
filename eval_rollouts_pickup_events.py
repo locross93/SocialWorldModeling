@@ -151,7 +151,13 @@ def eval_pickup_events_in_rollouts(model, input_data, ds='First'):
         # get the only pick up point in the trajectory
         steps2pickup = np.max(pickup_timepoints[row,:]).astype(int)
         # burn in until right before the pick up point
-        burn_in_length = steps2pickup - 10
+        if steps2pickup > 15:
+            burn_in_length = steps2pickup - 10
+        elif steps2pickup > 10:
+            burn_in_length = steps2pickup - 5
+        else:
+            # TO DO - don't include trial if not enough burn in available
+            burn_in_length = steps2pickup - 1
         # store the steps before pick up with real frames in imagined_trajs
         imagined_trajs[i,:burn_in_length,:] = x[:,:burn_in_length,:].cpu()
         # rollout model for the rest of the trajectory

@@ -6,14 +6,13 @@ Created on Fri May 12 17:13:33 2023
 """
 
 import matplotlib.pylab as plt
-import os
-import pickle
 import numpy as np
 from scipy.spatial import distance
 from sklearn.metrics import accuracy_score, precision_score, recall_score
+from analysis_utils import get_data_columns
 
 
-def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_location=True, plot=True):        
+def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_location=True, plot=True, ds_num=2):
     if hasattr(recon_matrices, 'requires_grad') and recon_matrices.requires_grad:
         recon_matrices = recon_matrices.detach().numpy()
         
@@ -24,11 +23,7 @@ def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_locati
     num_goals = 3
     y_labels = -1*np.ones([num_trials, num_goals])
     
-    data_columns = ['obj0_x', 'obj0_y', 'obj0_z', 'obj1_x', 'obj1_y', 'obj1_z', 'obj2_x',
-           'obj2_y', 'obj2_z', 'agent0_x', 'agent0_y', 'agent0_z', 'agent0_rot_x',
-           'agent0_rot_y', 'agent0_rot_z', 'agent0_rot_w', 'agent1_x', 'agent1_y',
-           'agent1_z', 'agent1_rot_x', 'agent1_rot_y', 'agent1_rot_z',
-           'agent1_rot_w']    
+    data_columns = get_data_columns(ds_num)   
     dims = ['x', 'y', 'z']
     fp1_pos = np.array([0.0, 0.5, -6.0])
     
@@ -111,7 +106,7 @@ def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_locati
     return scores, y_labels, y_recon
 
 
-def annotate_goal_timepoints(loaded_dataset, train_or_val='val'):
+def annotate_goal_timepoints(loaded_dataset, train_or_val='val', ds_num=2):
     # load train and val dataset
     train_dataset, test_dataset = loaded_dataset
     
@@ -123,11 +118,7 @@ def annotate_goal_timepoints(loaded_dataset, train_or_val='val'):
     input_matrices = input_data#input_data.reshape(-1, 300, 23)
     scores, y_val, y_recon = eval_recon_goals(input_matrices, input_matrices)
     
-    data_columns = ['obj0_x', 'obj0_y', 'obj0_z', 'obj1_x', 'obj1_y', 'obj1_z', 'obj2_x',
-           'obj2_y', 'obj2_z', 'agent0_x', 'agent0_y', 'agent0_z', 'agent0_rot_x',
-           'agent0_rot_y', 'agent0_rot_z', 'agent0_rot_w', 'agent1_x', 'agent1_y',
-           'agent1_z', 'agent1_rot_x', 'agent1_rot_y', 'agent1_rot_z',
-           'agent1_rot_w']    
+    data_columns = get_data_columns(ds_num)    
     dims = ['x', 'y', 'z']
     fp1_pos = np.array([0.0, 0.5, -6.0])
     

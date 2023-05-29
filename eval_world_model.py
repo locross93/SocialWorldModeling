@@ -17,11 +17,11 @@ from typing import List, Tuple, Dict, Any
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 
-from constants import DEFAULT_VALUES, MODEL_DICT_VAL
-from analysis_utils import load_config, get_highest_numbered_file
-from models import DreamerV2
+from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
+from analysis_utils import load_config, get_highest_numbered_file, get_data_columns
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
+from plot_eval_world_model import plot_eval_wm_results
 
 
 #@typechecked
@@ -37,11 +37,19 @@ class Analysis(object):
     def __init__(self, args) -> None:        
         self.args = args
 
-    def load_data(self) -> None:        
-        self.loaded_dataset = pickle.load(open(args.data_path, 'rb'))        
+    def load_data(self) -> None:
+        data_file = os.path.join(self.args.data_dir, self.args.dataset)        
+        self.ds_num = DATASET_NUMS[self.args.dataset]
+        self.loaded_dataset = pickle.load(open(data_file, 'rb'))        
         _, test_dataset = self.loaded_dataset
         self.input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
         self.num_timepoints = self.input_data.size(1)
+        # if 2+ dataset, load event log
+        if self.ds_num > 1:
+            # load dataset info
+            exp_info_file = data_file[:-4]+'_exp_info.pkl'
+            if os.path.isfile(exp_info_file):
+                self.exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
 
 
     def load_model(self, model_key) -> torch.nn.Module:
@@ -55,7 +63,16 @@ class Analysis(object):
         model_class = model_info['class']
         config_file = os.path.join(self.args.model_config_dir, model_info['config'])
         config = load_config(config_file)
-        model = model_class(config)
+        if self.args.gnn_model:
+            for key in config.keys():
+                setattr(self.args, key, config[key])
+            # set default values
+            setattr(self.args, 'env', 'tdw')
+            setattr(self.args, 'gt', False)
+            setattr(self.args, 'device', DEVICE)
+            model = model_class(self.args)
+        else:
+            model = model_class(config)
         # load checkpoint weights
         # checkpoints are in folder named after model
         model_dir = os.path.join(self.args.checkpoint_dir, 'models', model_info['model_dir'])
@@ -74,13 +91,14 @@ class Analysis(object):
 
 
     def eval_goal_events_in_rollouts(self, model, input_data, ds='First') -> Dict[str, typing.Any]:
-        if ds == 'First':
+        if self.ds_num == 1:
             # first dataset
-            pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move')
+            pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
             single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
         else:
-            # use event log for new datasets - TO DO
-            pickup_timepoints = []
+            # 2+ dataset use event logger to define events
+            pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
+            single_goal_trajs = self.exp_info_dict[self.args.train_or_val]['single_goal_trajs']
         
         num_single_goal_trajs = len(single_goal_trajs)
         imagined_trajs = np.zeros([num_single_goal_trajs, input_data.shape[1], input_data.shape[2]])        
@@ -120,16 +138,15 @@ class Analysis(object):
     
 
     def eval_multigoal_events_in_rollouts(self, model, input_data, ds='First') -> Dict[str, Any]:        
-        if ds == 'First':
+        if self.ds_num == 1:
             # first dataset
-            pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move')
-            # @TODO multi_goal_trajs are empty for new datasets because there is no event in which 
-            # three events have happened
+            pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
             multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
         else:
-            # use event log for new datasets - TO DO
-            pickup_timepoints = []
-                                        
+            # 2+ dataset use event logger to define events
+            pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
+            multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
+            
         num_multi_goal_trajs = len(multi_goal_trajs)
         imagined_trajs = np.zeros([num_multi_goal_trajs, input_data.shape[1], input_data.shape[2]])
         real_trajs = []
@@ -178,9 +195,10 @@ class Analysis(object):
             'g2_acc': acc_g2,
             'g2_goal_num': '2nd Goal',
             'g2_mse': mse,
-            'acc_g3': acc_g3,
+            'g3_acc': acc_g3,
             'g3_goal_num': '3rd Goal',
             'g3_mse': mse}
+        
         return result
     
 
@@ -194,22 +212,12 @@ class Analysis(object):
             else:
                 return 0
             
-        if input_matrices.shape[1:] != (300, 23):
-            input_matrices = input_matrices.reshape(-1, 300, 23)
-            
-        if recon_matrices.shape[1:] != (300, 23):
-            recon_matrices = recon_matrices.reshape(-1, 300, 23)
-            
         if hasattr(recon_matrices, 'requires_grad') and recon_matrices.requires_grad:
             recon_matrices = recon_matrices.detach().numpy()
             
         scores = {}
         
-        data_columns = ['obj0_x', 'obj0_y', 'obj0_z', 'obj1_x', 'obj1_y', 'obj1_z', 'obj2_x',
-            'obj2_y', 'obj2_z', 'agent0_x', 'agent0_y', 'agent0_z', 'agent0_rot_x',
-            'agent0_rot_y', 'agent0_rot_z', 'agent0_rot_w', 'agent1_x', 'agent1_y',
-            'agent1_z', 'agent1_rot_x', 'agent1_rot_y', 'agent1_rot_z',
-            'agent1_rot_w'] 
+        data_columns = get_data_columns(DATASET_NUMS[args.dataset])
         dims = ['x', 'y', 'z']
 
         num_trials = input_matrices.shape[0]
@@ -232,6 +240,8 @@ class Analysis(object):
                 trial_obj_pos = trial_x[:,pos_inds]
                 recon_moved_flag[i,j] = detect_object_move(trial_obj_pos, move_thr)
                 
+        # TO DO - DON'T COUNT TRIALS WERE OBJECT MOVED FROM UNPREDICTABLE COLLISION
+                
         scores['accuracy'] = accuracy_score(obj_moved_flag.reshape(-1), recon_moved_flag.reshape(-1))
         scores['precision'] = precision_score(obj_moved_flag.reshape(-1), recon_moved_flag.reshape(-1))
         scores['recall'] = recall_score(obj_moved_flag.reshape(-1), recon_moved_flag.reshape(-1))        
@@ -240,13 +250,16 @@ class Analysis(object):
     def eval_move_events_in_rollouts(self, model, input_data, ds='First') -> Dict[str, Any]:
         if ds == 'First':
             # first dataset
-            pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move')
-            goal_timepoints = annotate_goal_timepoints(self.loaded_dataset, train_or_val='val')
+            pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
+            goal_timepoints = annotate_goal_timepoints(self.loaded_dataset, train_or_val='val', ds_num=self.ds_num)
             single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
             multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
         else:
-            # use event log for new datasets - TO DO
-            pickup_timepoints = []
+            # 2+ dataset use event logger to define events
+            pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
+            goal_timepoints = self.exp_info_dict[self.args.train_or_val]['goal_timepoints']
+            single_goal_trajs = self.exp_info_dict[self.args.train_or_val]['single_goal_trajs']
+            multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
         
         imagined_trajs = np.zeros(input_data.shape)
         for i in range(input_data.shape[0]):
@@ -307,9 +320,15 @@ class Analysis(object):
 
     def save_results(self) -> None:
         save_file = f'eval_{self.args.eval_type}'
+        # if a training set eval, add suffix
+        if self.args.train_or_val == 'train':
+            save_file = save_file+'_train'
         save_path = os.path.join(self.args.analysis_dir, 'results', f'{save_file}.csv')
         df_results = pd.DataFrame(self.results)
-        df_results.to_csv(save_path)                             
+        df_results.to_csv(save_path)
+        if self.args.plot:
+            plot_save_file = os.path.join(self.args.analysis_dir, 'results', 'figures', save_file)
+            plot_eval_wm_results(df_results, self.args, plot_save_file)                             
 
 
     def run(self) -> None:
@@ -335,6 +354,11 @@ def load_args():
     parser.add_argument('--checkpoint_dir', type=str, action='store',
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
+    parser.add_argument('--dataset', type=str,
+                         default='dataset_5_25_23.pkl', 
+                         help='Dataset')
+    parser.add_argument('--gnn_model', type=bool, default=False, help='GNN Model')
+    parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--model_keys', nargs='+', action='store',
                         default=DEFAULT_VALUES['model_keys'], 
                         help='A list of keys, seperate by spaces, for all model to evaluate')
@@ -342,6 +366,7 @@ def load_args():
                         choices=DEFAULT_VALUES['eval_types'], 
                         default='goal_events', 
                         help='Type of evaluation to perform')
+    parser.add_argument('--plot', type=bool, default=True, help='Plot Results')
     parser.add_argument('--move_threshold', action='store',
                         default=DEFAULT_VALUES['move_threshold'],
                         help='Threshold for move event evaluation')
