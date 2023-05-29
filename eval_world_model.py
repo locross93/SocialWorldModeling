@@ -128,7 +128,7 @@ class Analysis(object):
         mse = ((x_true - x_hat)**2).mean().item()
     
         full_trajs = input_data[single_goal_trajs,:,:].cpu()
-        scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=True, plot=False)
+        scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=True, plot=False, ds_num=self.ds_num)
         # evaluate whether only appropriate goals (after object picked up) are reconstructed
         pickup_subset = pickup_timepoints[single_goal_trajs,:]
         indices = np.argwhere(pickup_subset > -1)
@@ -174,7 +174,7 @@ class Analysis(object):
         mse = ((x_true - x_hat)**2).mean().item()
         
         full_trajs = input_data[multi_goal_trajs,:,:].cpu()
-        scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False)
+        scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num)
         # 100% accuracy is all goal labels are == 1
         assert np.mean(y_labels) == 1.0
         # get accuracies separately for 2nd object and 3rd object (3rd object the hardest to imagine properly)

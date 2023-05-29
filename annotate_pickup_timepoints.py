@@ -25,7 +25,7 @@ def annotate_pickup_timepoints(loaded_dataset, train_or_val='val', pickup_or_mov
         input_matrices = train_dataset.dataset.tensors[0][train_dataset.indices,:,:].numpy()
     elif train_or_val == 'val':
         input_matrices = test_dataset.dataset.tensors[0][test_dataset.indices,:,:].numpy()
-    scores, y_val, y_recon = eval_recon_goals(input_matrices, input_matrices)
+    scores, y_val, y_recon = eval_recon_goals(input_matrices, input_matrices, ds_num=ds_num)
 
     data_columns = get_data_columns(ds_num)    
     dims = ['x', 'y', 'z']
