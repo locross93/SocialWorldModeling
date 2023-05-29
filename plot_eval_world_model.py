@@ -21,12 +21,12 @@ def plot_goal_events(df_results, save_file):
     plt.ylabel('Accuracy', fontsize=16)
     plt.ylim([0, 1])
     if save_file is not None:
-        plt.savefig(save_file, dpi=300)
+        plt.savefig(save_file, dpi=300, bbox_inches='tight')
     plt.show()
         
 def plot_multigoal_events(df_results, save_file):
     df_plot = pd.melt(df_results, id_vars="model", value_vars=["g2_acc", "g3_acc"], var_name="Goal Num", value_name="Accuracy")
-    df_plot["Goal Num"] = df_plot["Goal Num"].replace({"g2_acc": "2nd Goal", "acc_g3": "3rd Goal"})
+    df_plot["Goal Num"] = df_plot["Goal Num"].replace({"g2_acc": "2nd Goal", "g3_acc": "3rd Goal"})
 
     plt.figure()
     sns.barplot(x='model', y='Accuracy', hue='Goal Num', data=df_plot) 
@@ -36,7 +36,7 @@ def plot_multigoal_events(df_results, save_file):
     plt.ylim([0, 1])
     plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
     if save_file is not None:
-        plt.savefig(save_file, dpi=300)
+        plt.savefig(save_file, dpi=300, bbox_inches='tight')
     plt.show()
         
 def plot_move_events(df_results, save_file):
@@ -50,7 +50,7 @@ def plot_move_events(df_results, save_file):
     plt.ylim([0, 1])
     plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
     if save_file is not None:
-        plt.savefig(save_file, dpi=300)
+        plt.savefig(save_file, dpi=300, bbox_inches='tight')
     plt.show()
 
 def plot_eval_wm_results(df_results, args, save_file=None):
