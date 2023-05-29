@@ -2312,11 +2312,17 @@ class TransformerIrisWorldModel(nn.Module):
         x_burn_in = x[:, :burn_in_length]
         x_rollout = []
         for i in range(rollout_length):
+            x_burn_in = x_burn_in[:, -burn_in_length:]
             # roll out one step at a time
-            _, output_observations = self(x_burn_in)            
-            output_observations = output_observations[:, -1].unsqueeze(1)
-            x_burn_in = torch.cat((x_burn_in, output_observations), dim=1)
-            x_rollout.append(output_observations)        
-        x_rollout = torch.stack(x_rollout).squeeze(1)
+            # takes in burn in, returns one step ahead
+            _, output_observations = self(x_burn_in)
+            # only take the last observation from the output
+            output_observations = output_observations[:, -1]            
+            # updates the burn in with the new observation
+            x_burn_in = torch.cat((x_burn_in, output_observations.unsqueeze(1)), dim=1)
+            # updates the rollout with the new observation
+            x_rollout.append(output_observations)
+            print(f"rollout step {i}, mse is {F.mse_loss(x[:, burn_in_length + i], output_observations)}")
+        x_rollout = torch.stack(x_rollout)
         x_rollout = rearrange(x_rollout, 't b o -> b t o')
         return x_rollout

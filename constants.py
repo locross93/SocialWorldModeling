@@ -37,16 +37,16 @@ MODEL_DICT_VAL=  {
     #     'model_dir': 'multistep_delta_default', 'epoch': '3000', 'model_label': 'Multistep Delta'},
     'transformer_iris_default': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
-        'model_dir': 'transformer_iris_default', 'epoch': '200', 'model_label': 'Transformer Iris'},
+        'model_dir': 'transformer_iris_default', 'epoch': '1800', 'model_label': 'Transformer Iris'},
     'transformer_iris_concat_pos_embd_default': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_default', 'epoch': '200', 'model_label': 'Transformer Iris Concat Pos Embd'},
+        'model_dir': 'transformer_iris_concat_pos_embd_default', 'epoch': '1800', 'model_label': 'Transformer Iris Concat Pos Embd'},
     'transformer_iris_concat_pos_embd_lr1e-4': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'epoch': '200', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
+        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'epoch': '800', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
     'transformer_iris_concat_pos_embd_lr1e-5': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-5', 'epoch': '200', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-5'},
+        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-5', 'epoch': '1800', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-5'},
 }
 
 DEFAULT_VALUES = {

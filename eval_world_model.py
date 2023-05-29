@@ -96,10 +96,7 @@ class Analysis(object):
             # store the steps before pick up with real frames in imagined_trajs
             imagined_trajs[i,:steps2pickup,:] = x[:,:steps2pickup,:].cpu()
             # rollout model for the rest of the trajectory
-            rollout_length = self.num_timepoints - steps2pickup
-            # new dataset x contains float64, but model expects float32
-            if x.dtype == torch.float64:
-                x = x.float()
+            rollout_length = self.num_timepoints - steps2pickup        
             rollout_x = model.forward_rollout(x.cuda(), steps2pickup, rollout_length).cpu().detach()
             # get end portion of true trajectory to compare to rollout
             real_traj = x[:,steps2pickup:,:].to("cpu")

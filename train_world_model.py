@@ -170,7 +170,7 @@ def main():
             batch_recon_loss = []
             batch_kl_loss = []
         nsamples = 0
-        for i in range(batches_per_epoch):
+        for i in tqdm(range(batches_per_epoch)):
             batch_x = replay_buffer.sample(batch_size)
             batch_x = batch_x.to(DEVICE)
             nsamples += batch_x.shape[0]
