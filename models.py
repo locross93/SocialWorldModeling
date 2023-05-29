@@ -2086,23 +2086,284 @@ class RND(nn.Module):
         return loss
 
 
+# """ Tranformer world model adapted from IRIS(https://github.com/eloialonso/iris/blob/main/src/models/world_model.py) """
+# import math
+# from typing import Optional
+
+# from einops import rearrange
+# from kv_caching import KeysValues, KVCache
+# """Valus for discretization data"""
+# DISCRETIZATION_DICT_SMALL = {
+#     'max': [
+#         6.7625, 1.8597, 6.8753, 6.7313, 1.6808, 6.8558, 6.3460, 1.0356, 
+#         6.8317, 6.8851, 0.3761, 6.8929, 0.7643, 1.0000, 0.7607, 1.0000, 
+#         6.8764, 0.3719, 6.8717, 0.7659, 1.0000, 0.7655, 1.0000],
+#     'min': [
+#         -6.7398, -0.0123, -6.8303, -6.8838, -0.0220, -6.7574, -6.8617, -0.0117, 
+#         -6.7947, -6.8901, -0.0426, -6.8758, -0.7560, -1.0000, -0.7604, -1.0000,
+#         -6.8851, -0.0326, -6.8671, -0.7600, -1.0000, -0.7641, -1.0000]
+# }
+
+# " Some util functions for the world model "
+# def init_weights(module):
+#     if isinstance(module, (nn.Linear, nn.Embedding)):
+#         module.weight.data.normal_(mean=0.0, std=0.02)
+#         if isinstance(module, nn.Linear) and module.bias is not None:
+#             module.bias.data.zero_()
+#     elif isinstance(module, nn.LayerNorm):
+#         module.bias.data.zero_()
+#         module.weight.data.fill_(1.0)
+
+
+# class LossWithIntermediateLosses:
+#     def __init__(self, **kwargs):
+#         self.loss_total = sum(kwargs.values())
+#         self.intermediate_losses = {k: v.item() for k, v in kwargs.items()}
+
+#     def __truediv__(self, value):
+#         for k, v in self.intermediate_losses.items():
+#             self.intermediate_losses[k] = v / value
+#         self.loss_total = self.loss_total / value
+#         return self
+    
+
+# " main transformer block "
+# class SelfAttention(nn.Module):
+#     def __init__(self, config: Dict) -> None:
+#         super().__init__()
+#         self.config = config
+#         embed_dim = config['embed_dim']
+#         assert embed_dim % config['num_heads'] == 0
+#         assert config['attention'] in ['causal', 'window', 'square']
+#         self.num_heads = config['num_heads']
+#         self.key = nn.Linear(embed_dim, embed_dim)
+#         self.query = nn.Linear(embed_dim, embed_dim)
+#         self.value = nn.Linear(embed_dim, embed_dim)
+#         self.attn_drop = nn.Dropout(config['attn_pdrop'])
+#         self.resid_drop = nn.Dropout(config['resid_pdrop'])
+#         self.proj = nn.Linear(embed_dim, embed_dim)
+#         self._create_attn_mask()
+
+#     def _create_attn_mask(self) -> None:
+#         mask_type = self.config['attention']
+#         max_seq_len = self.config['max_seq_len']
+#         if mask_type == 'causal':    # autoregressive mask, keeps diagonal and below
+#             mask = torch.tril(torch.ones(max_seq_len, max_seq_len))
+#         elif mask_type == 'window':
+#             # slide window of 
+#             mask = torch.zeros(max_seq_len, max_seq_len)
+#             for i in range(self.config['max_seq_len']):
+#                 # can attend to previous window_size steps
+#                 mask[i, : min(i + self.config['window_size'] + 1, max_seq_len)] = 1
+#         elif mask_type == 'square':
+#             mask = torch.ones(max_seq_len, max_seq_len)
+#             mask[:, :self.config['square_size']] = 1        
+#         self.register_buffer('mask', mask)
+
+#     def forward(self, x: torch.Tensor, kv_cache: Optional[KVCache] = None) -> torch.Tensor:
+#         B, T, C = x.size()
+#         if kv_cache is not None:
+#             b, nh, L, c = kv_cache.shape
+#             assert nh == self.num_heads and b == B and c * nh == C
+#         else:
+#             L = 0
+
+#         q = self.query(x).view(B, T, self.num_heads, C // self.num_heads).transpose(1, 2)   # (B, nh, T, hs)
+#         k = self.key(x).view(B, T, self.num_heads, C // self.num_heads).transpose(1, 2)     # (B, nh, T, hs)
+#         v = self.value(x).view(B, T, self.num_heads, C // self.num_heads).transpose(1, 2)   # (B, nh, T, hs)
+
+#         if kv_cache is not None:
+#             kv_cache.update(k, v)
+#             k, v = kv_cache.get()
+
+#         att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))        
+#         att = att.masked_fill(self.mask[L:L + T, :L + T] == 0, float('-inf'))
+#         att = F.softmax(att, dim=-1)
+#         att = self.attn_drop(att)
+#         y = att @ v
+#         y = rearrange(y, 'b h t e -> b t (h e)')
+
+#         y = self.resid_drop(self.proj(y))
+
+#         return y
+    
+
+# class Block(nn.Module):
+#     def __init__(self, config: Dict) -> None:
+#         super().__init__()
+#         embed_dim = config['embed_dim']
+#         self.ln1 = nn.LayerNorm(embed_dim)
+#         self.ln2 = nn.LayerNorm(embed_dim)
+#         self.attn = SelfAttention(config)
+#         self.mlp = nn.Sequential(
+#             nn.Linear(embed_dim, 4 * embed_dim),
+#             nn.GELU(),
+#             nn.Linear(4 * embed_dim, embed_dim),
+#             nn.Dropout(config['resid_pdrop']),
+#         )
+
+#     def forward(self, x: torch.Tensor, past_keys_values: Optional[KeysValues] = None) -> torch.Tensor:
+#         x_attn = self.attn(self.ln1(x), past_keys_values)
+#         x = x + x_attn
+#         x = x + self.mlp(self.ln2(x))
+#         return x
+    
+
+# class Transformer(nn.Module):
+#     def __init__(self, config: Dict) -> None:
+#         super().__init__()
+#         self.config = config
+#         self.drop = nn.Dropout(config["embed_pdrop"])
+#         self.blocks = nn.ModuleList([Block(config) for _ in range(config['num_attn_layers'])])
+#         self.ln_f = nn.LayerNorm(config['embed_dim'])
+
+#     # def generate_empty_keys_values(self, n: int, max_seq_len: int) -> KeysValues:
+#     #     device = self.ln_f.weight.device  # Assumption that all submodules are on the same device
+#     #     return KeysValues(n, self.config['num_heads'], max_seq_len, self.config['embed_dim'], self.config['num_attn_layers'], device)
+
+#     def forward(self, sequences: torch.Tensor, past_keys_values: Optional[KeysValues] = None) -> torch.Tensor:
+#         assert past_keys_values is None or len(past_keys_values) == len(self.blocks)        
+#         x = self.drop(sequences)        
+#         for i, block in enumerate(self.blocks):
+#             x = block(x, None if past_keys_values is None else past_keys_values[i])
+
+#         x = self.ln_f(x)
+#         return x
+
+# " Head to convert transformer output to logits "
+# class Head(nn.Module):
+#     def __init__(self, config: Dict) -> None:
+#         super().__init__()
+#         self.config = config
+#         self.head = nn.Sequential(
+#             nn.Linear(config['embed_dim'], config['embed_dim']),
+#             nn.ReLU(),
+#             nn.Linear(config['embed_dim'], config['num_bins']),
+#         )
+
+#     def forward(self, x: torch.Tensor) -> torch.Tensor:
+#         return self.head(x)
+
+# " World model "
+# class TransformerIrisWorldModel(nn.Module):
+#     def __init__(self, config: Dict) -> None:
+#         super().__init__()
+#         self.config = config        
+#         self.embedding = nn.Embedding(config['num_bins'], config['embed_dim'])
+#         if 'pos_encode_aggregation' not in self.config:
+#             self.pos_emb = nn.Embedding(config['max_seq_len'], config['embed_dim']) 
+#         else:
+#             # concat pos embedding with input embedding
+#             assert 'pos_embed_dim' in self.config, \
+#                 "pos_embed_dim must be specified in config if pos_encode_aggregation is concat"
+#             self.pos_emb = nn.Embedding(config['max_seq_len'], config['pos_embed_dim'])
+#             self.pos_emb_proj = nn.Linear(config['embed_dim'] + config['pos_embed_dim'], config['embed_dim'])
+
+#         self.transformer = Transformer(config)
+#         self.observation_head = Head(config)
+#         self.apply(init_weights)
+#         self.boundaries = self._generate_boundaries(
+#             DISCRETIZATION_DICT_SMALL['min'], DISCRETIZATION_DICT_SMALL['max'], config['num_bins'])
+
+#     def __repr__(self) -> str:
+#         return "TranformerIrisWorldModel"
+    
+#     def _generate_boundaries(self, min_values: list, max_values: list, bin_size: int) -> torch.Tensor:
+#         boundaries = []
+#         for min_val, max_val in zip(min_values, max_values):
+#             boundary = torch.linspace(min_val, max_val, bin_size + 1)[1:-1]
+#             boundaries.append(boundary)
+#         return torch.stack(boundaries)
+    
+#     def discretize_obs(self, obs: torch.Tensor, boundaries: torch.Tensor):
+#         # Create an array to store the discretized values
+#         boundaries = boundaries.to(obs.device)
+#         discretized = torch.zeros_like(obs).to(obs.device)
+#         labels = torch.zeros_like(obs, dtype=torch.long).to(obs.device)        
+#         for i in range(obs.size(-1)):
+#             discretized[..., i] = torch.bucketize(obs[..., i], boundaries[i])
+#             labels[..., i] = torch.searchsorted(boundaries[i], obs[..., i])
+#         return discretized, labels    
+    
+#     def forward(self, obs: torch.FloatTensor, past_keys_values: Optional[KeysValues] = None):
+#         batch_size, num_steps, feat_size = obs.shape
+#         assert num_steps <= self.config['max_seq_len'], "num_steps should be less than or equal to max_seq_len"
+#         prev_steps = 0 if past_keys_values is None else past_keys_values.size
+#         embds = self.embedding(obs.long())        
+#         self.embds = embds
+#         self.pos_embds = self.pos_emb(prev_steps + torch.arange(num_steps, device=obs.device))        
+#         if 'pos_encode_aggregation' not in self.config:
+#             seq_embds = embds + self.pos_embds        
+#         else:
+#             #if self.config['pos_encode_aggregation'] == 'concat':            
+#             #pos_embds = self.pos_embds.unsqueeze(0).expand(embds.size(0), -1, -1) # (B, T, E)            
+#             pos_embds = self.pos_embds.unsqueeze(0).unsqueeze(2)
+#             pos_embds = pos_embds.expand(batch_size, -1, feat_size, -1) # (B, T, F, E)
+#             seq_embds = self.pos_emb_proj(torch.cat([embds, pos_embds], dim=-1))
+        
+#         seq_embds = seq_embds.reshape(batch_size * num_steps, feat_size, -1)
+#         x = self.transformer(seq_embds, past_keys_values)        
+#         observation_logits = self.observation_head(x)
+#         #observation_logits = observation_logits.reshape(batch_size, num_steps, feat_size, -1)        
+#         return (x, observation_logits)
+    
+#     def loss(self, obs: torch.LongTensor) -> torch.FloatTensor:
+#         obs, labels = self.discretize_obs(obs, self.boundaries)
+#         if self.config['attention'] == 'causal':
+#             inputs = obs[:, :-1]
+#             labels = labels[:, 1:]
+#         elif self.config['attention'] == 'window':
+#             # model can see up to T-window_size steps and predict the window_size steps
+#             assert self.config['window_size'] is not None, "window_size should be specified"
+#             assert self.config['window_size'] < obs.size(1), \
+#                 f"window_size should be at less than {obs.size(1)}"
+#             inputs = obs[:, :-self.config['window_size']]
+#             labels = labels[:, self.config['window_size']:]
+#         elif self.config['attention'] == 'square':
+#             assert self.config['square_size'] >= obs.size(1) / 2, \
+#                 f"square_size should be at least {obs.size(1)/2}"
+#             inputs = obs[:, : self.config['square_size']]
+#             labels = labels[:, self.config['square_size'] :]
+                
+#         x, observation_logits = self(inputs)
+#         # sqaure mask input and labels won't be the same size
+#         if self.config['attention'] == 'square':
+#             observation_logits = observation_logits[:, :labels.size(1)]
+                
+#         labels = labels.reshape(-1, labels.size(2))
+#         observation_logits = rearrange(observation_logits, 'n f c -> n c f')
+#         loss = F.cross_entropy(observation_logits, labels)        
+#         return loss
+    
+#     def map_to_bins(self, output, num_bins):
+#         # Scale the output values to be within [0, num_bins]
+#         scaled_output = torch.sigmoid(output) * num_bins
+#         # Floor the values to get the bin indices
+#         bin_indices = torch.floor(scaled_output).long()
+#         # Clamp the indices to be within [0, num_bins-1]
+#         bin_indices = torch.clamp(bin_indices, 0, num_bins-1)
+#         return bin_indices
+    
+#     def forward_rollout(self, x, burn_in_length, rollout_length):
+#         x_burn_in = x[:, :burn_in_length]
+#         x_rollout = []
+#         for i in range(rollout_length):
+#             # roll out one step at a time
+#             _, output_observations = self(x_burn_in)            
+#             output_observations = output_observations[:, -1].unsqueeze(1)
+#             x_burn_in = torch.cat((x_burn_in, output_observations), dim=1)
+#             x_rollout.append(output_observations)        
+#         x_rollout = torch.stack(x_rollout).squeeze(1)
+#         x_rollout = rearrange(x_rollout, 't b o -> b t o')
+#         return x_rollout
+
+
 """ Tranformer world model adapted from IRIS(https://github.com/eloialonso/iris/blob/main/src/models/world_model.py) """
 import math
 from typing import Optional
 
 from einops import rearrange
 from kv_caching import KeysValues, KVCache
-"""Valus for discretization data"""
-DISCRETIZATION_DICT_SMALL = {
-    'max': [
-        6.7625, 1.8597, 6.8753, 6.7313, 1.6808, 6.8558, 6.3460, 1.0356, 
-        6.8317, 6.8851, 0.3761, 6.8929, 0.7643, 1.0000, 0.7607, 1.0000, 
-        6.8764, 0.3719, 6.8717, 0.7659, 1.0000, 0.7655, 1.0000],
-    'min': [
-        -6.7398, -0.0123, -6.8303, -6.8838, -0.0220, -6.7574, -6.8617, -0.0117, 
-        -6.7947, -6.8901, -0.0426, -6.8758, -0.7560, -1.0000, -0.7604, -1.0000,
-        -6.8851, -0.0326, -6.8671, -0.7600, -1.0000, -0.7641, -1.0000]
-}
 
 " Some util functions for the world model "
 def init_weights(module):
@@ -2230,118 +2491,96 @@ class Transformer(nn.Module):
         x = self.ln_f(x)
         return x
 
-" Head to convert transformer output to logits "
-class Head(nn.Module):
-    def __init__(self, config: Dict) -> None:
-        super().__init__()
-        self.config = config
-        self.head = nn.Sequential(
-            nn.Linear(config['embed_dim'], config['embed_dim']),
-            nn.ReLU(),
-            nn.Linear(config['embed_dim'], config['obs_size']),
-        )
-
-    def map_to_bins(self, output, num_bins):
-        # Scale the output values to be within [0, num_bins]
-        scaled_output = torch.sigmoid(output) * num_bins
-        # Floor the values to get the bin indices
-        bin_indices = torch.floor(scaled_output).long()
-        # Clamp the indices to be within [0, num_bins-1]
-        bin_indices = torch.clamp(bin_indices, 0, num_bins-1)
-        return bin_indices
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.map_to_bins(x, self.config['num_bins'])
-        return self.head(x)
 
 " World model "
 class TransformerIrisWorldModel(nn.Module):
     def __init__(self, config: Dict) -> None:
         super().__init__()
         self.config = config        
-        self.embedding = nn.Linear(config['obs_size'], config['embed_dim'])#nn.Embedding(config['num_bins'], config['embed_dim'])
+        self.embedder = self._build_encoder_mlp(self.config['num_encode_layers'])
         if 'pos_encode_aggregation' not in self.config:
             self.pos_emb = nn.Embedding(config['max_seq_len'], config['embed_dim']) 
         else:
-            # concat pos embedding with input embedding
+            #self.config['pos_encode_aggregation'] == 'concat': 
             assert 'pos_embed_dim' in self.config, \
                 "pos_embed_dim must be specified in config if pos_encode_aggregation is concat"
             self.pos_emb = nn.Embedding(config['max_seq_len'], config['pos_embed_dim'])
             self.pos_emb_proj = nn.Linear(config['embed_dim'] + config['pos_embed_dim'], config['embed_dim'])
-                    
+        
+            
         self.transformer = Transformer(config)
-        self.observation_head = Head(config)
+        self.decoder = nn.Linear(self.config['embed_dim'], self.config['obs_size'])     #self._build_decoder_mlp(self.config['num_decode_layers'])
         self.apply(init_weights)
-        self.boundaries = self._generate_boundaries(
-            DISCRETIZATION_DICT_SMALL['min'], DISCRETIZATION_DICT_SMALL['max'], config['num_bins'])
 
     def __repr__(self) -> str:
         return "TranformerIrisWorldModel"
+        
+    def _build_encoder_mlp(self, num_layers):
+        layers = [
+            nn.Linear(self.config['obs_size'], self.config['embed_dim']),
+            nn.LayerNorm(self.config['embed_dim']),
+            nn.GELU()]
+        for _ in range(1, num_layers-1):
+            layers.append(nn.Linear(self.config['embed_dim'], self.config['embed_dim']))
+            layers.append(nn.GELU())
+        layers += [
+            nn.Linear(self.config['embed_dim'], self.config['embed_dim']),
+            nn.LayerNorm(self.config['embed_dim'])]
+        return nn.Sequential(*layers)
     
-    def _generate_boundaries(self, min_values: list, max_values: list, bin_size: int) -> torch.Tensor:
-        boundaries = []
-        for min_val, max_val in zip(min_values, max_values):
-            boundary = torch.linspace(min_val, max_val, bin_size + 1)[1:-1]
-            boundaries.append(boundary)
-        return torch.stack(boundaries)
-    
-    def discretize_obs(self, obs: torch.Tensor, boundaries: torch.Tensor):
-        # Create an array to store the discretized values
-        boundaries = boundaries.to(obs.device)
-        discretized = torch.zeros_like(obs).to(obs.device)
-        labels = torch.zeros_like(obs, dtype=torch.long).to(obs.device)        
-        for i in range(obs.size(-1)):
-            discretized[..., i] = torch.bucketize(obs[..., i], boundaries[i])
-            labels[..., i] = torch.searchsorted(boundaries[i], obs[..., i])
-        return discretized, labels    
+    def _build_decoder_mlp(self, num_layers):
+        layers = []
+        for _ in range(num_layers-1):
+            layers.append(nn.Linear(self.config['embed_dim'], self.config['embed_dim']))
+            layers.append(nn.GELU())
+        layers.append(nn.Linear(self.config['embed_dim'], self.config['obs_size']))
+        return nn.Sequential(*layers)
     
     def forward(self, obs: torch.FloatTensor, past_keys_values: Optional[KeysValues] = None):
-        batch_size, num_steps, feat_size = obs.shape
+        num_steps = obs.size(1)  # (B, T)
         assert num_steps <= self.config['max_seq_len'], "num_steps should be less than or equal to max_seq_len"
-        prev_steps = 0 if past_keys_values is None else past_keys_values.size
-        embds = self.embedding(obs.reshape(-1, feat_size))
-        embds = embds.reshape(batch_size, num_steps, -1)
+        prev_steps = 0 if past_keys_values is None else past_keys_values.size        
+        embds = self.embedder(obs)
         self.embds = embds
         self.pos_embds = self.pos_emb(prev_steps + torch.arange(num_steps, device=obs.device))
         if 'pos_encode_aggregation' not in self.config:
             seq_emdbs = embds + self.pos_embds        
         else:
             #if self.config['pos_encode_aggregation'] == 'concat':            
-            pos_embds = self.pos_embds.unsqueeze(0).expand(embds.size(0), -1, -1) # (B, T, E)            
-            seq_emdbs = self.pos_emb_proj(torch.cat([embds, pos_embds], dim=-1))
-        
-        x = self.transformer(seq_emdbs, past_keys_values)
-        observation_logits = self.observation_head(x)        
-        observation_logits = observation_logits.reshape(batch_size, num_steps, -1)
-        return (x, observation_logits)
+            pos_embds = self.pos_embds.unsqueeze(0).expand(embds.size(0), -1, -1) # (B, T, E)
+            seq_emdbs = self.pos_emb_proj(torch.cat([embds, pos_embds], dim=-1))        
+        x = self.transformer(seq_emdbs, past_keys_values)        
+        output_observations = self.decoder(x)
+        return (x, output_observations)
     
     def loss(self, obs: torch.LongTensor) -> torch.FloatTensor:
-        obs, labels = self.discretize_obs(obs, self.boundaries)
+        # somehow new data has dtype float64
+        if obs.dtype == torch.float64:
+            obs = obs.float()
         if self.config['attention'] == 'causal':
             inputs = obs[:, :-1]
-            labels = labels[:, 1:]
+            labels = obs[:, 1:]
         elif self.config['attention'] == 'window':
             # model can see up to T-window_size steps and predict the window_size steps
             assert self.config['window_size'] is not None, "window_size should be specified"
             assert self.config['window_size'] < obs.size(1), \
                 f"window_size should be at less than {obs.size(1)}"
             inputs = obs[:, :-self.config['window_size']]
-            labels = labels[:, self.config['window_size']:]
+            labels = obs[:, self.config['window_size']:]
         elif self.config['attention'] == 'square':
             assert self.config['square_size'] >= obs.size(1) / 2, \
                 f"square_size should be at least {obs.size(1)/2}"
             inputs = obs[:, : self.config['square_size']]
-            labels = labels[:, self.config['square_size'] :]
+            labels = obs[:, self.config['square_size'] :]
                 
-        x, observation_logits = self(inputs)
+        x, output_observations = self(inputs)
         # sqaure mask input and labels won't be the same size
         if self.config['attention'] == 'square':
-            observation_logits = observation_logits[:, :labels.size(1)]
+            output_observations = output_observations[:, :labels.size(1)]
 
-        outputs = rearrange(observation_logits, 'b t o -> (b t) o')
-        labels = rearrange(labels, 'b t o -> (b t) o')
-        breakpoint()
-        loss = F.cross_entropy(outputs, labels.float())        
+        outputs = rearrange(output_observations, 'b t o -> (b t) o')        
+        labels = rearrange(labels, 'b t o -> (b t) o')        
+        loss = F.mse_loss(labels, outputs)
         return loss
     
     def forward_rollout(self, x, burn_in_length, rollout_length):

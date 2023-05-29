@@ -95,8 +95,8 @@ DEFAULT_VALUES = {
     'checkpoint_dir': '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint',
     'model_config_dir': './model_configs',
     # general training parameters for all models
-    'batch_size': 2048,
-    'lr': 1e-3,
+    'batch_size': 512,
+    'lr': 3e-5,
     'epochs': int(3e4),
     'save_every': 200,
     # eval parameters

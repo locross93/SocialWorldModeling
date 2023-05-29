@@ -205,9 +205,9 @@ def main():
             writer.add_scalar('Train_Loss/recon_loss', np.sum(batch_recon_loss), epoch)
             writer.add_scalar('Train_Loss/kl_loss', np.sum(batch_kl_loss), epoch)
         elif config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
-            writer.add_embedding(model.pos_embds, global_step=epoch, tag='pos_embds')
+            #writer.add_embedding(model.pos_embds, global_step=epoch, tag='pos_embds')
             one_sample_time_embds = model.embds[0,:,:]
-            writer.add_embedding(one_sample_time_embds, global_step=epoch, tag='one_sample_time_embds')
+            #writer.add_embedding(one_sample_time_embds, global_step=epoch, tag='one_sample_time_embds')
         if epoch % args.save_every == 0 or epoch == (args.epochs-1):
             # save checkpoints in checkpoint directory with plenty of storage
             save_dir = os.path.join(args.checkpoint_dir, 'models', model_filename)            
@@ -216,6 +216,8 @@ def main():
             model_name = os.path.join(save_dir, f'{model_filename}_epoch{epoch}')
             torch.save(model.state_dict(), model_name)
         print(f'Epoch {epoch}, Train Loss {epoch_loss}')
+
+
 
 
 if __name__ == '__main__':    

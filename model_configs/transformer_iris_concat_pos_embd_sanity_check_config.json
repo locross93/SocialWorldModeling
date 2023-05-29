@@ -6,7 +6,7 @@
     "num_bins": 50,
 
     "num_encode_layers": 1,
-    "embed_dim": 512,
+    "embed_dim": 128,
     "num_decode_layers": 4,    
 
     "pos_encode_aggregation": "concat",
