@@ -25,7 +25,7 @@ def plot_goal_events(df_results, save_file):
     plt.show()
         
 def plot_multigoal_events(df_results, save_file):
-    df_plot = pd.melt(df_results, id_vars="model", value_vars=["g2_acc", "acc_g3"], var_name="Goal Num", value_name="Accuracy")
+    df_plot = pd.melt(df_results, id_vars="model", value_vars=["g2_acc", "g3_acc"], var_name="Goal Num", value_name="Accuracy")
     df_plot["Goal Num"] = df_plot["Goal Num"].replace({"g2_acc": "2nd Goal", "acc_g3": "3rd Goal"})
 
     plt.figure()
