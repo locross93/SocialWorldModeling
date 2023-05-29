@@ -55,15 +55,15 @@ def load_args():
     parser.add_argument('--burn_in_length', type=int, default=50, help='Amount of frames to burn into RNN')
     parser.add_argument('--rollout_length', type=int, default=30, help='Forward rollout length') 
     # model parameters
-    parser.add_argument('--obs_frames', type=int, default=50, help='Number of observation frames')
+    parser.add_argument('--obs_frames', type=int, help='Number of observation frames')
     parser.add_argument('--num_humans', type=int, default=5, help='Number of humans')
     parser.add_argument('--feat_dim', type=int, default=7, help='Feature dimension')
     parser.add_argument('--skip_first', type=int, default=0, help='Skip the first frame')
     parser.add_argument('--edge_types', type=int, default=2, help='Number of edge types')
-    parser.add_argument('--hidden_dim', type=int, default=512, help='Hidden dimension')
+    parser.add_argument('--hidden_dim', type=int, help='Hidden dimension')
     parser.add_argument('--plt', type=int, default=0, help='Progressive Layer Training')
     parser.add_argument('--burn_in', type=int, default=0, help='Burn-in flag')
-    parser.add_argument('--encoder', default='mlp', choices=['mlp', 'rnn', 'cnn'])
+    parser.add_argument('--encoder', choices=['mlp', 'rnn'])
 
     return parser.parse_args()
     
