@@ -519,10 +519,10 @@ class RNNEncoder(nn.Module):
         self.mlp3 = MLP(n_hid, n_hid, n_hid, do_prob)
         if self.factor:
             self.mlp4 = MLP(n_hid * 3, n_hid, n_hid, do_prob)
-            print("Using factor graph MLP encoder.")
+            print("Using factor graph RNN encoder.")
         else:
             self.mlp4 = MLP(n_hid * 2, n_hid, n_hid, do_prob)
-            print("Using MLP encoder.")
+            print("Using RNN encoder.")
         self.fc_out = nn.Linear(n_hid, n_out)
         self.init_weights()
 

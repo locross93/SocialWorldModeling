@@ -104,6 +104,20 @@ class GAT(nn.Module):
                 # # variable length encoding - take all batch_data and append new pred_obs
                 # batch_data = torch.cat([batch_data, pred_obs.unsqueeze(1)], dim=1)
         return ret
+    
+    def forward_rollout(self, x, burn_in_length, rollout_length):
+        batch_x = x.reshape(-1, x.shape[1], 5, 7)
+        batch_context = batch_x[:,:burn_in_length,:,:]
+        batch_graph = None
+        
+        preds = self.multistep_forward(batch_context, batch_graph, rollout_length)
+
+        x_hat = torch.zeros(x.shape[0], rollout_length, x.shape[2])
+        for idx in range(rollout_length):
+            pred = preds[idx][-1]
+            x_hat[:,idx,:] = pred.reshape(x.shape[0], 1, x.shape[2])
+            
+        return x_hat
 
     def loss(self, batch_x, burn_in_length, rollout_length):
         loss_fn = torch.nn.MSELoss()

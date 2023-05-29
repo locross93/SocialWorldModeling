@@ -222,11 +222,11 @@ if __name__ == '__main__':
     x_pred = x_true.copy()
     if args.model_key == 'transformer_wm':
         rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
-    elif args.gnn_model:
-        x = x.reshape(-1, x.size(1), 5, 7)
-        x_context = x[:,:steps2pickup,:,:]
-        batch_graph = None
-        rollout_x = model.multistep_forward(x_context, batch_graph, rollout_length)
+    # elif args.gnn_model:
+    #     x = x.reshape(-1, x.size(1), 5, 7)
+    #     x_context = x[:,:steps2pickup,:,:]
+    #     batch_graph = None
+    #     rollout_x = model.multistep_forward(x_context, batch_graph, rollout_length)
     else:
         rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()
     x_pred[burn_in_length:,:] = rollout_x 
