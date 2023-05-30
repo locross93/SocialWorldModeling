@@ -15,6 +15,7 @@ import time
 import pickle
 import argparse
 import numpy as np
+import pandas as pd
 from tqdm import tqdm
 
 import torch
@@ -227,6 +228,13 @@ def main():
                 os.makedirs(save_dir)
             model_name = os.path.join(save_dir, f'{model_filename}_epoch{epoch}')
             torch.save(model.state_dict(), model_name)
+            # save training history in dataframe
+            training_info = {
+                'Epochs': np.arange(len(loss_dict['train']))}
+            for key in loss_dict:
+                training_info[key] = loss_dict[key]
+            df_training = pd.DataFrame.from_dict(training_info)
+            df_training.to_csv(save_dir, f'training_info_{model_filename}')
         print(f'Epoch {epoch}, Train Loss {epoch_loss}, Validation Loss {val_loss}')
 
 
