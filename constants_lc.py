@@ -61,10 +61,16 @@ MODEL_DICT_VAL=  {
 }
 DEFAULT_VALUES = {
     'analysis_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/',
+    'data_path': '/Users/locro/Documents/Stanford/analysis/data/dataset_5_25_23.pkl' if platform.system() == 'Windows' else  '/mnt/fs2/locross/analysis/data/dataset_5_25_23.pkl',
     'data_dir': '/Users/locro/Documents/Stanford/analysis/data/' if platform.system() == 'Windows' else  '/mnt/fs2/locross/analysis/data/',
     'checkpoint_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/mnt/fs2/locross/analysis/',
     'results_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/results/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/results',
     'model_config_dir': './model_configs',
+    # general training parameters for all models
+    'batch_size': 8 if platform.system() == 'Windows' else 2048,
+    'lr': 1e-5,
+    'epochs': int(3e4),
+    'save_every': 200,
     #'model_keys': list(MODEL_DICT_VAL.keys()),
     #'model_keys': ['multistep_pred'],
     'model_keys': ['imma','gat','rfm','rfm_rnn'],

@@ -5,9 +5,8 @@ Created on Tue May  9 14:06:24 2023
 @author: locro
 """
 
-# example usage: python train_world_model.py --model dreamerv2 --config rssm_disc_default_config.json --dec_hidden_size 512
-# python train_world_model.py --model multistep_predictor --config multistep_predictor_default_config.json --mlp_hidden_size 512
-# python train_world_model.py --model transformer_wm --config transformer_wm_default_config.json
+# example usage: python train_world_model.py  --config rssm_disc_default_config.json --dec_hidden_size 512
+# python train_world_model.py  --config multistep_predictor_default_config.json --mlp_hidden_size 512
 
 import os
 import json

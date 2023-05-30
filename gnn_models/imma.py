@@ -36,11 +36,18 @@ class IMMA(nn.Module):
         self.encoder_dropout = 0.
         self.decoder_dropout = 0.
         self.factor = True
-
-        self.encoders = nn.ModuleList([MLPEncoder(self.obs_frames * self.input_human_state_dim,
+        
+        if self.encoder == 'mlp':
+            self.encoders = nn.ModuleList([MLPEncoder(self.obs_frames * self.input_human_state_dim,
+                                          self.encoder_hidden,
+                                          1,
+                                          self.encoder_dropout, self.factor) for _ in range(self.edge_types)])
+        elif self.encoder == 'rnn':
+            self.encoders = nn.ModuleList([RNNEncoder(self.input_human_state_dim,
                                       self.encoder_hidden,
                                       1,
-                                      self.encoder_dropout, self.factor) for _ in range(self.edge_types)])
+                                      self.encoder_dropout,
+                                      self.factor) for _ in range(self.edge_types)])
 
         self.rnn_decoder = RNNDecoder(n_in_node=self.decoder_hidden,
                                       edge_types=self.edge_types,
@@ -91,7 +98,10 @@ class IMMA(nn.Module):
         pred_graphs = []
         layer_edges = []
         for layer_idx in range(self.args.edge_types):
-            node_embeddings, logits = self.encoders[layer_idx](batch_data.contiguous(), self.rel_rec, self.rel_send)
+            if self.encoder == 'rnn':
+                node_embeddings, logits, x_all = self.encoders[layer_idx](batch_data.contiguous(), self.rel_rec, self.rel_send)
+            elif self.encoder == 'mlp':
+                node_embeddings, logits = self.encoders[layer_idx](batch_data.contiguous(), self.rel_rec, self.rel_send)
             logit = logits.reshape(-1, self.num_humans, self.num_humans-1)
             edges = F.softmax(logit, dim=-1)
             pred_graphs.append(edges)

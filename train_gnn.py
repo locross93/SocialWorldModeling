@@ -14,11 +14,13 @@ import pickle
 import platform
 import argparse
 import numpy as np
+import pandas as pd
+from tqdm import tqdm
 
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
-from constants import DEFAULT_VALUES, MODEL_DICT_TRAIN
+from constants_lc import DEFAULT_VALUES, MODEL_DICT_TRAIN
 from models import ReplayBuffer
 
 """Global variables"""
@@ -168,14 +170,14 @@ if __name__ == '__main__':
     
     model.to(DEVICE)
     start_time = time.time()
-    for epoch in range(args.epochs):
+    for epoch in tqdm(range(args.epochs)):
         model.train()
         batch_loss = []
         if config['model_type'][:4] == 'rssm':
             batch_recon_loss = []
             batch_kl_loss = []
         nsamples = 0
-        for i in range(batches_per_epoch):
+        for i in tqdm(range(batches_per_epoch)):
             batch_x = replay_buffer.sample(args.batch_size)
             batch_x = batch_x.to(torch.float32)
             batch_x = batch_x.to(DEVICE)
@@ -206,5 +208,12 @@ if __name__ == '__main__':
                 os.makedirs(save_dir)
             model_name = os.path.join(save_dir, f'{model_filename}_epoch{epoch}')
             torch.save(model.state_dict(), model_name)
+            # save training history in dataframe
+            training_info = {
+                'Epochs': np.arange(len(loss_dict['train']))}
+            for key in loss_dict:
+                training_info[key] = loss_dict[key]
+            df_training = pd.DataFrame.from_dict(training_info)
+            df_training.to_csv(os.path.join(save_dir, f'training_info_{model_filename}.csv'))
         print(f'Epoch {epoch}, Train Loss {epoch_loss}, Validation Loss {val_loss}')
 
