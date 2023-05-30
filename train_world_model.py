@@ -234,7 +234,7 @@ def main():
             for key in loss_dict:
                 training_info[key] = loss_dict[key]
             df_training = pd.DataFrame.from_dict(training_info)
-            df_training.to_csv(save_dir, f'training_info_{model_filename}')
+            df_training.to_csv(os.path.join(save_dir, f'training_info_{model_filename}.csv'))
         print(f'Epoch {epoch}, Train Loss {epoch_loss}, Validation Loss {val_loss}')
 
 
