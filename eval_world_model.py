@@ -10,6 +10,8 @@ import pickle
 import torch
 import numpy as np
 import pandas as pd
+from functools import reduce
+from scipy.spatial import distance
 # to enforce type checking
 from typeguard import typechecked
 import typing
@@ -90,7 +92,7 @@ class Analysis(object):
         return model
 
 
-    def eval_goal_events_in_rollouts(self, model, input_data, ds='First') -> Dict[str, typing.Any]:
+    def eval_goal_events_in_rollouts(self, model, input_data) -> Dict[str, typing.Any]:
         if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
@@ -128,7 +130,7 @@ class Analysis(object):
         mse = ((x_true - x_hat)**2).mean().item()
     
         full_trajs = input_data[single_goal_trajs,:,:].cpu()
-        scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=True, plot=False, ds_num=self.ds_num)
+        scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num)
         # evaluate whether only appropriate goals (after object picked up) are reconstructed
         pickup_subset = pickup_timepoints[single_goal_trajs,:]
         indices = np.argwhere(pickup_subset > -1)
@@ -137,7 +139,7 @@ class Analysis(object):
         return result
     
 
-    def eval_multigoal_events_in_rollouts(self, model, input_data, ds='First') -> Dict[str, Any]:        
+    def eval_multigoal_events_in_rollouts(self, model, input_data) -> Dict[str, Any]:        
         if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
@@ -247,8 +249,8 @@ class Analysis(object):
         scores['recall'] = recall_score(obj_moved_flag.reshape(-1), recon_moved_flag.reshape(-1))        
         return scores, obj_moved_flag, recon_moved_flag
     
-    def eval_move_events_in_rollouts(self, model, input_data, ds='First') -> Dict[str, Any]:
-        if ds == 'First':
+    def eval_move_events_in_rollouts(self, model, input_data) -> Dict[str, Any]:
+        if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
             goal_timepoints = annotate_goal_timepoints(self.loaded_dataset, train_or_val='val', ds_num=self.ds_num)
@@ -270,6 +272,9 @@ class Analysis(object):
                 # burn in to a few frames past the goal, so it is clear it is a single goal trial - TO DO THIS WILL BE DIFF FOR DS2
                 # get the only goal point in the trajectory
                 burn_in_length = np.max(goal_timepoints[i,:]).astype(int) + 10
+                if burn_in_length > input_data.size(1):
+                    # very late pickup
+                    burn_in_length = np.max(goal_timepoints[i,:]).astype(int)
             elif i in multi_goal_trajs:
                 # burn in to the pick up point of the 2nd object that is picked up, so its unambiguous that all objects will be delivered
                 burn_in_length = np.sort(pickup_timepoints[i,:])[1].astype(int)
@@ -290,7 +295,149 @@ class Analysis(object):
         result, obj_moved_flag, recon_moved_flag = self._eval_move_events(
             input_data, imagined_trajs, self.args.move_threshold)
         result['model'] = self.model_name
-        return result    
+        return result
+
+
+    def eval_pickup_events(self, input_matrices, recon_matrices):
+        def consecutive(data, stepsize=1):
+            return np.split(data, np.where(np.diff(data) > stepsize)[0]+1)
+        
+        def detect_obj_pick_up(trial_agent_pos, trial_obj_pos):
+            picked_up = False
+            dropped = False
+            # calculate how close agent is to object
+            agent_obj_dist = np.array([distance.euclidean(trial_agent_pos[t,[0,2]], trial_obj_pos[t,[0,2]]) for t in range(len(trial_agent_pos))])
+            # find inds where obj meet criteria
+            # 1. obj is above y_thr
+            # 2. obj is moving
+            # 3. obj is close to agent
+            # 4. largest y delta should be beginning or end of the sequence
+            #y_thr = pick_up_y_thr[temp_obj_name]
+            y_thr = 1e-3
+            pick_up_inds = np.where((trial_obj_pos[:,1] > y_thr) & (trial_obj_pos[:,1] < 0.6))[0]
+            #pick_up_event_inds = consecutive(pick_up_inds)
+            obj_pos_delta = np.zeros(trial_obj_pos.shape)
+            obj_pos_delta[1:,:] = np.abs(trial_obj_pos[1:,:] - trial_obj_pos[:-1,:])
+            obj_pos_delta_sum = obj_pos_delta.sum(axis=1)
+            obj_moving_inds = np.where(obj_pos_delta_sum > 1e-5)[0]
+            agent_close_inds = np.where(agent_obj_dist < 0.8)[0]
+            pick_up_move_close = reduce(np.intersect1d,(pick_up_inds, obj_moving_inds, agent_close_inds))
+            pick_up_event_inds = consecutive(pick_up_move_close)
+            for pick_up_event in pick_up_event_inds:
+                if len(pick_up_event) > 5:
+                    # largest y delta should be beginning or end of the sequence
+                    obj_delta_event = obj_pos_delta[pick_up_event,:]
+                    amax_delta = np.argmax(obj_delta_event[:,1])
+                    index_percentage = amax_delta / len(obj_delta_event) * 100
+                    if index_percentage < 0.1 or index_percentage > 0.9:
+                        picked_up = True
+                        dropped = True
+                    
+            if picked_up and dropped:
+                return True
+            else:
+                return False
+            
+        if hasattr(recon_matrices, 'requires_grad') and recon_matrices.requires_grad:
+            recon_matrices = recon_matrices.detach().numpy()
+        
+        data_columns = get_data_columns(DATASET_NUMS[args.dataset]) 
+        dims = ['x', 'y', 'z']
+    
+        num_trials = input_matrices.shape[0]
+        num_objs = 3
+        obj_pick_up_flag = np.zeros([num_trials, 3])
+        for i in range(num_trials):
+            trial_x = input_matrices[i,:,:]
+            for j in range(num_objs):
+                pos_inds = [data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
+                trial_obj_pos = trial_x[:,pos_inds]
+                agent_moved = []
+                for k in range(2):
+                    pos_inds2 = [data_columns.index('agent'+str(k)+'_'+dim) for dim in dims]
+                    trial_agent_pos = trial_x[:,pos_inds2]
+                    move_bool = detect_obj_pick_up(trial_agent_pos, trial_obj_pos)
+                    agent_moved.append(move_bool)
+                if any(agent_moved):
+                    obj_pick_up_flag[i,j] = 1
+                    
+        recon_pick_up_flag = np.zeros([num_trials, 3])
+        for i in range(num_trials):
+            trial_x = recon_matrices[i,:,:]
+            for j in range(num_objs):
+                pos_inds = [data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
+                trial_obj_pos = trial_x[:,pos_inds]
+                agent_moved = []
+                for k in range(2):
+                    pos_inds2 = [data_columns.index('agent'+str(k)+'_'+dim) for dim in dims]
+                    trial_agent_pos = trial_x[:,pos_inds2]
+                    move_bool = detect_obj_pick_up(trial_agent_pos, trial_obj_pos)
+                    agent_moved.append(move_bool)
+                if any(agent_moved):
+                    recon_pick_up_flag[i,j] = 1
+                    
+        pickup_idxs = np.where(obj_pick_up_flag)
+        accuracy = np.mean(recon_pick_up_flag[pickup_idxs])
+        
+        return accuracy, obj_pick_up_flag, recon_pick_up_flag    
+    
+    
+    def eval_pickup_events_in_rollouts(self, model, input_data) -> Dict[str, Any]:
+        if self.ds_num == 1:
+            # first dataset
+            pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
+            goal_timepoints = annotate_goal_timepoints(self.loaded_dataset, train_or_val='val', ds_num=self.ds_num)
+            single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
+            multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
+        else:
+            # 2+ dataset use event logger to define events
+            pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
+            goal_timepoints = self.exp_info_dict[self.args.train_or_val]['goal_timepoints']
+            single_goal_trajs = self.exp_info_dict[self.args.train_or_val]['single_goal_trajs']
+            multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
+            
+        # TO DO, ANALYZE EVERY PICKUP EVENT SEPARATELY, INCLUDING MULTI GOAL TRAJS
+        
+        num_single_goal_trajs = len(single_goal_trajs)
+        imagined_trajs = np.zeros([num_single_goal_trajs, input_data.shape[1], input_data.shape[2]])
+        num_timepoints = input_data.size(1)
+        real_trajs = []
+        imag_trajs = []
+        for i,row in enumerate(single_goal_trajs):
+            if i%50 == 0:
+                print(i)
+            x = input_data[row,:,:].unsqueeze(0)
+            # get the only pick up point in the trajectory
+            steps2pickup = np.max(pickup_timepoints[row,:]).astype(int)
+            # burn in until right before the pick up point
+            if steps2pickup > 15:
+                burn_in_length = steps2pickup - 10
+            elif steps2pickup > 10:
+                burn_in_length = steps2pickup - 5
+            else:
+                # TO DO - don't include trial if not enough burn in available
+                burn_in_length = steps2pickup - 1
+            # store the steps before pick up with real frames in imagined_trajs
+            imagined_trajs[i,:burn_in_length,:] = x[:,:burn_in_length,:].cpu()
+            # rollout model for the rest of the trajectory
+            rollout_length = num_timepoints - burn_in_length
+            rollout_x = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu().detach()
+            # get end portion of true trajectory to compare to rollout
+            real_traj = x[:,burn_in_length:,:].to("cpu")
+            assert rollout_x.size() == real_traj.size()
+            real_trajs.append(real_traj)
+            imag_trajs.append(rollout_x)
+            # store the steps after pick up with predicted frames in imagined_trajs
+            imagined_trajs[i,burn_in_length:,:] = rollout_x
+            
+        full_trajs = input_data[single_goal_trajs,:,:].cpu()
+        scores, y_labels, y_recon = self.eval_pickup_events(full_trajs, imagined_trajs)
+        # evaluate whether only appropriate goals (after object picked up) are reconstructed
+        pickup_subset = pickup_timepoints[single_goal_trajs,:]
+        indices = np.argwhere(pickup_subset > -1)
+        accuracy = np.mean(y_recon[indices[:,0],indices[:,1]])
+        result = {'model': self.model_name, 'score': accuracy}        
+        return result
 
 
     def eval_one_model(self, model_key) -> Dict[str, Any]:        
@@ -304,6 +451,8 @@ class Analysis(object):
             result = self.eval_multigoal_events_in_rollouts(model, self.input_data)
         elif self.args.eval_type == 'move_events':
             result = self.eval_move_events_in_rollouts(model, self.input_data)        
+        elif self.args.eval_type == 'pickup_events':
+            result = self.eval_pickup_events_in_rollouts(model, self.input_data)  
         else:
             raise NotImplementedError(f'Evaluation type {self.args.eval_type} not implemented')    
         return result

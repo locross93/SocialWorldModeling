@@ -37,6 +37,9 @@ MODEL_DICT_VAL=  {
     'gat': {
        'class': GAT, 'config': 'gat_default_config.json', 
        'model_dir': 'gat', 'model_label': 'GAT'},
+    'gat_rnn': {
+       'class': GAT, 'config': 'gat_encoder_rnn.json', 
+       'model_dir': 'gat', 'model_label': 'GAT RNN'},
     'imma': {
        'class': IMMA, 'config': 'imma_default_config.json', 
        'model_dir': 'imma', 'model_label': 'IMMA'},
@@ -63,9 +66,10 @@ DEFAULT_VALUES = {
     'results_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/results/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/results',
     'model_config_dir': './model_configs',
     #'model_keys': list(MODEL_DICT_VAL.keys()),
-    'model_keys': ['multistep_pred'],
+    #'model_keys': ['multistep_pred'],
+    'model_keys': ['imma','gat','rfm','rfm_rnn'],
     #'model_keys': ['mp_ds2', 'rssm_disc_ds2', 'rssm_cont_ds2'],
-    'eval_types': ['goal_events', 'multigoal_events', 'move_events'],
+    'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
 }

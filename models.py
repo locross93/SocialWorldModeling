@@ -1328,6 +1328,8 @@ class MultistepPredictor(nn.Module):
             pred_outputs.append(xt_hat.squeeze(1))
             # output is next input x
             xt_hat, hidden = self.forward(xt_hat, hidden)
+        if len(pred_outputs) == 0:
+            breakpoint()
         x_hat = torch.stack(pred_outputs, dim=1)
         
         return x_hat
