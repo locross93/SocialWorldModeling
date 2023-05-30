@@ -269,6 +269,9 @@ class Analysis(object):
                 # burn in to a few frames past the goal, so it is clear it is a single goal trial - TO DO THIS WILL BE DIFF FOR DS2
                 # get the only goal point in the trajectory
                 burn_in_length = np.max(goal_timepoints[i,:]).astype(int) + 10
+                if burn_in_length > input_data.size(1):
+                    # very late pickup
+                    burn_in_length = np.max(goal_timepoints[i,:]).astype(int)
             elif i in multi_goal_trajs:
                 # burn in to the pick up point of the 2nd object that is picked up, so its unambiguous that all objects will be delivered
                 burn_in_length = np.sort(pickup_timepoints[i,:])[1].astype(int)
