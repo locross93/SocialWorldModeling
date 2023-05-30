@@ -30,6 +30,7 @@ class IMMA(nn.Module):
 
         self.timesteps = args.obs_frames
         self.dims = args.hidden_dim
+        self.encoder = args.encoder
         self.encoder_hidden = args.hidden_dim
         self.decoder_hidden = args.hidden_dim
         self.encoder_dropout = 0.
@@ -66,6 +67,20 @@ class IMMA(nn.Module):
             if i+1 < self.num_humans:
                 pred_graph[:, i, i+1:self.num_humans] = tmp_graph[:, i, i:self.num_humans]
         return pred_graph
+    
+    def adjust_sequence_length(self, batch_context):
+        batch_size, seq_len, _, _ = batch_context.size()
+        target_len = self.obs_frames
+    
+        if seq_len < target_len:
+            # If sequence length is less than 50, pad with zeros at the beginning
+            padding = torch.zeros((batch_size, target_len - seq_len, 5, 7), device=batch_context.device)
+            batch_context = torch.cat((padding, batch_context), dim=1)
+        elif seq_len > target_len:
+            # If sequence length is more than 50, take the last 50 frames
+            batch_context = batch_context[:, -target_len:, :, :]
+    
+        return batch_context
 
     def multistep_forward(self, batch_data, batch_graph, rollouts):
         # batch_size, obs_frmes, num_humans, feat_dim
@@ -125,6 +140,9 @@ class IMMA(nn.Module):
         batch_x = x.reshape(-1, x.shape[1], 5, 7)
         batch_context = batch_x[:,:burn_in_length,:,:]
         batch_graph = None
+        
+        if self.encoder == 'mlp' and burn_in_length != self.obs_frames:
+            batch_context = self.adjust_sequence_length(batch_context)
         
         preds = self.multistep_forward(batch_context, batch_graph, rollout_length)
 
