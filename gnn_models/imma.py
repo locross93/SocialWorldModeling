@@ -74,7 +74,7 @@ class IMMA(nn.Module):
     
         if seq_len < target_len:
             # If sequence length is less than 50, pad with zeros at the beginning
-            padding = torch.zeros((batch_size, target_len - seq_len, 5, 7), device=batch_context.device)
+            padding = torch.zeros((batch_size, target_len - seq_len, self.num_humans, self.human_state_dim), device=batch_context.device)
             batch_context = torch.cat((padding, batch_context), dim=1)
         elif seq_len > target_len:
             # If sequence length is more than 50, take the last 50 frames
