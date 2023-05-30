@@ -4,6 +4,7 @@
   "feat_dim": 7,
   "hidden_dim": 512,
   "edge_types": 2,
+  "skip_first": 0,
   "encoder": "mlp",
-  "model_type": "gat"
+  "model_type": "rfm"
 }
