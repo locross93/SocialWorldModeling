@@ -43,16 +43,16 @@ MODEL_DICT_VAL=  {
     #     'model_dir': 'multistep_delta_default', 'epoch': '3000', 'model_label': 'Multistep Delta'},
     'transformer_iris_default': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
-        'model_dir': 'transformer_iris_default', 'epoch': '8000', 'model_label': 'Transformer Iris'},
+        'model_dir': 'transformer_iris_default', 'epoch': '29000', 'model_label': 'Transformer Iris'},
     'transformer_iris_concat_pos_embd_default': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_default', 'epoch': '8000', 'model_label': 'Transformer Iris Concat Pos Embd'},
+        'model_dir': 'transformer_iris_concat_pos_embd_default', 'epoch': '29000', 'model_label': 'Transformer Iris Concat Pos Embd'},
     'transformer_iris_concat_pos_embd_lr1e-4': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'epoch': '4800', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
+        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'epoch': '29000', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
     'transformer_iris_concat_pos_embd_lr1e-5': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-5', 'epoch': '10400', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-5'},
+        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-5', 'epoch': '15000', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-5'},
     # 'rfm_rnn': {
     #    'class': RFM, 'config': 'rfm_rnn_config.json', 
     #    'model_dir': 'rfm_rnn', 'model_label': 'RFM RNN'},
@@ -67,10 +67,8 @@ MODEL_DICT_VAL=  {
 DEFAULT_VALUES = {
     # general pipeline parameters
     'analysis_dir': './', 
-    #'checkpoint_dir': '/data2/ziyxiang/social_world_model/checkpoint',
-    # as of 5/29, the GNN models are trained on new dataset
-    'data_path': '/ccn2/u/ziyxiang/swm_data_and_results/data/dataset_5_25_23.pkl',
-    #'data_path': '/ccn2/u/ziyxiang/swm_data_and_results/data/train_test_splits_3D_dataset.pkl',
+    # as of 5/30, all models are trained on dataset_5_25_23.pkl
+    'data_path': '/ccn2/u/ziyxiang/swm_data_and_results/data/dataset_5_25_23.pkl',    
     'checkpoint_dir': '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint',
     'model_config_dir': './model_configs',
     # general training parameters for all models

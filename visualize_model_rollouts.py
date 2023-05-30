@@ -44,9 +44,6 @@ def load_args():
     parser.add_argument('--data_dir', type=str,
                          default=DEFAULT_VALUES['data_dir'], 
                          help='Data directory')
-    parser.add_argument('--dataset', type=str,
-                         default='dataset_5_25_23.pkl', 
-                         help='Dataset')
     parser.add_argument('--gnn_model', type=bool, default=False, help='GNN Model')
     # which trial to visualize
     parser.add_argument('--trial_type', type=str, default='single_goal', help='Trial Type') # single_goal, multi_goal, all
@@ -178,16 +175,16 @@ if __name__ == '__main__':
     model = load_trained_model(model_info, args.device, args.gnn_model)
     
     # load data
-    data_columns = get_data_columns(DATASET_NUMS[args.dataset])
-    data_file = os.path.join(data_dir, args.dataset)
-    loaded_dataset = pickle.load(open(data_file, 'rb'))
+    dataset = os.path.basename(args.data_path)
+    data_columns = get_data_columns(DATASET_NUMS[dataset])
+    loaded_dataset = pickle.load(open(args.data_path, 'rb'))
     train_dataset, test_dataset = loaded_dataset
     if args.train_or_val == 'train':
         input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     else:
         input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
     # load dataset info
-    exp_info_file = data_file[:-4]+'_exp_info.pkl'
+    exp_info_file = dataset[:-4]+'_exp_info.pkl'
     if os.path.isfile(exp_info_file):
         exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
         

@@ -1,6 +1,6 @@
 {
     "model_type": "transformer_iris",
-    "obs_size": 23,
+    "obs_size": 35,
     "max_seq_len": 1000,
     "attention": "causal",
 

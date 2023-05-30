@@ -38,8 +38,8 @@ class Analysis(object):
         self.args = args
 
     def load_data(self) -> None:
-        data_file = os.path.basename(args.data_path)        
-        self.ds_num = DATASET_NUMS[data_file]
+        self.data_file = os.path.basename(args.data_path)        
+        self.ds_num = DATASET_NUMS[self.data_file]
         self.loaded_dataset = pickle.load(open(args.data_path, 'rb'))        
         _, test_dataset = self.loaded_dataset
         self.input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
@@ -47,7 +47,7 @@ class Analysis(object):
         # if 2+ dataset, load event log
         if self.ds_num > 1:
             # load dataset info
-            exp_info_file = data_file[:-4]+'_exp_info.pkl'
+            exp_info_file = self.data_file[:-4]+'_exp_info.pkl'
             if os.path.isfile(exp_info_file):
                 self.exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
 
@@ -217,7 +217,7 @@ class Analysis(object):
             
         scores = {}
         
-        data_columns = get_data_columns(DATASET_NUMS[args.dataset])
+        data_columns = get_data_columns(self.data_file)
         dims = ['x', 'y', 'z']
 
         num_trials = input_matrices.shape[0]
@@ -342,8 +342,6 @@ class Analysis(object):
         self.load_data()
         self.eval_all_models()
         self.save_results()
-
-
 
 
 def load_args():
