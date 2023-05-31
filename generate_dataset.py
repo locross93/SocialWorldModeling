@@ -30,6 +30,30 @@ def get_trialtype_inds(names_dict):
     
     return names_dict
 
+def min_max_normalize(input_tensor):
+    min_values = np.min(input_tensor, axis=(0, 1))
+    max_values = np.max(input_tensor, axis=(0, 1))
+    # Compute the range for each feature
+    ranges = max_values - min_values
+    # Normalize the input_tensor using the formula
+    normalized_tensor = (input_tensor - min_values) / ranges
+    # Define a function that can map the normalized values back to the original input space
+    def inverse_normalize(normalized_tensor):
+        return normalized_tensor * ranges + min_values
+    
+    return normalized_tensor, inverse_normalize
+
+def add_velocity_features(input_tensor):
+    velocity = input_tensor[:,1:,:] - input_tensor[:,:-1,:]
+    vel_features = np.zeros(input_tensor.shape)
+    vel_features[:,1:,:] = velocity
+    new_input_tensor = np.zeros([input_tensor.shape[0], input_tensor.shape[1], input_tensor.shape[2]*2])
+    # Assign the odd numbers in the third dimension with the original values
+    new_input_tensor[:, :, ::2] = input_tensor
+    new_input_tensor[:, :, 1::2] = vel_features
+    
+    return new_input_tensor
+
 def postprocess_events(exp_info_dict):
     dwn_sample = 5
     dwn_timepoints = np.arange(0, 1500, dwn_sample)
@@ -112,8 +136,10 @@ def load_args():
                          default=DEFAULT_VALUES['data_dir'], 
                          help='Save data directory')
     parser.add_argument('--dataset_name', type=str,
-                         default='dataset_5_25_23.pkl', 
+                         required=True,
                          help='Dataset name')
+    parser.add_argument('--normalize', type=bool, default=True, help='Min Max Normalize each feature')
+    parser.add_argument('--velocity', type=bool, default=False, help='Add velocity/diff for each feature')
     
     return parser.parse_args()
 
@@ -128,7 +154,7 @@ if __name__ == '__main__':
     event_logs = []
     
     for exp_name in dir_folders:
-        trial_obs_file = args.tdw_data_dir+exp_name+'/trial_obs.csv'
+        trial_obs_file = os.path.join(args.tdw_data_dir, exp_name, 'trial_obs.csv')
         if os.path.exists(trial_obs_file):
             if os.stat(trial_obs_file).st_size == 0:
                 # if an empty file
@@ -175,6 +201,13 @@ if __name__ == '__main__':
         print(exp_name)
         
     input_tensor = np.stack(all_trial_data, axis=0)
+    data_columns = list(trial_data.columns)
+    
+    if args.normalize:
+        input_tensor, inverse_normalize = min_max_normalize(input_tensor)
+    if args.velocity:
+        input_tensor = add_velocity_features(input_tensor)
+    breakpoint()
     dataset = TensorDataset(torch.tensor(input_tensor).float())
     
     # make training and test splits
@@ -188,7 +221,7 @@ if __name__ == '__main__':
     train_dataset = Subset(dataset, train_idx) # a subset of the dataset with train indices
     test_dataset = Subset(dataset, val_idx) # a subset of the dataset with test indices
     
-    save_file = os.path.join(args.data_dir, 'dataset_5_25_23.pkl')
+    save_file = os.path.join(args.data_dir, args.dataset_name+'.pkl')
     full_dataset = [train_dataset, test_dataset]
     with open(save_file, 'wb') as handle:
         pickle.dump(full_dataset, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -204,11 +237,14 @@ if __name__ == '__main__':
     exp_info_dict['val'] = get_trialtype_inds(exp_info_dict['val'])
     exp_info_dict['train']['event_logs'] = [event_logs[i] for i in train_idx]
     exp_info_dict['val']['event_logs'] = [event_logs[i] for i in val_idx]
+    exp_info_dict['data_columns'] = data_columns
+    if args.normalize:
+        exp_info_dict['inverse_normalize'] = inverse_normalize
     
     # annotate pickup and goal timepoints and sg mg triajs
     exp_info_dict = postprocess_events(exp_info_dict)
     
-    exp_info_file = os.path.join(args.data_dir, 'dataset_5_25_23_exp_info.pkl')
+    exp_info_file = os.path.join(args.data_dir, args.dataset_name+'_exp_info.pkl')
     with open(exp_info_file, 'wb') as handle:
         pickle.dump(exp_info_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
     

@@ -92,12 +92,22 @@ def get_highest_numbered_file(model_filename, directory):
 
 
 
-def load_trained_model(model_info, config_dir, checkpoint_dir, device='cpu'):
+def load_trained_model(model_info, config_dir, checkpoint_dir, device='cpu', gnn_model=False):
     model_class = model_info['class']
     # load config and initialize model class
     config_file = os.path.join(config_dir, model_info['config'])
     config = load_config(config_file)
-    model = model_class(config)
+    if gnn_model:
+        args = argparse.Namespace()
+        for key in config.keys():
+            setattr(args, key, config[key])
+        # set default values
+        setattr(args, 'env', 'tdw')
+        setattr(args, 'gt', False)
+        setattr(args, 'device', device)
+        model = model_class(args)
+    else:
+        model = model_class(config)
     # load checkpoint weights
     # checkpoints are in folder named after model
     model_dir = os.path.join(checkpoint_dir, 'models', model_info['model_dir'])

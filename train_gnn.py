@@ -5,7 +5,7 @@ Created on Thu May 25 18:38:01 2023
 @author: locro
 """
 
-# example usage: python train_gnn.py --config imma_default_config.json
+# example usage: python train_gnn.py --config imma_encoder_rnn.json --model_filename imma_rnn_enc
 
 import os
 import json

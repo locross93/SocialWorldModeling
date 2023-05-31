@@ -35,6 +35,9 @@ def load_args():
     parser.add_argument('--data_path', type=str,
                          default=DEFAULT_VALUES['data_path'], 
                          help='Data directory')
+    parser.add_argument('--dataset', type=str,
+                         default='dataset_5_25_23.pkl', 
+                         help='Dataset name')
     parser.add_argument('--checkpoint_dir', type=str, 
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
@@ -48,7 +51,7 @@ def load_args():
     # which trial to visualize
     parser.add_argument('--trial_type', type=str, default='single_goal', help='Trial Type') # single_goal, multi_goal, all
     parser.add_argument('--trial_num', type=int, default=0, help='Trial Type')
-    parser.add_argument('--goal_num', type=int, default=0, help='Goal number to burn in to for multigoal trials')
+    parser.add_argument('--goal_num', type=int, default=1, help='Goal number to burn in to for multigoal trials')
     parser.add_argument('--burn_in_length', type=int, default=50, help='Burn in length when trial type == all')
     # which visualizations
     parser.add_argument('--plot_traj_subplots', type=bool, default=True, help='Make subplot of true vs predicted trajectory')
@@ -172,7 +175,7 @@ if __name__ == '__main__':
     
     model_info = MODEL_DICT_VAL[args.model_key]
     model_name = model_info['model_label']
-    model = load_trained_model(model_info, args.device, args.gnn_model)
+    model = load_trained_model(model_info, args.model_config_dir, args.checkpoint_dir, args.device, args.gnn_model)
     
     # load data
     dataset = os.path.basename(args.data_path)
@@ -183,10 +186,6 @@ if __name__ == '__main__':
         input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     else:
         input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
-    # load dataset info
-    exp_info_file = dataset[:-4]+'_exp_info.pkl'
-    if os.path.isfile(exp_info_file):
-        exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
         
     if DATASET_NUMS[args.dataset] == 1:
         # first dataset use states to define events
@@ -195,6 +194,12 @@ if __name__ == '__main__':
         single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
         multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
     elif DATASET_NUMS[args.dataset] > 1:
+        # load dataset info
+        exp_info_file = args.data_path[:-4]+'_exp_info.pkl'
+        if os.path.isfile(exp_info_file):
+            exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
+        else:
+            print('DS info dict not found')
         # second dataset use event logger to define events
         pickup_timepoints = exp_info_dict[args.train_or_val]['pickup_timepoints']
         single_goal_trajs = exp_info_dict[args.train_or_val]['single_goal_trajs']
@@ -213,9 +218,6 @@ if __name__ == '__main__':
         # all trial types
         traj_ind = args.trial_num
         burn_in_length = args.burn_in_length
-        
-    # EXTREMELY TEMP
-    burn_in_length = 50
     
     rollout_length = input_data.size(1) - burn_in_length
     x = input_data[traj_ind,:,:].unsqueeze(0)
@@ -248,13 +250,13 @@ if __name__ == '__main__':
     if args.train_or_val == 'train':
         save_file = save_file+'_train'
         
+    data_columns = get_data_columns(DATASET_NUMS[args.dataset])
     # make subplot of true vs predicted trajectory
     if args.plot_traj_subplots:
         subplot_dims = (3,3)
         num_frames = x_true.shape[0]
         num_steps = subplot_dims[0] * subplot_dims[1]
         steps = np.linspace(0, num_frames-1, num_steps, endpoint=True).astype(int)
-        data_columns = get_data_columns()
         fig, ax = make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_columns)
     
     # make video - compare real and reconstructed traj side by side
