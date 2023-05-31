@@ -1,0 +1,11 @@
+{
+    "model_type": "sgnet_cvae",
+    "obs_size": 35,
+    "hidden_size": 512,
+    "pred_dim": 35,
+    "latent_dim": 128,
+
+    "dropout": 0.2,
+    "K": 4,
+    "map": false
+}

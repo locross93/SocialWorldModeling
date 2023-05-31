@@ -104,6 +104,9 @@ def main():
             print(f"{k}_{v}")
     
     model_class = model_dict[config['model_type']]
+    if model_class == "sgnet_cvae":
+        config['enc_steps'] = args.burn_in_length
+        config['dec_steps'] = args.rollout_length
     model = model_class(config)
     
     # filename same as cofnig makes it easier for identifying different parameters
