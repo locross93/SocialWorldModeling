@@ -207,7 +207,10 @@ if __name__ == '__main__':
         input_tensor, inverse_normalize = min_max_normalize(input_tensor)
     if args.velocity:
         input_tensor = add_velocity_features(input_tensor)
-    breakpoint()
+        data_columns = []
+        for column in trial_data.columns:
+            data_columns.append(column)
+            data_columns.append(column+'_vel')
     dataset = TensorDataset(torch.tensor(input_tensor).float())
     
     # make training and test splits
