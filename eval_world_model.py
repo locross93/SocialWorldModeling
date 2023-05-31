@@ -19,7 +19,7 @@ from typing import List, Tuple, Dict, Any
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 
-from constants import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
+from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
 from analysis_utils import load_config, get_highest_numbered_file, get_data_columns
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
@@ -49,9 +49,11 @@ class Analysis(object):
         # if 2+ dataset, load event log
         if self.ds_num > 1:
             # load dataset info
-            exp_info_file = self.data_file[:-4]+'_exp_info.pkl'
+            exp_info_file = args.data_path[:-4]+'_exp_info.pkl'
             if os.path.isfile(exp_info_file):
                 self.exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
+            else:
+                print('DS info dict not found')
 
 
     def load_model(self, model_key) -> torch.nn.Module:

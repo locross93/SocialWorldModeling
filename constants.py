@@ -78,7 +78,7 @@ DEFAULT_VALUES = {
     'save_every': 200,
     # eval parameters
     'model_keys': list(MODEL_DICT_VAL.keys()),
-    'eval_types': ['goal_events', 'multigoal_events', 'move_events'],
+    'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
 }
