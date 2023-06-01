@@ -147,7 +147,11 @@ class IMMA(nn.Module):
         return ret
     
     def forward_rollout(self, x, burn_in_length, rollout_length):
-        batch_x = x.reshape(-1, x.shape[1], 5, 7)
+        if len(x.size()) == 3:
+            # unroll num_entities, num_feats dims
+            batch_x = x.reshape(-1, x.size(1), self.num_humans, self.human_state_dim)
+        else:
+            batch_x = x
         batch_context = batch_x[:,:burn_in_length,:,:]
         batch_graph = None
         
