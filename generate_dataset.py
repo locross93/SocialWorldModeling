@@ -31,8 +31,8 @@ def get_trialtype_inds(names_dict):
     return names_dict
 
 def min_max_normalize(input_tensor):
-    min_values = np.min(input_tensor, axis=(0, 1))
-    max_values = np.max(input_tensor, axis=(0, 1))
+    min_values = np.min(input_tensor, axis=(0, 1)).astype(np.float32)
+    max_values = np.max(input_tensor, axis=(0, 1)).astype(np.float32)
     # Compute the range for each feature
     ranges = max_values - min_values
     # Normalize the input_tensor using the formula

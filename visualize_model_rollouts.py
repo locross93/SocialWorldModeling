@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import moviepy.editor as mpy
 from moviepy.video.io.bindings import mplfig_to_npimage
 
-from analysis_utils import load_trained_model, get_data_columns
+from analysis_utils import load_trained_model, get_data_columns, inverse_normalize
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import annotate_goal_timepoints
 
@@ -32,9 +32,6 @@ def load_args():
     parser.add_argument('--analysis_dir', type=str, action='store',
                         default=DEFAULT_VALUES['analysis_dir'], 
                         help='Analysis directory')
-    parser.add_argument('--data_path', type=str,
-                         default=DEFAULT_VALUES['data_path'], 
-                         help='Data directory')
     parser.add_argument('--dataset', type=str,
                          default='dataset_5_25_23.pkl', 
                          help='Dataset name')
@@ -178,33 +175,51 @@ if __name__ == '__main__':
     model = load_trained_model(model_info, args.model_config_dir, args.checkpoint_dir, args.device, args.gnn_model)
     
     # load data
-    dataset = os.path.basename(args.data_path)
-    data_columns = get_data_columns(DATASET_NUMS[dataset])
-    loaded_dataset = pickle.load(open(args.data_path, 'rb'))
+    dataset_file = os.path.join(args.data_dir, args.dataset)
+    loaded_dataset = pickle.load(open(dataset_file, 'rb'))
     train_dataset, test_dataset = loaded_dataset
     if args.train_or_val == 'train':
         input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     else:
         input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
         
-    if DATASET_NUMS[args.dataset] == 1:
+    if args.dataset in DATASET_NUMS and DATASET_NUMS[args.dataset] == 1:
         # first dataset use states to define events
         # select trajectory where goal occurred
         pickup_timepoints = annotate_pickup_timepoints(loaded_dataset, args.train_or_val, pickup_or_move='move', ds_num=DATASET_NUMS[args.dataset])
         single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
         multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
-    elif DATASET_NUMS[args.dataset] > 1:
+        data_columns = get_data_columns(DATASET_NUMS[args.dataset])
+    else:
         # load dataset info
-        exp_info_file = args.data_path[:-4]+'_exp_info.pkl'
+        exp_info_file = dataset_file[:-4]+'_exp_info.pkl'
         if os.path.isfile(exp_info_file):
-            exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
+            with open(exp_info_file, 'rb') as f:
+                exp_info_dict = pickle.load(f)
+            #exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
         else:
             print('DS info dict not found')
         # second dataset use event logger to define events
         pickup_timepoints = exp_info_dict[args.train_or_val]['pickup_timepoints']
         single_goal_trajs = exp_info_dict[args.train_or_val]['single_goal_trajs']
         multi_goal_trajs = exp_info_dict[args.train_or_val]['multi_goal_trajs']
+        data_columns = exp_info_dict['data_columns']
+        if 'min_max_values' in exp_info_dict:
+            # data is normalize, project it back into regular input space
+            min_values, max_values = exp_info_dict['min_max_values']
+            velocity = any('vel' in s for s in data_columns)
+            input_data = inverse_normalize(input_data, max_values.astype(np.float32), min_values.astype(np.float32), velocity)
+            
+    breakpoint()
     
+    # input_data = input_data.numpy()
+    # min_values = np.min(input_data, axis=(0, 1))
+    # max_values = np.max(input_data, axis=(0, 1))
+    # ranges = max_values - min_values
+    # normalized_tensor = (input_data - min_values) / ranges
+    # input_data = inverse_normalize(normalized_tensor, max_values, min_values)
+    # input_data = torch.tensor(input_data)
+            
     if args.trial_type == 'single_goal':
         traj_ind = single_goal_trajs[args.trial_num]
         steps2pickup = np.max(pickup_timepoints[traj_ind,:]).astype(int)
@@ -227,11 +242,6 @@ if __name__ == '__main__':
     x_pred = x_true.copy()
     if args.model_key == 'transformer_wm':
         rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
-    # elif args.gnn_model:
-    #     x = x.reshape(-1, x.size(1), 5, 7)
-    #     x_context = x[:,:steps2pickup,:,:]
-    #     batch_graph = None
-    #     rollout_x = model.multistep_forward(x_context, batch_graph, rollout_length)
     else:
         rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()
     x_pred[burn_in_length:,:] = rollout_x 
@@ -250,7 +260,6 @@ if __name__ == '__main__':
     if args.train_or_val == 'train':
         save_file = save_file+'_train'
         
-    data_columns = get_data_columns(DATASET_NUMS[args.dataset])
     # make subplot of true vs predicted trajectory
     if args.plot_traj_subplots:
         subplot_dims = (3,3)

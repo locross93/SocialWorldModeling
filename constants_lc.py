@@ -40,12 +40,21 @@ MODEL_DICT_VAL=  {
     'gat_rnn_enc': {
        'class': GAT, 'config': 'gat_encoder_rnn_config.json', 
        'model_dir': 'gat_rnn_enc', 'model_label': 'GAT RNN Encoder'},
+    'gat_rnn_norm_vel': {
+       'class': GAT, 'config': 'gat_encoder_rnn_config.json', 
+       'model_dir': 'gat_rnn_norm_vel', 'model_label': 'GAT RNN Encoder'},
     'imma': {
        'class': IMMA, 'config': 'imma_default_config.json', 
        'model_dir': 'imma', 'model_label': 'IMMA'},
     'imma_encoder': {
        'class': IMMA, 'config': 'imma_encoder_rnn.json', 
        'model_dir': 'imma_encoder', 'model_label': 'IMMA RNN Encoder'},
+    'imma_rnn_simple_ds': {
+       'class': IMMA, 'config': 'imma_rnn_simple_ds_hidden_dim_128.json', 
+       'model_dir': 'imma_rnn_simple_ds', 'model_label': 'IMMA RNN Encoder'},
+    'imma_rnn_norm_vel': {
+       'class': IMMA, 'config': 'imma_encoder_rnn.json', 
+       'model_dir': 'imma_rnn_norm_vel', 'model_label': 'IMMA RNN Encoder'},
     'rfm': {
        'class': RFM, 'config': 'rfm_default_config.json', 
        'model_dir': 'rfm', 'model_label': 'RFM'},

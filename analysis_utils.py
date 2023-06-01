@@ -146,3 +146,15 @@ def plot_results(result_file):
     plt.xlabel('Model Name', fontsize=16) 
     plt.ylabel('MSE', fontsize=16)
     plt.savefig(f'{save_name}_mse.png', dpi=300, bbox_inches='tight')
+    
+def inverse_normalize(normalized_tensor, max_values, min_values, velocity=False):
+    ranges = max_values - min_values
+    if velocity:
+        input_data_pos = normalized_tensor[:, :, ::2]
+        input_data_pos = input_data_pos * ranges + min_values
+        unnormalized_tensor = normalized_tensor.clone()
+        unnormalized_tensor[:, :, ::2] = input_data_pos
+    else:
+        unnormalized_tensor = normalized_tensor * ranges + min_values
+        
+    return unnormalized_tensor
