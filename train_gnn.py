@@ -20,6 +20,7 @@ from tqdm import tqdm
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
+from analysis_utils import init_model_class
 from constants_lc import DEFAULT_VALUES, MODEL_DICT_TRAIN
 from models import ReplayBuffer
 
@@ -102,17 +103,12 @@ if __name__ == '__main__':
             overridden_parameters.append(f"{k}_{v}")
             print(f"{k}_{v}")
             
-    # set config params in args
-    for key in config.keys():
-        setattr(args, key, config[key])
-            
     # Check that we are using GPU
     DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(DEVICE)
     setattr(args, 'device', DEVICE)
     
-    model_class = model_dict[config['model_type']]
-    model = model_class(args)
+    model = init_model_class(config, args)
     
     # filename same as cofnig makes it easier for identifying different parameters
     if args.model_filename is None:

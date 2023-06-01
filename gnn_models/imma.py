@@ -166,6 +166,10 @@ class IMMA(nn.Module):
     def loss(self, batch_x, burn_in_length, rollout_length):
         loss_fn = torch.nn.MSELoss()
         
+        if len(batch_x.size()) == 3:
+            # unroll num_entities, num_feats dims
+            batch_x = batch_x.reshape(-1, batch_x.size(1), self.num_humans, self.human_state_dim)
+        
         batch_context = batch_x[:,:burn_in_length,:,:]
         true_rollout_x = batch_x[:,-rollout_length:,:,:]
         batch_graph = None
