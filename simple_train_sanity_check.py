@@ -193,8 +193,13 @@ def main():
         else:
             loss = model.loss(batch_x, burn_in_length, rollout_length)
         loss.backward()
-        opt.step()        
-        batch_loss.append(loss.item())
+        opt.step()    
+        # TEMP FOR PRINTING MSE FOR RSSM
+        if config['model_type'] == 'dreamerv2':
+            mse = model.recon_loss / batch_x.numel()
+            batch_loss.append(mse.item())
+        else:
+            batch_loss.append(loss.item())
         if config['model_type'] == 'dreamerv2':
             batch_recon_loss.append(model.recon_loss.item())
             batch_kl_loss.append(model.kl.item())        

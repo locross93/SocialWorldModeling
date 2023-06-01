@@ -162,7 +162,7 @@ def main():
     loss_dict['train'] = []
     loss_dict['val'] = []
     loss_dict['epoch_times'] = []
-    if config['model_type'][:4] == 'rssm':
+    if config['model_type'] == 'dreamerv2':
         loss_dict['recon_loss'] = []
         loss_dict['kl_loss'] = []
     
@@ -171,7 +171,7 @@ def main():
     for epoch in tqdm(range(args.epochs)):
         model.train()
         batch_loss = []
-        if config['model_type'][:4] == 'rssm':
+        if config['model_type'] == 'dreamerv2':
             batch_recon_loss = []
             batch_kl_loss = []
         nsamples = 0
@@ -194,10 +194,10 @@ def main():
             opt.step()
             
             batch_loss.append(loss.item())
-            if config['model_type'][:4] == 'rssm':
+            if config['model_type'] == 'dreamerv2':
                 batch_recon_loss.append(model.recon_loss.item())
                 batch_kl_loss.append(model.kl.item())
-        epoch_loss = np.mean(batch_loss)
+        epoch_loss = np.mean(batch_loss) # TO DO IS THIS REALLY MSE?
         loss_dict['train'].append(epoch_loss)
         loss_dict['epoch_times'].append(time.time()-start_time)
         if config['model_type'] == 'dreamerv2':
