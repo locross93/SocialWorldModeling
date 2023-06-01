@@ -10,7 +10,7 @@ class GAT(nn.Module):
     def __init__(self, args):
         super().__init__()
         self.args = args
-        self.env = args.env
+        self.env = 'tdw'
         self.num_humans = args.num_humans
         self.obs_frames = args.obs_frames
         self.human_state_dim = args.feat_dim
@@ -23,16 +23,10 @@ class GAT(nn.Module):
             self.w_h = mlp(self.obs_frames*self.human_state_dim, self.wh_dims, last_relu=True)
         elif self.encoder == 'rnn':
             self.w_h = nn.GRU(self.human_state_dim, self.hidden_dim , num_layers=1, batch_first=True)
-
-        if args.gt:
-            self.final_layer = mlp(2*self.hidden_dim, [self.hidden_dim, self.hidden_dim//2, self.human_state_dim])
-            self.final_layer = torch.nn.Linear(2*self.hidden_dim, self.human_state_dim)
-        else:
-            self.final_layer = mlp(self.hidden_dim, [self.hidden_dim, self.hidden_dim//2, self.human_state_dim])
-            #torch.nn.Linear(self.hidden_dim, human_state_dim)
+            
+        self.final_layer = mlp(self.hidden_dim, [self.hidden_dim, self.hidden_dim//2, self.human_state_dim])
 
         self.W = Parameter(torch.randn(self.hidden_dim, self.hidden_dim))
-        # for visualization
         
     def adjust_sequence_length(self, batch_context):
         batch_size, seq_len, _, _ = batch_context.size()
