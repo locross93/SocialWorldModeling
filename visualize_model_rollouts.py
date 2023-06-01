@@ -209,8 +209,6 @@ if __name__ == '__main__':
             min_values, max_values = exp_info_dict['min_max_values']
             velocity = any('vel' in s for s in data_columns)
             input_data = inverse_normalize(input_data, max_values.astype(np.float32), min_values.astype(np.float32), velocity)
-            
-    breakpoint()
     
     # input_data = input_data.numpy()
     # min_values = np.min(input_data, axis=(0, 1))
