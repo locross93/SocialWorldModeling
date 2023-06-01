@@ -181,7 +181,7 @@ def load_args():
     parser.add_argument('--dataset_name', type=str,
                          required=True,
                          help='Dataset name')
-    parser.add_argument('--normalize', type=bool, default=True, help='Min Max Normalize each feature')
+    parser.add_argument('--normalize', type=bool, default=False, help='Min Max Normalize each feature')
     parser.add_argument('--velocity', type=bool, default=False, help='Add velocity/diff for each feature')
     parser.add_argument('--shuffle_entities', type=bool, default=False, help='Shuffle agents and objects together')
     parser.add_argument('--rotations', type=bool, default=False, help='Rotate data 90, 180, 270')
@@ -249,14 +249,17 @@ if __name__ == '__main__':
     data_columns = list(trial_data.columns)
     
     if args.normalize:
+        print('Normalizing features')
         input_tensor, min_max_values = min_max_normalize(input_tensor)
     if args.velocity:
+        print('Adding velocity features')
         input_tensor = add_velocity_features(input_tensor)
         data_columns = []
         for column in trial_data.columns:
             data_columns.append(column)
             data_columns.append(column+'_vel')
     if args.shuffle_entities:
+        print('Shuffling entities')
         input_tensor, data_columns = shuffle_entities(input_tensor, data_columns, args.rotations)
     dataset = TensorDataset(torch.tensor(input_tensor).float())
     
