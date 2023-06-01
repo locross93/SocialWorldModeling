@@ -83,10 +83,10 @@ def make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_colu
             x_ind = data_columns.index('obj'+str(obj_num)+'_x')
             z_ind = data_columns.index('obj'+str(obj_num)+'_z')
             ax[row, col].plot(x_true[step,x_ind], x_true[step,z_ind], marker='o', markerfacecolor=color, markeredgecolor='black')
-        for agent_num in range(2):
-            color = colors[agent_num+3]
-            x_ind = data_columns.index('agent'+str(agent_num)+'_x')
-            z_ind = data_columns.index('agent'+str(agent_num)+'_z')
+        for num_agent in range(2):
+            color = colors[num_agent+3]
+            x_ind = data_columns.index('agent'+str(num_agent)+'_x')
+            z_ind = data_columns.index('agent'+str(num_agent)+'_z')
             ax[row, col].plot(x_true[step,x_ind], x_true[step,z_ind], marker='^', markersize=16, markerfacecolor=color, markeredgecolor='black')
         # observer
         ax[row, col].plot(0.0, -6.0, marker='s', markersize=12)
@@ -97,10 +97,10 @@ def make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_colu
             x_ind = data_columns.index('obj'+str(obj_num)+'_x')
             z_ind = data_columns.index('obj'+str(obj_num)+'_z')
             ax[row, col].plot(x_pred[step,x_ind], x_pred[step,z_ind], marker='o', markerfacecolor=color, markeredgecolor=color, alpha=0.5)
-        for agent_num in range(2):
-            color = colors[agent_num+3]
-            x_ind = data_columns.index('agent'+str(agent_num)+'_x')
-            z_ind = data_columns.index('agent'+str(agent_num)+'_z')
+        for num_agent in range(2):
+            color = colors[num_agent+3]
+            x_ind = data_columns.index('agent'+str(num_agent)+'_x')
+            z_ind = data_columns.index('agent'+str(num_agent)+'_z')
             ax[row, col].plot(x_pred[step,x_ind], x_pred[step,z_ind], marker='^', markersize=16, markerfacecolor=color, markeredgecolor=color, alpha=0.5)
     # save
     plt.savefig(save_file, dpi=300)
@@ -125,9 +125,9 @@ def make_frame_compare(t):
         x_ind = data_columns.index('obj'+str(obj_num)+'_x')
         z_ind = data_columns.index('obj'+str(obj_num)+'_z')
         ax[0].plot(x_true[t_ind,x_ind], x_true[t_ind,z_ind], marker='o')
-    for agent_num in range(2):
-        x_ind = data_columns.index('agent'+str(agent_num)+'_x')
-        z_ind = data_columns.index('agent'+str(agent_num)+'_z')
+    for num_agent in range(2):
+        x_ind = data_columns.index('agent'+str(num_agent)+'_x')
+        z_ind = data_columns.index('agent'+str(num_agent)+'_z')
         ax[0].plot(x_true[t_ind,x_ind], x_true[t_ind,z_ind], marker='^', markersize=16)
     # observer
     ax[0].plot(0.0, -6.0, marker='s', markersize=12)
@@ -139,9 +139,9 @@ def make_frame_compare(t):
         x_ind = data_columns.index('obj'+str(obj_num)+'_x')
         z_ind = data_columns.index('obj'+str(obj_num)+'_z')
         ax[1].plot(x_pred[t_ind,x_ind], x_pred[t_ind,z_ind], marker='o')
-    for agent_num in range(2):
-        x_ind = data_columns.index('agent'+str(agent_num)+'_x')
-        z_ind = data_columns.index('agent'+str(agent_num)+'_z')
+    for num_agent in range(2):
+        x_ind = data_columns.index('agent'+str(num_agent)+'_x')
+        z_ind = data_columns.index('agent'+str(num_agent)+'_z')
         ax[1].plot(x_pred[t_ind,x_ind], x_pred[t_ind,z_ind], marker='^', markersize=16)
     ax[1].plot(0.0, -6.0, marker='s', markersize=12)
     ax[1].set_title('Reconstructed Trajectory')

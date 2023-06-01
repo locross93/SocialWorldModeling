@@ -99,7 +99,7 @@ def main():
             overridden_parameters.append(f"{k}_{v}")
             print(f"{k}_{v}")
     
-    #model_class = model_dict[args.model]
+    
     model_class = model_dict[config['model_type']]
     model = model_class(config)
     

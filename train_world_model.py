@@ -102,11 +102,15 @@ def main():
             config[k] = v
             overridden_parameters.append(f"{k}_{v}")
             print(f"{k}_{v}")
-    
-    model_class = model_dict[config['model_type']]
-    if model_class == "sgnet_cvae":
+
+    if config['model_type'] == "sgnet_cvae":
         config['enc_steps'] = args.burn_in_length
         config['dec_steps'] = args.rollout_length
+    elif config['model_type'] == "agent_former":        
+        config['past_frames'] = args.burn_in_length
+        config['future_frames'] = args.rollout_length
+
+    model_class = model_dict[config['model_type']]        
     model = model_class(config)
     
     # filename same as cofnig makes it easier for identifying different parameters
@@ -186,7 +190,8 @@ def main():
             if batch_x.dtype == torch.int64:
                 batch_x = batch_x.float()
             if config['model_type'][:4] == 'rssm' or \
-                config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
+                config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout', 
+                                         'sgnet_cvae', 'agent_former']:
                 loss = model.loss(batch_x)
             elif config['model_type'] in ['multistep_predictor', 'multistep_delta']:
                 loss = model.loss(batch_x, burn_in_length, rollout_length)

@@ -4,7 +4,7 @@ Created on Wed Nov 16 15:09:25 2022
 
 @author: locro
 """
-
+# %%
 from collections import namedtuple
 from typing import Tuple, Dict
 import math
@@ -13,7 +13,7 @@ import torch
 import torch.nn.functional as F
 import torch.nn as nn
 import torch.distributions as td
-
+# %%
 
 class MlpAutoencoder(torch.nn.Module):
     def __init__(self, config):
@@ -2551,8 +2551,9 @@ class SGNet_CVAE(nn.Module):
         self.training = training
         if torch.is_tensor(start_index):
             start_index = start_index[1].item()
-            traj_input_temp = self.feature_extractor(inputs[:,start_index:,:])
-            traj_input = traj_input_temp.new_zeros((inputs.size(0), inputs.size(1), traj_input_temp.size(-1)))
-            traj_input[:,start_index:,:] = traj_input_temp
-            all_goal_traj, all_cvae_dec_traj, KLD, total_probabilities = self.encoder(inputs, targets, traj_input, None, start_index)
-            return all_goal_traj, all_cvae_dec_traj, KLD, total_probabilities
+        # create embeddings for input trajectories
+        traj_input_temp = self.feature_extractor(inputs[:,start_index:,:])
+        traj_input = traj_input_temp.new_zeros((inputs.size(0), inputs.size(1), traj_input_temp.size(-1)))
+        traj_input[:,start_index:,:] = traj_input_temp
+        all_goal_traj, all_cvae_dec_traj, KLD, total_probabilities = self.encoder(inputs, targets, traj_input, None, start_index)
+        return all_goal_traj, all_cvae_dec_traj, KLD, total_probabilities

@@ -1,5 +1,7 @@
 from models import DreamerV2, MultistepPredictor, MultistepDelta, \
-    TransformerMSPredictor, TransformerIrisWorldModel, TransformerWorldModel
+    TransformerMSPredictor, TransformerIrisWorldModel, TransformerWorldModel, \
+    SGNet_CVAE
+from agent_former.agentformer import AgentFormer
 from gnn_models.imma import IMMA
 from gnn_models.gat import GAT
 from gnn_models.rfm import RFM
@@ -28,10 +30,18 @@ MODEL_DICT_TRAIN = {
     'transformer_iris': TransformerIrisWorldModel,
     'imma': IMMA,
     'gat': GAT,
-    'rfm': RFM
+    'rfm': RFM,
+    'sgnet_cvae': SGNet_CVAE,
+    'agent_former': AgentFormer
 }
 """Values for validation"""
 MODEL_DICT_VAL=  {
+    'sgnet_cvae': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
+        'model_dir': 'sgnet_cvae_default', 'epoch': '3000', 'model_label': 'SGNet CVAE'},
+    'agent_former': {
+        'class': AgentFormer, 'config': 'agent_former_default_config.json',
+        'model_dir': 'agent_former_default', 'epoch': '3000', 'model_label': 'AgentFormer'},
     # 'rssm_disc': {
     #     'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
     #     'model_dir': 'rssm_disc_default', 'epoch': '3000', 'model_label': 'RSSM Discrete'},
@@ -41,18 +51,18 @@ MODEL_DICT_VAL=  {
     # 'multistep_delta': {
     #     'class': MultistepDelta, 'config': 'multistep_delta_default_config.json',
     #     'model_dir': 'multistep_delta_default', 'epoch': '3000', 'model_label': 'Multistep Delta'},
-    'transformer_iris_default': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
-        'model_dir': 'transformer_iris_default', 'epoch': '29000', 'model_label': 'Transformer Iris'},
-    'transformer_iris_concat_pos_embd_default': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_default', 'epoch': '29000', 'model_label': 'Transformer Iris Concat Pos Embd'},
-    'transformer_iris_concat_pos_embd_lr1e-4': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'epoch': '29000', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
-    'transformer_iris_concat_pos_embd_lr1e-5': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-5', 'epoch': '15000', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-5'},
+    # 'transformer_iris_default': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
+    #     'model_dir': 'transformer_iris_default', 'epoch': '29000', 'model_label': 'Transformer Iris'},
+    # 'transformer_iris_concat_pos_embd_default': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
+    #     'model_dir': 'transformer_iris_concat_pos_embd_default', 'epoch': '29000', 'model_label': 'Transformer Iris Concat Pos Embd'},
+    # 'transformer_iris_concat_pos_embd_lr1e-4': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
+    #     'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'epoch': '29000', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
+    # 'transformer_iris_concat_pos_embd_lr1e-5': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
+    #     'model_dir': 'transformer_iris_concat_pos_embd_lr1e-5', 'epoch': '15000', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-5'},
     # 'rfm_rnn': {
     #    'class': RFM, 'config': 'rfm_rnn_config.json', 
     #    'model_dir': 'rfm_rnn', 'model_label': 'RFM RNN'},
