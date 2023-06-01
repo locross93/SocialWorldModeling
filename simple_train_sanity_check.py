@@ -167,7 +167,7 @@ def main():
     loss_dict['train'] = []
     loss_dict['val'] = []
     loss_dict['epoch_times'] = []
-    if config['model_type'][:4] == 'rssm':
+    if config['model_type'] == 'dreamerv2':
         loss_dict['recon_loss'] = []
         loss_dict['kl_loss'] = []
     
