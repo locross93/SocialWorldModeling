@@ -179,13 +179,13 @@ def main():
     for epoch in tqdm(range(args.epochs)):
         model.train()
         batch_loss = []
-        if config['model_type'][:4] == 'rssm':
+        if config['model_type'] == 'dreamerv2':
             batch_recon_loss = []
             batch_kl_loss = []            
             opt.zero_grad()
         if batch_x.dtype == torch.int64:
             batch_x = batch_x.float()
-        if config['model_type'][:4] == 'rssm' or \
+        if config['model_type'] == 'dreamerv2' or \
             config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
             loss = model.loss(batch_x)
         elif config['model_type'] == 'transformer_mp':
@@ -195,13 +195,13 @@ def main():
         loss.backward()
         opt.step()        
         batch_loss.append(loss.item())
-        if config['model_type'][:4] == 'rssm':
+        if config['model_type'] == 'dreamerv2':
             batch_recon_loss.append(model.recon_loss.item())
             batch_kl_loss.append(model.kl.item())        
         epoch_loss = np.sum(batch_loss)
         loss_dict['train'].append(epoch_loss)
         loss_dict['epoch_times'].append(time.time()-start_time)
-        if config['model_type'][:4] == 'rssm':
+        if config['model_type'] == 'dreamerv2':
             loss_dict['recon_loss'].append(np.sum(batch_recon_loss))
             loss_dict['kl_loss'].append(np.sum(batch_kl_loss))
         elif config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
@@ -209,7 +209,7 @@ def main():
         
         # log to tensorboard
         writer.add_scalar('Train Loss/loss', epoch_loss, epoch)
-        if config['model_type'][:4] == 'rssm':
+        if config['model_type'] == 'dreamerv2':
             writer.add_scalar('Train_Loss/recon_loss', np.sum(batch_recon_loss), epoch)
             writer.add_scalar('Train_Loss/kl_loss', np.sum(batch_kl_loss), epoch)
         elif config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:

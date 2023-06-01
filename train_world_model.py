@@ -183,7 +183,7 @@ def main():
             opt.zero_grad()
             if batch_x.dtype == torch.int64:
                 batch_x = batch_x.float()
-            if config['model_type'][:4] == 'rssm' or \
+            if config['model_type'] == 'dreamerv2' or \
                 config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
                 loss = model.loss(batch_x)
             elif config['model_type'] in ['multistep_predictor', 'multistep_delta']:
@@ -200,13 +200,13 @@ def main():
         epoch_loss = np.mean(batch_loss)
         loss_dict['train'].append(epoch_loss)
         loss_dict['epoch_times'].append(time.time()-start_time)
-        if config['model_type'][:4] == 'rssm':
+        if config['model_type'] == 'dreamerv2':
             loss_dict['recon_loss'].append(np.sum(batch_recon_loss))
             loss_dict['kl_loss'].append(np.sum(batch_kl_loss))
         # test on validation set
         with torch.no_grad():
             model.eval()
-            if config['model_type'][:4] == 'rssm' or \
+            if config['model_type'] == 'dreamerv2' or \
                 config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
                 val_loss = model.loss(val_trajs)
             elif config['model_type'] in ['multistep_predictor', 'multistep_delta']:
@@ -218,7 +218,7 @@ def main():
         # log to tensorboard
         writer.add_scalar('Train Loss/loss', epoch_loss, epoch)
         writer.add_scalar('Val Loss/val', val_loss, epoch)
-        if config['model_type'][:4] == 'rssm':
+        if config['model_type'] == 'dreamerv2':
             writer.add_scalar('Train_Loss/recon_loss', np.sum(batch_recon_loss), epoch)
             writer.add_scalar('Train_Loss/kl_loss', np.sum(batch_kl_loss), epoch)
         if epoch % args.save_every == 0 or epoch == (args.epochs-1):
