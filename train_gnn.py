@@ -110,7 +110,7 @@ if __name__ == '__main__':
     
     model = init_model_class(config, args)
     
-    # filename same as cofnig makes it easier for identifying different parameters
+    # filename same as config makes it easier for identifying different parameters
     if args.model_filename is None:
         model_filename = '_'.join(args.config.split('.')[0].split('_')[:-1])
     else:

@@ -21,6 +21,7 @@ DISCRETIZATION_DICT_BIG = {}
 """Values for training"""
 MODEL_DICT_TRAIN = {
     'rssm_disc': DreamerV2,
+    'dreamerv2': DreamerV2,
     'multistep_predictor': MultistepPredictor,
     'multistep_delta':  MultistepDelta,
     'transformer_wm': TransformerWorldModel,   

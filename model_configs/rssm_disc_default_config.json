@@ -6,5 +6,5 @@
   "rnn_type": "GRU",
   "category_size": 32,
   "class_size": 32,
-  "model_type": "rssm_disc"
+  "model_type": "dreamerv2"
 }
