@@ -36,8 +36,8 @@ def load_args():
     parser.add_argument('--analysis_dir', type=str, action='store',
                         default=DEFAULT_VALUES['analysis_dir'], 
                         help='Analysis directory')
-    parser.add_argument('--data_path', type=str,
-                         default=DEFAULT_VALUES['data_path'], 
+    parser.add_argument('--data_dir', type=str,
+                         default=DEFAULT_VALUES['data_dir'], 
                          help='Data directory')
     parser.add_argument('--dataset', type=str,
                          default='dataset_5_25_23.pkl', 
@@ -123,7 +123,8 @@ def main():
     print(f'Using device: {DEVICE}')
 
     # load data    
-    loaded_dataset = pickle.load(open(args.data_path, 'rb'))
+    dataset_file = os.path.join(args.data_dir, args.dataset)
+    loaded_dataset = pickle.load(open(dataset_file, 'rb'))
     train_dataset, test_dataset = loaded_dataset
     train_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     val_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
