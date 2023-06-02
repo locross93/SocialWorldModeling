@@ -42,9 +42,13 @@ class Analysis(object):
     def load_data(self) -> None:
         self.data_file = os.path.basename(args.data_path)        
         self.ds_num = DATASET_NUMS[self.data_file]
-        self.loaded_dataset = pickle.load(open(args.data_path, 'rb'))        
-        _, test_dataset = self.loaded_dataset
-        self.input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
+        self.dataset_file = os.path.join(self.args.data_dir, self.args.dataset)
+        self.loaded_dataset = pickle.load(open(self.dataset_file, 'rb'))
+        train_dataset, test_dataset = self.loaded_dataset
+        if self.args.train_or_val == 'train':
+            self.input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
+        else:
+            self.input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
         self.num_timepoints = self.input_data.size(1)
         # if 2+ dataset, load event log
         if self.ds_num > 1:
