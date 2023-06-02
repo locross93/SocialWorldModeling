@@ -45,6 +45,9 @@ MODEL_DICT_VAL=  {
     # 'transformer_iris_default': {
     #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
     #     'model_dir': 'transformer_iris_default', 'epoch': '29000', 'model_label': 'Transformer Iris'},
+    'gat_rnn_norm_vel': {
+       'class': GAT, 'config': 'gat_encoder_rnn_config.json', 
+       'model_dir': 'gat_rnn_norm_vel', 'model_label': 'GAT RNN Encoder'},
     'transformer_iris_concat_pos_embd_default': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
         'model_dir': 'transformer_iris_concat_pos_embd_default', 'epoch': '29000', 'model_label': 'Transformer Iris Concat Pos Embd'},

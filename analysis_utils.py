@@ -15,7 +15,7 @@ import matplotlib.pylab as plt
 import seaborn as sns
 import torch
 
-from constants_lc import DEFAULT_VALUES, MODEL_DICT_TRAIN, MODEL_DICT_VAL
+from constants import DEFAULT_VALUES, MODEL_DICT_TRAIN, MODEL_DICT_VAL
 
 """Global variables"""
 model_dict = MODEL_DICT_TRAIN

@@ -21,7 +21,7 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 
 from analysis_utils import init_model_class
-from constants_lc import DEFAULT_VALUES, MODEL_DICT_TRAIN
+from constants import DEFAULT_VALUES, MODEL_DICT_TRAIN
 from models import ReplayBuffer
 
 """Global variables"""
