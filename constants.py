@@ -70,6 +70,7 @@ DEFAULT_VALUES = {
     'analysis_dir': './', 
     # as of 5/30, all models are trained on dataset_5_25_23.pkl
     'data_path': '/ccn2/u/ziyxiang/swm_data_and_results/data/dataset_5_25_23.pkl',    
+    'data_dir': '/ccn2/u/ziyxiang/swm_data_and_results/data/',  
     'checkpoint_dir': '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint',
     'model_config_dir': './model_configs',
     # general training parameters for all models
