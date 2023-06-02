@@ -63,7 +63,7 @@ class Analysis(object):
                 print('DS info dict not found')
             self.data_columns = self.exp_info_dict['data_columns']
         else:
-            self.data_columns = get_data_columns(self.dataset)
+            self.data_columns = get_data_columns(self.args.dataset)
 
 
     def load_model(self, model_key) -> torch.nn.Module:
