@@ -20,7 +20,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 
 from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
-from analysis_utils import load_config, get_highest_numbered_file, get_data_columns
+from analysis_utils import load_config, get_highest_numbered_file, get_data_columns, init_model_class
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
 from plot_eval_world_model import plot_eval_wm_results
@@ -54,6 +54,9 @@ class Analysis(object):
                 self.exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
             else:
                 print('DS info dict not found')
+            self.data_columns = self.exp_info_dict['data_columns']
+        else:
+            self.data_columns = get_data_columns(self.data_file)
 
 
     def load_model(self, model_key) -> torch.nn.Module:
@@ -64,19 +67,25 @@ class Analysis(object):
         self.model_name = model_info['model_label']
         # set device, this assumes only one gpu is available to the script
         DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-        model_class = model_info['class']
+        setattr(args, 'device', DEVICE)
         config_file = os.path.join(self.args.model_config_dir, model_info['config'])
         config = load_config(config_file)
-        if self.args.gnn_model:
-            for key in config.keys():
-                setattr(self.args, key, config[key])
-            # set default values
-            setattr(self.args, 'env', 'tdw')
-            setattr(self.args, 'gt', False)
-            setattr(self.args, 'device', DEVICE)
-            model = model_class(self.args)
-        else:
-            model = model_class(config)
+        model = init_model_class(config, args)
+        
+        # model_class = model_info['class']
+        # config_file = os.path.join(self.args.model_config_dir, model_info['config'])
+        # config = load_config(config_file)
+        # if self.args.gnn_model:
+        #     for key in config.keys():
+        #         setattr(self.args, key, config[key])
+        #     # set default values
+        #     setattr(self.args, 'env', 'tdw')
+        #     setattr(self.args, 'gt', False)
+        #     setattr(self.args, 'device', DEVICE)
+        #     model = model_class(self.args)
+        # else:
+        #     model = model_class(config)
+            
         # load checkpoint weights
         # checkpoints are in folder named after model
         model_dir = os.path.join(self.args.checkpoint_dir, 'models', model_info['model_dir'])
@@ -221,7 +230,6 @@ class Analysis(object):
             
         scores = {}
         
-        data_columns = get_data_columns(self.data_file)
         dims = ['x', 'y', 'z']
 
         num_trials = input_matrices.shape[0]
@@ -232,7 +240,7 @@ class Analysis(object):
         for i in range(num_trials):
             trial_x = input_matrices[i,:,:]
             for j in range(num_objs):
-                pos_inds = [data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
+                pos_inds = [self.data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
                 trial_obj_pos = trial_x[:,pos_inds]
                 obj_moved_flag[i,j] = detect_object_move(trial_obj_pos, move_thr_true)
                 
@@ -240,7 +248,7 @@ class Analysis(object):
         for i in range(num_trials):
             trial_x = recon_matrices[i,:,:]
             for j in range(num_objs):
-                pos_inds = [data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
+                pos_inds = [self.data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
                 trial_obj_pos = trial_x[:,pos_inds]
                 recon_moved_flag[i,j] = detect_object_move(trial_obj_pos, move_thr)
                 
@@ -471,7 +479,10 @@ class Analysis(object):
     
 
     def save_results(self) -> None:
-        save_file = f'eval_{self.args.eval_type}'
+        if args.save is None:
+            save_file = f'eval_{self.args.eval_type}'
+        else:
+            save_file = args.save_file
         # if a training set eval, add suffix
         if self.args.train_or_val == 'train':
             save_file = save_file+'_train'
@@ -510,6 +521,9 @@ def load_args():
     parser.add_argument('--checkpoint_dir', type=str, action='store',
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
+    parser.add_argument('--save_file', type=str,
+                        default=None, 
+                        help='Filename for saving model')
     parser.add_argument('--gnn_model', type=bool, default=False, help='GNN Model')
     parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--model_keys', nargs='+', action='store',
