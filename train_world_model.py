@@ -5,9 +5,8 @@ Created on Tue May  9 14:06:24 2023
 @author: locro
 """
 
-# example usage: python train_world_model.py --model dreamerv2 --config rssm_disc_default_config.json --dec_hidden_size 512
-# python train_world_model.py --model multistep_predictor --config multistep_predictor_default_config.json --mlp_hidden_size 512
-# python train_world_model.py --model transformer_wm --config transformer_wm_default_config.json
+# example usage: python train_world_model.py  --config rssm_disc_default_config.json --dec_hidden_size 512
+# python train_world_model.py  --config multistep_predictor_default_config.json --mlp_hidden_size 512
 
 import os
 import json
@@ -15,11 +14,13 @@ import time
 import pickle
 import argparse
 import numpy as np
+import pandas as pd
 from tqdm import tqdm
 
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
+from analysis_utils import init_model_class
 from constants import DEFAULT_VALUES, MODEL_DICT_TRAIN
 from models import ReplayBuffer
 
@@ -36,8 +37,8 @@ def load_args():
     parser.add_argument('--analysis_dir', type=str, action='store',
                         default=DEFAULT_VALUES['analysis_dir'], 
                         help='Analysis directory')
-    parser.add_argument('--data_path', type=str,
-                         default=DEFAULT_VALUES['data_path'], 
+    parser.add_argument('--data_dir', type=str,
+                         default=DEFAULT_VALUES['data_dir'], 
                          help='Data directory')
     parser.add_argument('--dataset', type=str,
                          default='dataset_5_25_23.pkl', 
@@ -110,8 +111,10 @@ def main():
         config['past_frames'] = args.burn_in_length
         config['future_frames'] = args.rollout_length
 
-    model_class = model_dict[config['model_type']]        
-    model = model_class(config)
+    # model_class = model_dict[config['model_type']]        
+    # model = model_class(config)
+    
+    model = init_model_class(config, args)
     
     # filename same as cofnig makes it easier for identifying different parameters
     if args.model_filename is None:
@@ -130,7 +133,8 @@ def main():
     print(f'Using device: {DEVICE}')
 
     # load data    
-    loaded_dataset = pickle.load(open(args.data_path, 'rb'))
+    dataset_file = os.path.join(args.data_dir, args.dataset)
+    loaded_dataset = pickle.load(open(dataset_file, 'rb'))
     train_dataset, test_dataset = loaded_dataset
     train_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     val_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
@@ -154,7 +158,7 @@ def main():
     val_trajs = val_trajs.to(DEVICE)
     val_trajs = val_trajs.to(torch.float32)
         
-    print('Starting', model_filename)
+    print('Starting', model_filename, 'On DS', args.dataset)
     
     # log to tensorboard
     log_dir = os.path.join(args.checkpoint_dir, 'models/training_info/tensorboard/', model_filename)
@@ -168,7 +172,7 @@ def main():
     loss_dict['train'] = []
     loss_dict['val'] = []
     loss_dict['epoch_times'] = []
-    if config['model_type'][:4] == 'rssm':
+    if config['model_type'] == 'dreamerv2':
         loss_dict['recon_loss'] = []
         loss_dict['kl_loss'] = []
     
@@ -177,7 +181,7 @@ def main():
     for epoch in tqdm(range(args.epochs)):
         model.train()
         batch_loss = []
-        if config['model_type'][:4] == 'rssm':
+        if config['model_type'] == 'dreamerv2':
             batch_recon_loss = []
             batch_kl_loss = []
         nsamples = 0
@@ -201,13 +205,13 @@ def main():
             opt.step()
             
             batch_loss.append(loss.item())
-            if config['model_type'][:4] == 'rssm':
+            if config['model_type'] == 'dreamerv2':
                 batch_recon_loss.append(model.recon_loss.item())
                 batch_kl_loss.append(model.kl.item())
-        epoch_loss = np.mean(batch_loss)
+        epoch_loss = np.mean(batch_loss) # TO DO IS THIS REALLY MSE?
         loss_dict['train'].append(epoch_loss)
         loss_dict['epoch_times'].append(time.time()-start_time)
-        if config['model_type'][:4] == 'rssm':
+        if config['model_type'] == 'dreamerv2':
             loss_dict['recon_loss'].append(np.sum(batch_recon_loss))
             loss_dict['kl_loss'].append(np.sum(batch_kl_loss))
         # test on validation set
@@ -226,7 +230,7 @@ def main():
         # log to tensorboard
         writer.add_scalar('Train Loss/loss', epoch_loss, epoch)
         writer.add_scalar('Val Loss/val', val_loss, epoch)
-        if config['model_type'][:4] == 'rssm':
+        if config['model_type'] == 'dreamerv2':
             writer.add_scalar('Train_Loss/recon_loss', np.sum(batch_recon_loss), epoch)
             writer.add_scalar('Train_Loss/kl_loss', np.sum(batch_kl_loss), epoch)
         if epoch % args.save_every == 0 or epoch == (args.epochs-1):
@@ -236,6 +240,13 @@ def main():
                 os.makedirs(save_dir)
             model_name = os.path.join(save_dir, f'{model_filename}_epoch{epoch}')
             torch.save(model.state_dict(), model_name)
+            # save training history in dataframe
+            training_info = {
+                'Epochs': np.arange(len(loss_dict['train']))}
+            for key in loss_dict:
+                training_info[key] = loss_dict[key]
+            df_training = pd.DataFrame.from_dict(training_info)
+            df_training.to_csv(os.path.join(save_dir, f'training_info_{model_filename}.csv'))
         print(f'Epoch {epoch}, Train Loss {epoch_loss}, Validation Loss {val_loss}')
 
 

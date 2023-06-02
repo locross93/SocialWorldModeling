@@ -5,5 +5,5 @@
   "rssm_type": "continuous",
   "rnn_type": "GRU",
   "stoch_size": 1024,
-  "model_type": "rssm_cont"
+  "model_type": "dreamerv2"
 }

@@ -4,6 +4,7 @@
     "feat_dim": 7,
     "hidden_dim": 128,
     "encoder": "rnn",
+    "edge_types": 2,
     "num_enc_layers": 1,
     "model_type": "gat"
 }

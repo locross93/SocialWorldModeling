@@ -52,6 +52,17 @@ def plot_move_events(df_results, save_file):
     if save_file is not None:
         plt.savefig(save_file, dpi=300, bbox_inches='tight')
     plt.show()
+    
+def plot_pickup_events(df_results, save_file):
+    plt.figure()
+    sns.barplot(x='model', y='score', data=df_results) 
+    plt.title('Evaluate Pick Up Events From Forward Rollouts', fontsize=14)
+    plt.xlabel('Model Name', fontsize=16) 
+    plt.ylabel('Accuracy', fontsize=16)
+    plt.ylim([0, 1])
+    if save_file is not None:
+        plt.savefig(save_file, dpi=300, bbox_inches='tight')
+    plt.show()
 
 def plot_eval_wm_results(df_results, args, save_file=None):
     if args.eval_type == 'goal_events':
@@ -60,6 +71,8 @@ def plot_eval_wm_results(df_results, args, save_file=None):
         plot_multigoal_events(df_results, save_file)
     elif args.eval_type == 'move_events':
         plot_move_events(df_results, save_file)
+    elif args.eval_type == 'pickup_events':
+        plot_pickup_events(df_results, save_file)
         
 def load_args():
     parser = argparse.ArgumentParser()

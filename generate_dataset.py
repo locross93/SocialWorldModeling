@@ -30,6 +30,69 @@ def get_trialtype_inds(names_dict):
     
     return names_dict
 
+def min_max_normalize(input_tensor):
+    min_values = np.min(input_tensor, axis=(0, 1)).astype(np.float32)
+    max_values = np.max(input_tensor, axis=(0, 1)).astype(np.float32)
+    # Compute the range for each feature
+    ranges = max_values - min_values
+    # Normalize the input_tensor using the formula
+    normalized_tensor = (input_tensor - min_values) / ranges
+    # Define a function that can map the normalized values back to the original input space
+    #def inverse_normalize(normalized_tensor):
+        #return normalized_tensor * ranges + min_values
+    min_max_values = [min_values, max_values]
+    
+    return normalized_tensor, min_max_values
+
+def add_velocity_features(input_tensor):
+    velocity = input_tensor[:,1:,:] - input_tensor[:,:-1,:]
+    vel_features = np.zeros(input_tensor.shape)
+    vel_features[:,1:,:] = velocity
+    new_input_tensor = np.zeros([input_tensor.shape[0], input_tensor.shape[1], input_tensor.shape[2]*2])
+    # Assign the odd numbers in the third dimension with the original values
+    new_input_tensor[:, :, ::2] = input_tensor
+    new_input_tensor[:, :, 1::2] = vel_features
+    
+    return new_input_tensor
+
+def shuffle_entities(data, data_columns, observer=False):
+    # for every entity other than observer, shuffle the features so agents and objects are mixed
+    # Get the number of instances, timepoints, and features
+    n_trials, n_timepoints, n_features = data.shape
+
+    n_entities = 5 + int(observer)
+
+    n_feats = n_features // n_entities
+
+    # Reshape the data to group the features of each agent together
+    data = data.reshape(n_trials, n_timepoints, n_entities, n_feats)
+    
+    # Reshape the data columns to group the features of each agent together
+    data_columns = np.array(data_columns).reshape(n_entities, n_feats)
+    
+    # TO DO - MODIFY THIS WITH OBSERVER FEATURES
+    
+    # Shuffle the agents
+    entity_cols = np.arange(n_entities-int(observer))
+    # Initialize a list to store the shuffled feature labels for each trial
+    shuffled_columns = []
+    for i in range(n_trials):
+        trial_data = data[i,:,:,:]
+        # Randomly permute the entity columns
+        cols = np.random.permutation(entity_cols)
+        data[i,:,:,:] = trial_data[:,cols,:]
+        
+        # Reorder the data columns according to the permutation
+        trial_columns = data_columns[cols,:]
+        
+        # Flatten and append the shuffled feature labels to the list
+        shuffled_columns.append(trial_columns.flatten().tolist())
+
+    # Reshape the data back to its original shape
+    data = data.reshape(n_trials, n_timepoints, n_features)
+    
+    return data, shuffled_columns
+
 def postprocess_events(exp_info_dict):
     dwn_sample = 5
     dwn_timepoints = np.arange(0, 1500, dwn_sample)
@@ -50,7 +113,8 @@ def postprocess_events(exp_info_dict):
             # Filter rows where Event starts with 'pickup'
             pickup_rows = event_log[event_log['Event'].str.startswith('pickup')]
             # Split the Event string on underscore and get the number part
-            pickup_rows['obj_num'] = pickup_rows['Event'].str.split('_').str[1].astype(int)
+            pickup_rows = pickup_rows.copy()
+            pickup_rows.loc[:, 'obj_num'] = pickup_rows['Event'].str.split('_').str[1].astype(int)
             for index, row in pickup_rows.iterrows():
                 obj_num = int(row['obj_num'])
                 pickup_t = int(row['Frame'])
@@ -62,7 +126,8 @@ def postprocess_events(exp_info_dict):
             # Filter rows where Event starts with 'pickup'
             goal_rows = event_log[event_log['Event'].str.startswith('goal')]
             # Split the Event string on underscore and get the number part
-            goal_rows['obj_num'] = goal_rows['Event'].str.split('_').str[1].astype(int)
+            goal_rows = goal_rows.copy()
+            goal_rows.loc[:, 'obj_num'] = goal_rows['Event'].str.split('_').str[1].astype(int)
             for index, row in goal_rows.iterrows():
                 obj_num = int(row['obj_num'])
                 goal_t = int(row['Frame'])
@@ -112,8 +177,12 @@ def load_args():
                          default=DEFAULT_VALUES['data_dir'], 
                          help='Save data directory')
     parser.add_argument('--dataset_name', type=str,
-                         default='dataset_5_25_23.pkl', 
+                         required=True,
                          help='Dataset name')
+    parser.add_argument('--normalize', type=bool, default=False, help='Min Max Normalize each feature')
+    parser.add_argument('--velocity', type=bool, default=False, help='Add velocity/diff for each feature')
+    parser.add_argument('--shuffle_entities', type=bool, default=False, help='Shuffle agents and objects together')
+    parser.add_argument('--rotations', type=bool, default=False, help='Rotate data 90, 180, 270')
     
     return parser.parse_args()
 
@@ -128,7 +197,7 @@ if __name__ == '__main__':
     event_logs = []
     
     for exp_name in dir_folders:
-        trial_obs_file = args.tdw_data_dir+exp_name+'/trial_obs.csv'
+        trial_obs_file = os.path.join(args.tdw_data_dir, exp_name, 'trial_obs.csv')
         if os.path.exists(trial_obs_file):
             if os.stat(trial_obs_file).st_size == 0:
                 # if an empty file
@@ -175,6 +244,21 @@ if __name__ == '__main__':
         print(exp_name)
         
     input_tensor = np.stack(all_trial_data, axis=0)
+    data_columns = list(trial_data.columns)
+    
+    if args.normalize:
+        print('Normalizing features')
+        input_tensor, min_max_values = min_max_normalize(input_tensor)
+    if args.velocity:
+        print('Adding velocity features')
+        input_tensor = add_velocity_features(input_tensor)
+        data_columns = []
+        for column in trial_data.columns:
+            data_columns.append(column)
+            data_columns.append(column+'_vel')
+    if args.shuffle_entities:
+        print('Shuffling entities')
+        input_tensor, data_columns = shuffle_entities(input_tensor, data_columns, args.rotations)
     dataset = TensorDataset(torch.tensor(input_tensor).float())
     
     # make training and test splits
@@ -188,7 +272,7 @@ if __name__ == '__main__':
     train_dataset = Subset(dataset, train_idx) # a subset of the dataset with train indices
     test_dataset = Subset(dataset, val_idx) # a subset of the dataset with test indices
     
-    save_file = os.path.join(args.data_dir, 'dataset_5_25_23.pkl')
+    save_file = os.path.join(args.data_dir, args.dataset_name+'.pkl')
     full_dataset = [train_dataset, test_dataset]
     with open(save_file, 'wb') as handle:
         pickle.dump(full_dataset, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -204,11 +288,14 @@ if __name__ == '__main__':
     exp_info_dict['val'] = get_trialtype_inds(exp_info_dict['val'])
     exp_info_dict['train']['event_logs'] = [event_logs[i] for i in train_idx]
     exp_info_dict['val']['event_logs'] = [event_logs[i] for i in val_idx]
+    exp_info_dict['data_columns'] = data_columns
+    if args.normalize:
+        exp_info_dict['min_max_values'] = min_max_values
     
     # annotate pickup and goal timepoints and sg mg triajs
     exp_info_dict = postprocess_events(exp_info_dict)
     
-    exp_info_file = os.path.join(args.data_dir, 'dataset_5_25_23_exp_info.pkl')
+    exp_info_file = os.path.join(args.data_dir, args.dataset_name+'_exp_info.pkl')
     with open(exp_info_file, 'wb') as handle:
         pickle.dump(exp_info_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
     

@@ -37,9 +37,24 @@ MODEL_DICT_VAL=  {
     'gat': {
        'class': GAT, 'config': 'gat_default_config.json', 
        'model_dir': 'gat', 'model_label': 'GAT'},
+    'gat_rnn_enc': {
+       'class': GAT, 'config': 'gat_encoder_rnn_config.json', 
+       'model_dir': 'gat_rnn_enc', 'model_label': 'GAT RNN Encoder'},
+    'gat_rnn_norm_vel': {
+       'class': GAT, 'config': 'gat_encoder_rnn_config.json', 
+       'model_dir': 'gat_rnn_norm_vel', 'model_label': 'GAT RNN Encoder'},
     'imma': {
        'class': IMMA, 'config': 'imma_default_config.json', 
        'model_dir': 'imma', 'model_label': 'IMMA'},
+    'imma_encoder': {
+       'class': IMMA, 'config': 'imma_encoder_rnn.json', 
+       'model_dir': 'imma_encoder', 'model_label': 'IMMA RNN Encoder'},
+    'imma_rnn_simple_ds': {
+       'class': IMMA, 'config': 'imma_rnn_simple_ds_hidden_dim_128.json', 
+       'model_dir': 'imma_rnn_simple_ds', 'model_label': 'IMMA RNN Encoder'},
+    'imma_rnn_norm_vel': {
+       'class': IMMA, 'config': 'imma_encoder_rnn.json', 
+       'model_dir': 'imma_rnn_norm_vel', 'model_label': 'IMMA RNN Encoder'},
     'rfm': {
        'class': RFM, 'config': 'rfm_default_config.json', 
        'model_dir': 'rfm', 'model_label': 'RFM'},
@@ -58,14 +73,21 @@ MODEL_DICT_VAL=  {
 }
 DEFAULT_VALUES = {
     'analysis_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/',
+    'data_path': '/Users/locro/Documents/Stanford/analysis/data/dataset_5_25_23.pkl' if platform.system() == 'Windows' else  '/mnt/fs2/locross/analysis/data/dataset_5_25_23.pkl',
     'data_dir': '/Users/locro/Documents/Stanford/analysis/data/' if platform.system() == 'Windows' else  '/mnt/fs2/locross/analysis/data/',
     'checkpoint_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/mnt/fs2/locross/analysis/',
     'results_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/results/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/results',
     'model_config_dir': './model_configs',
+    # general training parameters for all models
+    'batch_size': 8 if platform.system() == 'Windows' else 2048,
+    'lr': 1e-5,
+    'epochs': int(3e4),
+    'save_every': 200,
     #'model_keys': list(MODEL_DICT_VAL.keys()),
-    'model_keys': ['multistep_pred'],
+    #'model_keys': ['multistep_pred'],
+    'model_keys': ['imma','gat','rfm','rfm_rnn'],
     #'model_keys': ['mp_ds2', 'rssm_disc_ds2', 'rssm_cont_ds2'],
-    'eval_types': ['goal_events', 'multigoal_events', 'move_events'],
+    'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
 }

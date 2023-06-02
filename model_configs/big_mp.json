@@ -1,0 +1,10 @@
+{
+    "input_size": 35,
+    "input_embed_size": 1024,
+    "mlp_hidden_size": 4096,
+    "num_mlp_layers": 3,
+    "rnn_hidden_size": 4096,
+    "num_rnn_layers": 4,
+    "rnn_type": "LSTM",
+    "model_type": "multistep_predictor"
+}

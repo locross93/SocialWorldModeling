@@ -23,6 +23,7 @@ DISCRETIZATION_DICT_BIG = {}
 """Values for training"""
 MODEL_DICT_TRAIN = {
     'rssm_disc': DreamerV2,
+    'dreamerv2': DreamerV2,
     'multistep_predictor': MultistepPredictor,
     'multistep_delta':  MultistepDelta,
     'transformer_wm': TransformerWorldModel,   
@@ -51,9 +52,12 @@ MODEL_DICT_VAL=  {
     # 'multistep_delta': {
     #     'class': MultistepDelta, 'config': 'multistep_delta_default_config.json',
     #     'model_dir': 'multistep_delta_default', 'epoch': '3000', 'model_label': 'Multistep Delta'},
-    # 'transformer_iris_default': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
-    #     'model_dir': 'transformer_iris_default', 'epoch': '29000', 'model_label': 'Transformer Iris'},
+    # # 'transformer_iris_default': {
+    # #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
+    # #     'model_dir': 'transformer_iris_default', 'epoch': '29000', 'model_label': 'Transformer Iris'},
+    'gat_rnn_norm_vel': {
+       'class': GAT, 'config': 'gat_encoder_rnn_config.json', 
+       'model_dir': 'gat_rnn_norm_vel', 'model_label': 'GAT RNN Encoder'},
     # 'transformer_iris_concat_pos_embd_default': {
     #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
     #     'model_dir': 'transformer_iris_concat_pos_embd_default', 'epoch': '29000', 'model_label': 'Transformer Iris Concat Pos Embd'},
@@ -79,6 +83,7 @@ DEFAULT_VALUES = {
     'analysis_dir': './', 
     # as of 5/30, all models are trained on dataset_5_25_23.pkl
     'data_path': '/ccn2/u/ziyxiang/swm_data_and_results/data/dataset_5_25_23.pkl',    
+    'data_dir': '/ccn2/u/ziyxiang/swm_data_and_results/data/',  
     'checkpoint_dir': '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint',
     'model_config_dir': './model_configs',
     # general training parameters for all models
@@ -88,7 +93,7 @@ DEFAULT_VALUES = {
     'save_every': 200,
     # eval parameters
     'model_keys': list(MODEL_DICT_VAL.keys()),
-    'eval_types': ['goal_events', 'multigoal_events', 'move_events'],
+    'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
 }

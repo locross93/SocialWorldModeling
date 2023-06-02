@@ -5,7 +5,7 @@ Created on Thu May 25 18:38:01 2023
 @author: locro
 """
 
-# example usage: python train_gnn.py --config imma_default_config.json
+# example usage: python train_gnn.py --config imma_encoder_rnn.json --model_filename imma_rnn_enc
 
 import os
 import json
@@ -14,10 +14,13 @@ import pickle
 import platform
 import argparse
 import numpy as np
+import pandas as pd
+from tqdm import tqdm
 
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
+from analysis_utils import init_model_class
 from constants import DEFAULT_VALUES, MODEL_DICT_TRAIN
 from models import ReplayBuffer
 
@@ -33,12 +36,12 @@ def load_args():
     parser.add_argument('--analysis_dir', type=str, action='store',
                         default=DEFAULT_VALUES['analysis_dir'], 
                         help='Analysis directory')
-    parser.add_argument('--data_path', type=str,
-                         default=DEFAULT_VALUES['data_path'], 
+    parser.add_argument('--data_dir', type=str,
+                         default=DEFAULT_VALUES['data_dir'], 
                          help='Data directory')
     parser.add_argument('--dataset', type=str,
                          default='dataset_5_25_23.pkl', 
-                         help='Data directory')
+                         help='Dataset name')
     parser.add_argument('--checkpoint_dir', type=str, 
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
@@ -100,19 +103,14 @@ if __name__ == '__main__':
             overridden_parameters.append(f"{k}_{v}")
             print(f"{k}_{v}")
             
-    # set config params in args
-    for key in config.keys():
-        setattr(args, key, config[key])
-            
     # Check that we are using GPU
     DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(DEVICE)
     setattr(args, 'device', DEVICE)
     
-    model_class = model_dict[config['model_type']]
-    model = model_class(args)
+    model = init_model_class(config, args)
     
-    # filename same as cofnig makes it easier for identifying different parameters
+    # filename same as config makes it easier for identifying different parameters
     if args.model_filename is None:
         model_filename = '_'.join(args.config.split('.')[0].split('_')[:-1])
     else:
@@ -124,7 +122,8 @@ if __name__ == '__main__':
         save_config(config, new_config_filename)
 
     # load data    
-    loaded_dataset = pickle.load(open(args.data_path, 'rb'))
+    dataset_file = os.path.join(args.data_dir, args.dataset)
+    loaded_dataset = pickle.load(open(dataset_file, 'rb'))
     train_dataset, test_dataset = loaded_dataset
     train_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     val_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
@@ -168,14 +167,14 @@ if __name__ == '__main__':
     
     model.to(DEVICE)
     start_time = time.time()
-    for epoch in range(args.epochs):
+    for epoch in tqdm(range(args.epochs)):
         model.train()
         batch_loss = []
         if config['model_type'][:4] == 'rssm':
             batch_recon_loss = []
             batch_kl_loss = []
         nsamples = 0
-        for i in range(batches_per_epoch):
+        for i in tqdm(range(batches_per_epoch)):
             batch_x = replay_buffer.sample(args.batch_size)
             batch_x = batch_x.to(torch.float32)
             batch_x = batch_x.to(DEVICE)
@@ -206,5 +205,12 @@ if __name__ == '__main__':
                 os.makedirs(save_dir)
             model_name = os.path.join(save_dir, f'{model_filename}_epoch{epoch}')
             torch.save(model.state_dict(), model_name)
+            # save training history in dataframe
+            training_info = {
+                'Epochs': np.arange(len(loss_dict['train']))}
+            for key in loss_dict:
+                training_info[key] = loss_dict[key]
+            df_training = pd.DataFrame.from_dict(training_info)
+            df_training.to_csv(os.path.join(save_dir, f'training_info_{model_filename}.csv'))
         print(f'Epoch {epoch}, Train Loss {epoch_loss}, Validation Loss {val_loss}')
 

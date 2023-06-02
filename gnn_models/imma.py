@@ -30,16 +30,24 @@ class IMMA(nn.Module):
 
         self.timesteps = args.obs_frames
         self.dims = args.hidden_dim
+        self.encoder = args.encoder
         self.encoder_hidden = args.hidden_dim
         self.decoder_hidden = args.hidden_dim
         self.encoder_dropout = 0.
         self.decoder_dropout = 0.
         self.factor = True
-
-        self.encoders = nn.ModuleList([MLPEncoder(self.obs_frames * self.input_human_state_dim,
+        
+        if self.encoder == 'mlp':
+            self.encoders = nn.ModuleList([MLPEncoder(self.obs_frames * self.input_human_state_dim,
+                                          self.encoder_hidden,
+                                          1,
+                                          self.encoder_dropout, self.factor) for _ in range(self.edge_types)])
+        elif self.encoder == 'rnn':
+            self.encoders = nn.ModuleList([RNNEncoder(self.input_human_state_dim,
                                       self.encoder_hidden,
                                       1,
-                                      self.encoder_dropout, self.factor) for _ in range(self.edge_types)])
+                                      self.encoder_dropout,
+                                      self.factor) for _ in range(self.edge_types)])
 
         self.rnn_decoder = RNNDecoder(n_in_node=self.decoder_hidden,
                                       edge_types=self.edge_types,
@@ -66,6 +74,20 @@ class IMMA(nn.Module):
             if i+1 < self.num_humans:
                 pred_graph[:, i, i+1:self.num_humans] = tmp_graph[:, i, i:self.num_humans]
         return pred_graph
+    
+    def adjust_sequence_length(self, batch_context):
+        batch_size, seq_len, _, _ = batch_context.size()
+        target_len = self.obs_frames
+    
+        if seq_len < target_len:
+            # If sequence length is less than 50, pad with zeros at the beginning
+            padding = torch.zeros((batch_size, target_len - seq_len, self.num_humans, self.human_state_dim), device=batch_context.device)
+            batch_context = torch.cat((padding, batch_context), dim=1)
+        elif seq_len > target_len:
+            # If sequence length is more than 50, take the last 50 frames
+            batch_context = batch_context[:, -target_len:, :, :]
+    
+        return batch_context
 
     def multistep_forward(self, batch_data, batch_graph, rollouts):
         # batch_size, obs_frmes, num_humans, feat_dim
@@ -76,7 +98,10 @@ class IMMA(nn.Module):
         pred_graphs = []
         layer_edges = []
         for layer_idx in range(self.args.edge_types):
-            node_embeddings, logits = self.encoders[layer_idx](batch_data.contiguous(), self.rel_rec, self.rel_send)
+            if self.encoder == 'rnn':
+                node_embeddings, logits, x_all = self.encoders[layer_idx](batch_data.contiguous(), self.rel_rec, self.rel_send)
+            elif self.encoder == 'mlp':
+                node_embeddings, logits = self.encoders[layer_idx](batch_data.contiguous(), self.rel_rec, self.rel_send)
             logit = logits.reshape(-1, self.num_humans, self.num_humans-1)
             edges = F.softmax(logit, dim=-1)
             pred_graphs.append(edges)
@@ -122,9 +147,16 @@ class IMMA(nn.Module):
         return ret
     
     def forward_rollout(self, x, burn_in_length, rollout_length):
-        batch_x = x.reshape(-1, x.shape[1], 5, 7)
+        if len(x.size()) == 3:
+            # unroll num_entities, num_feats dims
+            batch_x = x.reshape(-1, x.size(1), self.num_humans, self.human_state_dim)
+        else:
+            batch_x = x
         batch_context = batch_x[:,:burn_in_length,:,:]
         batch_graph = None
+        
+        if self.encoder == 'mlp' and burn_in_length != self.obs_frames:
+            batch_context = self.adjust_sequence_length(batch_context)
         
         preds = self.multistep_forward(batch_context, batch_graph, rollout_length)
 
@@ -137,6 +169,10 @@ class IMMA(nn.Module):
     
     def loss(self, batch_x, burn_in_length, rollout_length):
         loss_fn = torch.nn.MSELoss()
+        
+        if len(batch_x.size()) == 3:
+            # unroll num_entities, num_feats dims
+            batch_x = batch_x.reshape(-1, batch_x.size(1), self.num_humans, self.human_state_dim)
         
         batch_context = batch_x[:,:burn_in_length,:,:]
         true_rollout_x = batch_x[:,-rollout_length:,:,:]

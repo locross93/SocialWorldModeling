@@ -75,6 +75,20 @@ class RFM(nn.Module):
         rel_send = np.array(encode_onehot(np.where(off_diag)[1]), dtype=np.float32)
         self.rel_rec = torch.FloatTensor(rel_rec).to(self.device)
         self.rel_send = torch.FloatTensor(rel_send).to(self.device)
+        
+    def adjust_sequence_length(self, batch_context):
+        batch_size, seq_len, _, _ = batch_context.size()
+        target_len = self.obs_frames
+    
+        if seq_len < target_len:
+            # If sequence length is less than 50, pad with zeros at the beginning
+            padding = torch.zeros((batch_size, target_len - seq_len, self.num_humans, self.human_state_dim), device=batch_context.device)
+            batch_context = torch.cat((padding, batch_context), dim=1)
+        elif seq_len > target_len:
+            # If sequence length is more than 50, take the last 50 frames
+            batch_context = batch_context[:, -target_len:, :, :]
+    
+        return batch_context
 
     def encode(self, batch_data):
         batch_data = batch_data.permute(0, 2, 1, 3)
@@ -126,9 +140,16 @@ class RFM(nn.Module):
         return ret
     
     def forward_rollout(self, x, burn_in_length, rollout_length):
-        batch_x = x.reshape(-1, x.shape[1], 5, 7)
+        if len(x.size()) == 3:
+            # unroll num_entities, num_feats dims
+            batch_x = x.reshape(-1, x.size(1), self.num_humans, self.human_state_dim)
+        else:
+            batch_x = x
         batch_context = batch_x[:,:burn_in_length,:,:]
         batch_graph = None
+        
+        if self.encoder_type == 'mlp' and burn_in_length != self.obs_frames:
+            batch_context = self.adjust_sequence_length(batch_context)
         
         preds = self.multistep_forward(batch_context, batch_graph, rollout_length)
 
@@ -141,6 +162,10 @@ class RFM(nn.Module):
     
     def loss(self, batch_x, burn_in_length, rollout_length):
         loss_fn = torch.nn.MSELoss()
+        
+        if len(batch_x.size()) == 3:
+            # unroll num_entities, num_feats dims
+            batch_x = batch_x.reshape(-1, batch_x.size(1), self.num_humans, self.human_state_dim)
         
         batch_context = batch_x[:,:burn_in_length,:,:]
         true_rollout_x = batch_x[:,-rollout_length:,:,:]

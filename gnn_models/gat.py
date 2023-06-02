@@ -10,7 +10,7 @@ class GAT(nn.Module):
     def __init__(self, args):
         super().__init__()
         self.args = args
-        self.env = args.env
+        self.env = 'tdw'
         self.num_humans = args.num_humans
         self.obs_frames = args.obs_frames
         self.human_state_dim = args.feat_dim
@@ -23,16 +23,24 @@ class GAT(nn.Module):
             self.w_h = mlp(self.obs_frames*self.human_state_dim, self.wh_dims, last_relu=True)
         elif self.encoder == 'rnn':
             self.w_h = nn.GRU(self.human_state_dim, self.hidden_dim , num_layers=1, batch_first=True)
-
-        if args.gt:
-            self.final_layer = mlp(2*self.hidden_dim, [self.hidden_dim, self.hidden_dim//2, self.human_state_dim])
-            self.final_layer = torch.nn.Linear(2*self.hidden_dim, self.human_state_dim)
-        else:
-            self.final_layer = mlp(self.hidden_dim, [self.hidden_dim, self.hidden_dim//2, self.human_state_dim])
-            #torch.nn.Linear(self.hidden_dim, human_state_dim)
+            
+        self.final_layer = mlp(self.hidden_dim, [self.hidden_dim, self.hidden_dim//2, self.human_state_dim])
 
         self.W = Parameter(torch.randn(self.hidden_dim, self.hidden_dim))
-        # for visualization
+        
+    def adjust_sequence_length(self, batch_context):
+        batch_size, seq_len, _, _ = batch_context.size()
+        target_len = self.obs_frames
+    
+        if seq_len < target_len:
+            # If sequence length is less than 50, pad with zeros at the beginning
+            padding = torch.zeros((batch_size, target_len - seq_len, self.num_humans, self.human_state_dim), device=batch_context.device)
+            batch_context = torch.cat((padding, batch_context), dim=1)
+        elif seq_len > target_len:
+            # If sequence length is more than 50, take the last 50 frames
+            batch_context = batch_context[:, -target_len:, :, :]
+    
+        return batch_context
 
     def get_embeddings(self, human_states):
         return self.embedding(human_states)
@@ -106,9 +114,16 @@ class GAT(nn.Module):
         return ret
     
     def forward_rollout(self, x, burn_in_length, rollout_length):
-        batch_x = x.reshape(-1, x.shape[1], 5, 7)
+        if len(x.size()) == 3:
+            # unroll num_entities, num_feats dims
+            batch_x = x.reshape(-1, x.size(1), self.num_humans, self.human_state_dim)
+        else:
+            batch_x = x
         batch_context = batch_x[:,:burn_in_length,:,:]
         batch_graph = None
+        
+        if self.encoder == 'mlp' and burn_in_length != self.obs_frames:
+            batch_context = self.adjust_sequence_length(batch_context)
         
         preds = self.multistep_forward(batch_context, batch_graph, rollout_length)
 
@@ -121,6 +136,10 @@ class GAT(nn.Module):
 
     def loss(self, batch_x, burn_in_length, rollout_length):
         loss_fn = torch.nn.MSELoss()
+        
+        if len(batch_x.size()) == 3:
+            # unroll num_entities, num_feats dims
+            batch_x = batch_x.reshape(-1, batch_x.size(1), self.num_humans, self.human_state_dim)
         
         batch_context = batch_x[:,:burn_in_length,:,:]
         true_rollout_x = batch_x[:,-rollout_length:,:,:]
