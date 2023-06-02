@@ -32,6 +32,9 @@ def load_args():
     parser.add_argument('--analysis_dir', type=str, action='store',
                         default=DEFAULT_VALUES['analysis_dir'], 
                         help='Analysis directory')
+    parser.add_argument('--data_dir', type=str,
+                         default=DEFAULT_VALUES['data_dir'], 
+                         help='Data directory')
     parser.add_argument('--dataset', type=str,
                          default='dataset_5_25_23.pkl', 
                          help='Dataset name')
@@ -41,10 +44,6 @@ def load_args():
     parser.add_argument('--model_key', type=str, required=True, help='Model to use for visualization')
     parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--device', type=str, default='cpu', help='Device')
-    parser.add_argument('--data_dir', type=str,
-                         default=DEFAULT_VALUES['data_dir'], 
-                         help='Data directory')
-    parser.add_argument('--gnn_model', type=bool, default=False, help='GNN Model')
     # which trial to visualize
     parser.add_argument('--trial_type', type=str, default='single_goal', help='Trial Type') # single_goal, multi_goal, all
     parser.add_argument('--trial_num', type=int, default=0, help='Trial Type')
@@ -172,7 +171,7 @@ if __name__ == '__main__':
     
     model_info = MODEL_DICT_VAL[args.model_key]
     model_name = model_info['model_label']
-    model = load_trained_model(model_info, args.model_config_dir, args.checkpoint_dir, args.device, args.gnn_model)
+    model = load_trained_model(model_info, args)
     
     # load data
     dataset_file = os.path.join(args.data_dir, args.dataset)

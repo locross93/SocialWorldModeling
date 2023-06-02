@@ -91,12 +91,14 @@ class Analysis(object):
         # checkpoints are in folder named after model
         model_dir = os.path.join(self.args.checkpoint_dir, 'models', model_info['model_dir'])
         if 'epoch' in model_info:
+            self.epoch = model_info['epoch']
             model_file_name = os.path.join(model_dir, model_info['model_dir']+'_epoch'+model_info['epoch'])
             model.load_state_dict(torch.load(model_file_name))
             print('Loading model',model_file_name)
         else:
             latest_checkpoint, _ =  get_highest_numbered_file(model_info['model_dir'], model_dir)
             print('Loading from last checkpoint',latest_checkpoint)
+            self.epoch = latest_checkpoint
             model.load_state_dict(torch.load(latest_checkpoint))
 
         model.eval()
@@ -466,6 +468,11 @@ class Analysis(object):
             result = self.eval_pickup_events_in_rollouts(model, self.input_data)  
         else:
             raise NotImplementedError(f'Evaluation type {self.args.eval_type} not implemented')    
+        
+        if self.args.append_results:
+            # add more information for this analysis
+            result['epoch'] = self.epoch
+            result['dataset'] = self.args.dataset
         return result
 
 
@@ -498,7 +505,10 @@ class Analysis(object):
             if not os.path.exists(figure_save_dir):
                 os.makedirs(figure_save_dir)                
             plot_save_file = os.path.join(self.args.analysis_dir, 'results', 'figures', save_file)
-            plot_eval_wm_results(df_results, self.args, plot_save_file)                             
+            plot_eval_wm_results(df_results, self.args, plot_save_file)     
+        # if self.args.append_results:
+        #     df_all_results = pd.read(os.path.join(result_save_dir, 'all_results_'+self.args.eval_type+'.csv'), index_col=0)
+            
 
 
     def run(self) -> None:
@@ -516,16 +526,19 @@ def load_args():
     parser.add_argument('--model_config_dir', type=str, action='store',
                         default=DEFAULT_VALUES['model_config_dir'],
                         help='Model config directory')   
-    parser.add_argument('--data_path', type=str, action='store',
-                        default=DEFAULT_VALUES['data_path'], 
-                        help='Data directory')
+    parser.add_argument('--data_dir', type=str,
+                         default=DEFAULT_VALUES['data_dir'], 
+                         help='Data directory')
+    parser.add_argument('--dataset', type=str,
+                         default='dataset_5_25_23.pkl', 
+                         help='Dataset name')
     parser.add_argument('--checkpoint_dir', type=str, action='store',
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
     parser.add_argument('--save_file', type=str,
                         default=None, 
                         help='Filename for saving model')
-    parser.add_argument('--gnn_model', type=bool, default=False, help='GNN Model')
+    parser.add_argument('--append_results', type=bool, default=True, help='Append to master dataframe of results')
     parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--model_keys', nargs='+', action='store',
                         default=DEFAULT_VALUES['model_keys'], 

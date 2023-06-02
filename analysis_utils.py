@@ -108,25 +108,25 @@ def init_model_class(config, args):
         
     return model
 
-def load_trained_model(model_info, config_dir, checkpoint_dir, device='cpu', gnn_model=False):
-    model_class = model_info['class']
+#def load_trained_model(model_info, config_dir, checkpoint_dir, device='cpu', gnn_model=False):
+def load_trained_model(model_info, args):
+    gnn_models = ['imma', 'gat', 'rfm']
     # load config and initialize model class
-    config_file = os.path.join(config_dir, model_info['config'])
+    config_file = os.path.join(args.model_config_dir, model_info['config'])
     config = load_config(config_file)
-    if gnn_model:
-        args = argparse.Namespace()
+    model_type = config['model_type']
+    model_class = model_dict[model_type]
+    if model_type in gnn_models:
+        # set config params in args
         for key in config.keys():
             setattr(args, key, config[key])
-        # set default values
-        setattr(args, 'env', 'tdw')
-        setattr(args, 'gt', False)
-        setattr(args, 'device', device)
         model = model_class(args)
     else:
+        # init class with config
         model = model_class(config)
     # load checkpoint weights
     # checkpoints are in folder named after model
-    model_dir = os.path.join(checkpoint_dir, 'models', model_info['model_dir'])
+    model_dir = os.path.join(args.checkpoint_dir, 'models', model_info['model_dir'])
     if 'epoch' in model_info:
         model_file_name = os.path.join(model_dir, model_info['model_dir']+'_epoch'+model_info['epoch'])
         model.load_state_dict(torch.load(model_file_name))
@@ -137,8 +137,8 @@ def load_trained_model(model_info, config_dir, checkpoint_dir, device='cpu', gnn
         model.load_state_dict(torch.load(latest_checkpoint))
 
     model.eval()
-    model.device = device
-    model.to(device)
+    model.device = args.device
+    model.to(args.device)
         
     return model
 
