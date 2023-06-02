@@ -236,10 +236,10 @@ if __name__ == '__main__':
         x = x.float()
     x_true = x[0,:burn_in_length+rollout_length,:].numpy()
     x_pred = x_true.copy()
-    if args.model_key == 'transformer_wm':
-        rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
-    else:
-        rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()
+    # if args.model_key == 'transformer_wm':
+    #     rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
+    # else:
+    rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()
     x_pred[burn_in_length:,:] = rollout_x 
     
     viz_dir = os.path.join(args.analysis_dir, 'results/viz_trajs',args.model_key)
