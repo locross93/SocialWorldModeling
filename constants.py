@@ -41,7 +41,7 @@ MODEL_DICT_VAL=  {
         'model_dir': 'sgnet_cvae_default', 'epoch': '3000', 'model_label': 'SGNet CVAE'},
     'agent_former': {
         'class': AgentFormer, 'config': 'agent_former_default_config.json',
-        'model_dir': 'agent_former_default', 'epoch': '3000', 'model_label': 'AgentFormer'},
+        'model_dir': 'agent_former_default', 'epoch': '200', 'model_label': 'AgentFormer'},
     # 'rssm_disc': {
     #     'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
     #     'model_dir': 'rssm_disc_default', 'epoch': '3000', 'model_label': 'RSSM Discrete'},

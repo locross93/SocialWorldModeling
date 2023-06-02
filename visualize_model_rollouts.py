@@ -21,7 +21,7 @@ from analysis_utils import load_trained_model, get_data_columns
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import annotate_goal_timepoints
 
-from constants_lc import MODEL_DICT_VAL, DEFAULT_VALUES, DATASET_NUMS
+from constants import MODEL_DICT_VAL, DEFAULT_VALUES, DATASET_NUMS
     
     
 def load_args():
@@ -41,9 +41,6 @@ def load_args():
     parser.add_argument('--model_key', type=str, required=True, help='Model to use for visualization')
     parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--device', type=str, default='cpu', help='Device')
-    parser.add_argument('--data_dir', type=str,
-                         default=DEFAULT_VALUES['data_dir'], 
-                         help='Data directory')
     parser.add_argument('--gnn_model', type=bool, default=False, help='GNN Model')
     # which trial to visualize
     parser.add_argument('--trial_type', type=str, default='single_goal', help='Trial Type') # single_goal, multi_goal, all
@@ -169,11 +166,6 @@ def make_frame_compare(t):
 
 if __name__ == '__main__':
     args = load_args()
-    
-    model_info = MODEL_DICT_VAL[args.model_key]
-    model_name = model_info['model_label']
-    model = load_trained_model(model_info, args.device, args.gnn_model)
-    
     # load data
     dataset = os.path.basename(args.data_path)
     data_columns = get_data_columns(DATASET_NUMS[dataset])
@@ -188,13 +180,13 @@ if __name__ == '__main__':
     if os.path.isfile(exp_info_file):
         exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
         
-    if DATASET_NUMS[args.dataset] == 1:
+    if DATASET_NUMS[dataset] == 1:
         # first dataset use states to define events
         # select trajectory where goal occurred
         pickup_timepoints = annotate_pickup_timepoints(loaded_dataset, args.train_or_val, pickup_or_move='move', ds_num=DATASET_NUMS[args.dataset])
         single_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 1))[0]
         multi_goal_trajs = np.where((np.sum(pickup_timepoints > -1, axis=1) == 3))[0]
-    elif DATASET_NUMS[args.dataset] > 1:
+    elif DATASET_NUMS[dataset] > 1:
         # second dataset use event logger to define events
         pickup_timepoints = exp_info_dict[args.train_or_val]['pickup_timepoints']
         single_goal_trajs = exp_info_dict[args.train_or_val]['single_goal_trajs']
@@ -216,13 +208,21 @@ if __name__ == '__main__':
         
     # EXTREMELY TEMP
     burn_in_length = 50
-    
     rollout_length = input_data.size(1) - burn_in_length
+    # load model
+    model_info = MODEL_DICT_VAL[args.model_key]
+    model_name = model_info['model_label']
+    config = load_config(os.path.join(args.model_config_dir, model_info['config_file'])) 
+    if args.model_type == "agent_former":
+        config['past_frames'] = args.burn_in_length
+        config['future_frames'] = args.rollout_length
+    model = load_trained_model(model_info, config, device=args.device, gnn_model=args.gnn_model)
+    # visualize
     x = input_data[traj_ind,:,:].unsqueeze(0)
     if x.dtype == torch.float64:
         x = x.float()
     x_true = x[0,:burn_in_length+rollout_length,:].numpy()
-    x_pred = x_true.copy()
+    x_pred = x_true.copy()    
     if args.model_key == 'transformer_wm':
         rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
     # elif args.gnn_model:

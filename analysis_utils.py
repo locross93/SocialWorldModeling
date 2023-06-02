@@ -40,12 +40,12 @@ def load_config(file):
     return config
 
 
-def load_trained_model(model_info, device='cpu', gnn_model=False):
+def load_trained_model(model_info, config, device='cpu', gnn_model=False):
     model_class = model_info['class']
     # load config and initialize model class
     analysis_dir = DEFAULT_VALUES['analysis_dir']
     checkpoint_dir = DEFAULT_VALUES['checkpoint_dir']
-    config_file = os.path.join(analysis_dir, 'model_configs/',model_info['config'])
+    config_file = os.path.join(checkpoint_dir, model_info['config'])
     config = load_config(config_file)
     if gnn_model:
         args = argparse.Namespace()
@@ -91,29 +91,31 @@ def get_highest_numbered_file(model_filename, directory):
 
 
 
-def load_trained_model(model_info, config_dir, checkpoint_dir, device='cpu'):
-    model_class = model_info['class']
-    # load config and initialize model class
-    config_file = os.path.join(config_dir, model_info['config'])
-    config = load_config(config_file)
-    model = model_class(config)
-    # load checkpoint weights
-    # checkpoints are in folder named after model
-    model_dir = os.path.join(checkpoint_dir, 'models', model_info['model_dir'])
-    if 'epoch' in model_info:
-        model_file_name = os.path.join(model_dir, model_info['model_dir']+'_epoch'+model_info['epoch'])
-        model.load_state_dict(torch.load(model_file_name))
-        print('Loading model',model_file_name)
-    else:
-        latest_checkpoint, _ =  get_highest_numbered_file(model_info['model_dir'], model_dir)
-        print('Loading from last checkpoint',latest_checkpoint)
-        model.load_state_dict(torch.load(latest_checkpoint))
+# #def load_trained_model(model_info, config_dir, checkpoint_dir, device='cpu'):
+# def load_trained_model(model_info, config, checkpoint_dir, device='cpu'):
+#     model_class = model_info['class']
+#     # load config and initialize model class
+#     #config_file = os.path.join(config_dir, model_info['config'])
+#     print(config_file)
+#     #config = load_config(config_file)
+#     model = model_class(config)
+#     # load checkpoint weights
+#     # checkpoints are in folder named after model
+#     model_dir = os.path.join(checkpoint_dir, 'models', model_info['model_dir'])
+#     if 'epoch' in model_info:
+#         model_file_name = os.path.join(model_dir, model_info['model_dir']+'_epoch'+model_info['epoch'])
+#         model.load_state_dict(torch.load(model_file_name))
+#         print('Loading model',model_file_name)
+#     else:
+#         latest_checkpoint, _ =  get_highest_numbered_file(model_info['model_dir'], model_dir)
+#         print('Loading from last checkpoint',latest_checkpoint)
+#         model.load_state_dict(torch.load(latest_checkpoint))
 
-    model.eval()
-    model.device = device
-    model.to(device)
+#     model.eval()
+#     model.device = device
+#     model.to(device)
         
-    return model
+#     return model
 
 # @TODO plot functions here
 # @TODO will need more work depending on the evaluation type
