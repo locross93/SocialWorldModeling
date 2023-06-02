@@ -42,9 +42,9 @@ MODEL_DICT_VAL=  {
     # 'multistep_delta': {
     #     'class': MultistepDelta, 'config': 'multistep_delta_default_config.json',
     #     'model_dir': 'multistep_delta_default', 'epoch': '3000', 'model_label': 'Multistep Delta'},
-    'transformer_iris_default': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
-        'model_dir': 'transformer_iris_default', 'epoch': '29000', 'model_label': 'Transformer Iris'},
+    # 'transformer_iris_default': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
+    #     'model_dir': 'transformer_iris_default', 'epoch': '29000', 'model_label': 'Transformer Iris'},
     'transformer_iris_concat_pos_embd_default': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
         'model_dir': 'transformer_iris_concat_pos_embd_default', 'epoch': '29000', 'model_label': 'Transformer Iris Concat Pos Embd'},
