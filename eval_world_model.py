@@ -40,8 +40,10 @@ class Analysis(object):
         self.args = args
 
     def load_data(self) -> None:
-        self.data_file = os.path.basename(args.data_path)        
-        self.ds_num = DATASET_NUMS[self.data_file]
+        if self.args.dataset == 'train_test_splits_3D_dataset.pkl':
+            self.ds_num = 1
+        else:
+            self.ds_num = 2
         self.dataset_file = os.path.join(self.args.data_dir, self.args.dataset)
         self.loaded_dataset = pickle.load(open(self.dataset_file, 'rb'))
         train_dataset, test_dataset = self.loaded_dataset
