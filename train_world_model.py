@@ -148,7 +148,7 @@ def main():
     val_trajs = val_trajs.to(DEVICE)
     val_trajs = val_trajs.to(torch.float32)
         
-    print('Starting', model_filename)
+    print('Starting', model_filename, 'On DS', args.dataset)
     
     # log to tensorboard
     log_dir = os.path.join(args.checkpoint_dir, 'models/training_info/tensorboard/', model_filename)

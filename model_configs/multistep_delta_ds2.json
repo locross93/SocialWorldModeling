@@ -1,5 +1,5 @@
 {
-  "input_size": 23,
+  "input_size": 35,
   "mlp_hidden_size": 1024,
   "num_mlp_layers": 2,
   "rnn_hidden_size": 1024,
