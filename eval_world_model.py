@@ -480,7 +480,7 @@ class Analysis(object):
     
 
     def save_results(self) -> None:
-        if args.save is None:
+        if args.save_file is None:
             save_file = f'eval_{self.args.eval_type}'
         else:
             save_file = args.save_file
