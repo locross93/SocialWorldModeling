@@ -138,7 +138,6 @@ def postprocess_events(exp_info_dict):
                    goal_timepoints[i,obj_num] = goal_t
                    
         single_goal_keys = ['gathering_random','random_gathering','static_gathering','gathering_static']
-        single_goal_keys = ['static_gathering']
         sg_inds = []
         for key in single_goal_keys:
             sg_inds = sg_inds+exp_info_dict[train_or_val][key]
@@ -151,7 +150,6 @@ def postprocess_events(exp_info_dict):
         single_goal_trajs = np.intersect1d(intersection_arr, single_goal_inds)
         
         multi_goal_keys = ['multistep_static', 'multistep_random', 'static_multistep', 'random_multistep', 'leader_follower'] 
-        multi_goal_keys = ['static_multistep']
         mg_inds = []
         for key in multi_goal_keys:
             mg_inds = mg_inds+exp_info_dict[train_or_val][key]

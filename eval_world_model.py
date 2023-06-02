@@ -19,7 +19,7 @@ from typing import List, Tuple, Dict, Any
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 
-from constants import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
+from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
 from analysis_utils import load_config, get_highest_numbered_file, get_data_columns, init_model_class
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
@@ -121,6 +121,8 @@ class Analysis(object):
             # 2+ dataset use event logger to define events
             pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
             single_goal_trajs = self.exp_info_dict[self.args.train_or_val]['single_goal_trajs']
+            
+        breakpoint()
         
         num_single_goal_trajs = len(single_goal_trajs)
         imagined_trajs = np.zeros([num_single_goal_trajs, input_data.shape[1], input_data.shape[2]])        
