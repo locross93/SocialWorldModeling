@@ -121,8 +121,6 @@ class Analysis(object):
             # 2+ dataset use event logger to define events
             pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
             single_goal_trajs = self.exp_info_dict[self.args.train_or_val]['single_goal_trajs']
-            
-        breakpoint()
         
         num_single_goal_trajs = len(single_goal_trajs)
         imagined_trajs = np.zeros([num_single_goal_trajs, input_data.shape[1], input_data.shape[2]])        
