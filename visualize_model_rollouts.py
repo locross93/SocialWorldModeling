@@ -195,7 +195,6 @@ if __name__ == '__main__':
         if os.path.isfile(exp_info_file):
             with open(exp_info_file, 'rb') as f:
                 exp_info_dict = pickle.load(f)
-            #exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
         else:
             print('DS info dict not found')
         # second dataset use event logger to define events

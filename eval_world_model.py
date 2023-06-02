@@ -55,7 +55,7 @@ class Analysis(object):
         # if 2+ dataset, load event log
         if self.ds_num > 1:
             # load dataset info
-            exp_info_file = args.data_path[:-4]+'_exp_info.pkl'
+            exp_info_file = self.dataset_file[:-4]+'_exp_info.pkl'
             if os.path.isfile(exp_info_file):
                 with open(exp_info_file, 'rb') as f:
                     self.exp_info_dict = pickle.load(f)
