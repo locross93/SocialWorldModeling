@@ -191,15 +191,14 @@ class ContextEncoder(nn.Module):
         encoder_layers = AgentFormerEncoderLayer(cfg['tf_cfg'], self.model_dim, self.nhead, self.ff_dim, self.dropout)
         self.tf_encoder = AgentFormerEncoder(encoder_layers, self.nlayer)
 
-    def forward(self, data, agent_mask):
-        num_agent = self.cfg['num_agent']         
+    def forward(self, data, agent_mask):        
+        num_agent = self.cfg['num_agent']
         tf_in = self.input_fc(data)     
         tf_in_pos = self.pos_encoder(tf_in, num_a=num_agent, agent_enc_shuffle=self.agent_enc_shuffle)
                 
         src_agent_mask = agent_mask.clone()        
         src_mask = generate_mask(tf_in.shape[0], tf_in.shape[0], num_agent, src_agent_mask).to(tf_in.device)
-
-        # aggre
+        # aggregate context across all agents
         context_enc = self.tf_encoder(tf_in_pos, mask=src_mask, num_agent=num_agent)        
         context_rs = context_enc.reshape(-1, num_agent, self.model_dim)
         # compute per agent context
@@ -249,27 +248,40 @@ class FutureEncoder(nn.Module):
         # initialize
         initialize_weights(self.q_z_net.modules())
 
-    def forward(self, traj_in, agent_context, agent_mask, reparam=True):        
-        num_agent = self.cfg['num_agent']        
-        tf_in = self.input_fc(traj_in)
-        agent_enc_shuffle = self.cfg['agent_enc_shuffle'] if self.agent_enc_shuffle else None        
+    def forward(self, traj_in, context_enc, agent_mask, reparam=True):        
+        num_agent = self.cfg['num_agent']    
+        # (T * A, B, E)
+        fc_traj_in = rearrange(traj_in, 't a b d -> (t a) b d')
+        tf_in = self.input_fc(fc_traj_in)
+        agent_enc_shuffle = self.cfg['agent_enc_shuffle'] if self.agent_enc_shuffle else None
+        # (T*A, B, E)
         tf_in_pos = self.pos_encoder(tf_in, num_a=num_agent, agent_enc_shuffle=agent_enc_shuffle)        
 
+        # (A, A)
         mem_agent_mask = agent_mask.clone()
+        # (A, A)
         tgt_agent_mask = agent_mask.clone()
-        mem_mask = generate_mask(tf_in.shape[0], agent_context.shape[0], num_agent, mem_agent_mask).to(tf_in.device)
+        # (T*A, past_T*A)
+        mem_mask = generate_mask(tf_in.shape[0], context_enc.shape[0], num_agent, mem_agent_mask).to(tf_in.device)
+        # (T*A, T*A)
         tgt_mask = generate_mask(tf_in.shape[0], tf_in.shape[0], num_agent, tgt_agent_mask).to(tf_in.device)        
         
-        tf_out, _ = self.tf_decoder(tf_in_pos, agent_context, memory_mask=mem_mask, tgt_mask=tgt_mask, num_agent=self.cfg['num_agent'])
-        tf_out = tf_out.view(traj_in.shape[0], -1, self.model_dim)
-
+        # (T*A, B, E)        
+        tf_out, _ = self.tf_decoder(tf_in_pos, context_enc, memory_mask=mem_mask, tgt_mask=tgt_mask, num_agent=self.cfg['num_agent'])
+        #tf_out = tf_out.view(traj_in.shape[0], -1, self.model_dim)
+        tf_out = tf_out.reshape(-1, traj_in.shape[1], self.model_dim)        
+        
         if self.pooling == 'mean':
+            # (A, E)
             h = torch.mean(tf_out, dim=0)
         else:
             h = torch.max(tf_out, dim=0)[0]
         if self.out_mlp_dim is not None:
+            # (A, E)
             h = self.out_mlp(h)
-        q_z_params = self.q_z_net(h)
+
+        # (A, num_dist_params)        
+        q_z_params = self.q_z_net(h)        
         if self.z_type == 'gaussian':
             q_z_dist = Normal(params=q_z_params)
         else:
@@ -320,31 +332,36 @@ class FutureDecoder(nn.Module):
             self.p_z_net = nn.Linear(self.model_dim, num_dist_params)
             initialize_weights(self.p_z_net.modules())
     
-    def decode_traj_ar(self, dec_in, mode, context, agent_mask, z, sample_num, need_weights=False):        
+    def decode_traj_ar(self, dec_in, mode, context, agent_mask, z, sample_num, need_weights=False):
         num_agent = self.cfg['num_agent']
-        dec_in = rearrange(dec_in, 't b f -> b (f t)')       
-        dec_in = dec_in.reshape(-1, sample_num, dec_in.shape[-1])
-        z_in = z.reshape(-1, sample_num, z.shape[-1])        
+        # orginal shape (T, A*num_sample, B, F)        
+        bs = dec_in.shape[-2]        
+        dec_in = rearrange(dec_in[[-1]], 't a b f -> a t b f')
+        # (A, T, B, F) -> (A, num_sample*B, F)
+        dec_in = dec_in.reshape(dec_in.shape[0], -1, dec_in.shape[-1])
+
+        # z: (A * num_sample, dz) -> (A, num_sample * B, dz) 
+        z_in = z.reshape(-1, sample_num, z.shape[-1]).repeat_interleave(bs, dim=1)
         in_arr = [dec_in, z_in]
-        dec_in_z = torch.cat(in_arr, dim=-1)       
+        # (A, num_sample * B, F+dz)       
+        dec_in_z = torch.cat(in_arr, dim=-1)        
 
         mem_agent_mask = agent_mask.clone()
         tgt_agent_mask = agent_mask.clone()
 
-        for i in range(self.future_frames):            
-            tf_in = self.input_fc(dec_in_z)
-            print(f"{i}th tf_in shape: {tf_in.shape}")
+        for i in range(self.future_frames):
+                
+            # (B, A, num_sample, E)            
+            tf_in = self.input_fc(dec_in_z)            
             agent_enc_shuffle = self.cfg['agent_enc_shuffle'] if self.agent_enc_shuffle else None
-            tf_in_pos = self.pos_encoder(tf_in, num_a=num_agent, agent_enc_shuffle=agent_enc_shuffle, t_offset=self.past_frames-1 if self.pos_offset else 0)
-            print(f"tf_in_pos shape: {tf_in_pos.shape}")
+
+            tf_in_pos = self.pos_encoder(tf_in, num_a=num_agent, agent_enc_shuffle=agent_enc_shuffle, t_offset=self.past_frames-1 if self.pos_offset else 0)            
             # tf_in_pos = tf_in
             mem_mask = generate_mask(tf_in.shape[0], context.shape[0], self.cfg['num_agent'], mem_agent_mask).to(tf_in.device)
             tgt_mask = generate_ar_mask(tf_in_pos.shape[0], num_agent, tgt_agent_mask).to(tf_in.device)
 
-            tf_out, attn_weights = self.tf_decoder(tf_in_pos, context, memory_mask=mem_mask, tgt_mask=tgt_mask, num_agent=self.cfg['num_agent'], need_weights=need_weights)
-            print(f"tf_out shape: {tf_out.shape} attn_weights shape: {attn_weights.shape}")
+            tf_out, attn_weights = self.tf_decoder(tf_in_pos, context, memory_mask=mem_mask, tgt_mask=tgt_mask, num_agent=self.cfg['num_agent'], need_weights=need_weights)            
             out_tmp = tf_out.view(-1, tf_out.shape[-1])
-            print(f"out_tmp shape: {out_tmp.shape}")
             if self.out_mlp_dim is not None:
                 out_tmp = self.out_mlp(out_tmp)
             seq_out = self.out_fc(out_tmp).view(tf_out.shape[0], -1, self.forecast_dim)
@@ -352,8 +369,7 @@ class FutureDecoder(nn.Module):
                 out_in = seq_out[-num_agent:].clone().detach()
             else:
                 out_in = seq_out[-num_agent:]
-
-            print(f"seq_out shape: {seq_out.shape} out_in shape: {out_in.shape} z_in shape: {z_in.shape}")
+            
             # create dec_in_z
             in_arr = [out_in, z_in]            
             out_in_z = torch.cat(in_arr, dim=-1)
@@ -367,9 +383,17 @@ class FutureDecoder(nn.Module):
         raise NotImplementedError
 
     def forward(self, dec_in, mode, context_enc, agent_context, agent_mask, q_z_dist, q_z_samp, sample_num=1, autoregress=True, need_weights=False):        
+        num_agent = self.cfg['num_agent']
+        # Pre dec_in: (T*A, B, E) -> (T, A, B, E)
+        dec_in = dec_in.reshape(-1, num_agent, dec_in.shape[1], dec_in.shape[-1])        
+        # (T, A * sample_num, B, E)
+        dec_in = dec_in.repeat_interleave(sample_num, dim=1)
+        # (A * T, B * sample_num, E)
         context = context_enc.repeat_interleave(sample_num, dim=1)        
-        # p(z)
+
+        # p(z)        
         if self.learn_prior:
+            # agent_context: (A, E), h: (A * num_sample, E)
             h = agent_context.repeat_interleave(sample_num, dim=0)
             p_z_params = self.p_z_net(h)
             if self.z_type == 'gaussian':
@@ -383,14 +407,16 @@ class FutureDecoder(nn.Module):
                 p_z_dist = Categorical(logits=torch.zeros(dec_in.shape[1], self.nz).to(dec_in.device))
 
         if mode in {'train', 'recon'}:
+            q_z_dist.mode()
             z = q_z_samp if mode == 'train' else q_z_dist.mode()
         elif mode == 'infer':
             z = p_z_dist.sample()
         else:
             raise ValueError('Unknown Mode!')
-
+                
         if autoregress:           
-            return self.decode_traj_ar(dec_in, mode, context, agent_mask, z, sample_num, need_weights=need_weights)
+            seq_out, _ = self.decode_traj_ar(dec_in, mode, context, agent_mask, z, sample_num, need_weights=need_weights)
+            return seq_out, p_z_dist
         else:
             self.decode_traj_batch(dec_in, mode, context, agent_mask, z, sample_num)
         
@@ -457,34 +483,62 @@ class AgentFormer(nn.Module):
             data.size(0), self.cfg['future_frames'], num_agent, -1)
         # reshape data to (time, batch, feature)
         past_trajs = rearrange(past_trajs, 'b t a f  -> (t a) b f')
-        fut_trajs = rearrange(fut_trajs, 'b t a f  -> (t a) b f')
+        fut_trajs = rearrange(fut_trajs, 'b t a f  -> t a b f')
         agent_mask = torch.zeros([num_agent, num_agent]).to(data.device)
-
+        
         context_enc, agent_context = self.context_encoder(past_trajs, agent_mask)       
-        q_z_dist, q_z_samp = self.future_encoder(fut_trajs, context_enc, agent_mask)                        
-        seq_out, attn_weights = self.future_decoder(past_trajs, 'train', context_enc, agent_context, agent_mask, q_z_dist, q_z_samp, autoregress=self.ar_train)
+        q_z_dist, q_z_samp = self.future_encoder(fut_trajs, context_enc, agent_mask)        
+        seq_out, p_z_dist = self.future_decoder(past_trajs, 'train', context_enc, agent_context, agent_mask, q_z_dist, q_z_samp, autoregress=self.ar_train)
 
-        if self.compute_sample:
-            self.inference(sample_num=self.loss_cfg['sample']['k'])
-        return self.data
+        #if self.compute_sample:
+        #    self.inference(context_enc, sample_num=self.loss_cfg['sample']['k'])
+        return seq_out, fut_trajs, q_z_dist, p_z_dist
 
-    def inference(self, mode='infer', sample_num=20, need_weights=False):
-        if self.data['context_enc'] is None:
+    def inference(self, past_traj, context_enc=None, mode='infer', sample_num=20, need_weights=False):
+        if context_enc is None:
             self.context_encoder(self.data)
         if mode == 'recon':
             sample_num = 1
-            self.future_encoder(self.data)
-        self.future_decoder(self.data, mode=mode, sample_num=sample_num, autoregress=True, need_weights=need_weights)
+            self.future_encoder(past_traj)
+        self.future_decoder(past_traj, mode=mode, sample_num=sample_num, autoregress=True, need_weights=need_weights)
         return self.data[f'{mode}_dec_motion'], self.data
 
+    def compute_mse(self, pred_traj, gt_traj):
+        pred_traj = pred_traj.reshape(-1, pred_traj.size(-1))
+        gt_traj = gt_traj.reshape(-1, gt_traj.size(-1))
+        loss_unweighted = F.mse_loss(pred_traj, gt_traj, reduction='mean')
+        loss = loss_unweighted * self.cfg['loss_cfg']['mse']['weight']
+        return loss, loss_unweighted
+    
+    def compute_kl(self, q_z_dist, p_z_dist):
+        min_clip = self.cfg['loss_cfg']['kld']['min_clip']
+        loss_unweighted = q_z_dist.kl(p_z_dist).mean()    # normalize by batch_size
+        loss_unweighted = loss_unweighted.clamp_min_(min_clip)
+        loss = loss_unweighted * self.cfg['loss_cfg']['kld']['weight']
+        return loss, loss_unweighted
+    
+    def compute_sample_loss(self, pred_traj, gt_traj):
+        diff = pred_traj - gt_traj.unsqueeze(1)
+        dist = diff.pow(2).sum(dim=-1).sum(dim=-1)
+        loss_unweighted = dist.min(dim=1)[0]        
+        # normalize the loss
+        loss_unweighted = loss_unweighted.mean()
+        loss = loss_unweighted * self.cfg['loss_cfg']['sample']['weight']
+        return loss, loss_unweighted
+
     def loss(self, data):
-        self(data)
+        seq_out, fut_trajs, q_z_dist, p_z_dist = self(data)
         total_loss = 0
         loss_dict = {}
         loss_unweighted_dict = {}
         for loss_name in self.loss_names:
-            loss, loss_unweighted = loss_func[loss_name](self.data, self.loss_cfg[loss_name])
-            total_loss += loss
+            if loss_name == 'mse':
+                loss, loss_unweighted = self.compute_mse(seq_out, fut_trajs)
+            elif loss_name == 'kld':
+                loss, loss_unweighted = self.compute_kl(q_z_dist, p_z_dist)
+            #elif loss_name == 'sample':
+            #    loss, loss_unweighted = self.compute_sample_loss(seq_out, fut_trajs)
+            total_loss += loss            
             loss_dict[loss_name] = loss.item()
             loss_unweighted_dict[loss_name] = loss_unweighted.item()
-        return total_loss, loss_dict, loss_unweighted_dict
+        return total_loss#, loss_dict, loss_unweighted_dict
