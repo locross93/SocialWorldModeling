@@ -51,7 +51,8 @@ class Analysis(object):
             # load dataset info
             exp_info_file = args.data_path[:-4]+'_exp_info.pkl'
             if os.path.isfile(exp_info_file):
-                self.exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
+                with open(exp_info_file, 'rb') as f:
+                    self.exp_info_dict = pickle.load(f)
             else:
                 print('DS info dict not found')
             self.data_columns = self.exp_info_dict['data_columns']
