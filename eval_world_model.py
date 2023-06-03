@@ -141,7 +141,6 @@ class Analysis(object):
         pickup_subset = pickup_timepoints[single_goal_trajs,:]
         indices = np.argwhere(pickup_subset > -1)
         accuracy = np.mean(y_recon[indices[:,0],indices[:,1]])
-        print(np.where(y_recon[indices[:,0],indices[:,1]] == 1))
         result = {'model': self.model_name, 'score': accuracy, 'MSE': mse}        
         return result
     
@@ -502,7 +501,7 @@ class Analysis(object):
         if self.args.append_results:
             all_results_file = os.path.join(result_save_dir, 'all_results_'+self.args.eval_type+'.csv')
             df_all_results = pd.read_csv(all_results_file, index_col=0)
-            df_all_results = df_all_results.append(df_results)
+            df_all_results = df_all_results.concat(df_results)
             df_all_results.to_csv(all_results_file)
 
 
