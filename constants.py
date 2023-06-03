@@ -37,12 +37,12 @@ MODEL_DICT_TRAIN = {
 }
 """Values for validation"""
 MODEL_DICT_VAL=  {
-    'sgnet_cvae': {
-        'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
-        'model_dir': 'sgnet_cvae_default', 'epoch': '3000', 'model_label': 'SGNet CVAE'},
-    'agent_former': {
-        'class': AgentFormer, 'config': 'agent_former_default_config.json',
-        'model_dir': 'agent_former_default', 'epoch': '200', 'model_label': 'AgentFormer'},
+    # 'sgnet_cvae': {
+    #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
+    #     'model_dir': 'sgnet_cvae_default', 'epoch': '3000', 'model_label': 'SGNet CVAE'},
+    # 'agent_former': {
+    #     'class': AgentFormer, 'config': 'agent_former_default_config.json',
+    #     'model_dir': 'agent_former_default', 'epoch': '200', 'model_label': 'AgentFormer'},
     # 'rssm_disc': {
     #     'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
     #     'model_dir': 'rssm_disc_default', 'epoch': '3000', 'model_label': 'RSSM Discrete'},
@@ -55,18 +55,33 @@ MODEL_DICT_VAL=  {
     # # 'transformer_iris_default': {
     # #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
     # #     'model_dir': 'transformer_iris_default', 'epoch': '29000', 'model_label': 'Transformer Iris'},
-    'gat_rnn_norm_vel': {
-       'class': GAT, 'config': 'gat_encoder_rnn_config.json', 
-       'model_dir': 'gat_rnn_norm_vel', 'model_label': 'GAT RNN Encoder'},
-    # 'transformer_iris_concat_pos_embd_default': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_default', 'epoch': '29000', 'model_label': 'Transformer Iris Concat Pos Embd'},
-    # 'transformer_iris_concat_pos_embd_lr1e-4': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'epoch': '29000', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
+    # 'gat_rnn_norm_vel': {
+    #    'class': GAT, 'config': 'gat_encoder_rnn_config.json', 
+    #    'model_dir': 'gat_rnn_norm_vel', 'model_label': 'GAT RNN Encoder'},
+    'transformer_iris_concat_pos_embd_lr3e-4': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
+        'model_dir': 'transformer_iris_concat_pos_embd_lr3e-4', 'epoch': '8000', 'model_label': 'Iris Concat lr3e-4'},
+    'transformer_iris_concat_pos_embd_lr1e-4': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
+        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'epoch': '8000', 'model_label': 'Iris Concat lr1e-4'},
+    'transformer_iris_concat_pos_embd_lr3e-5': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
+        'model_dir': 'transformer_iris_concat_pos_embd_lr3e-5', 'epoch': '8000', 'model_label': 'Iris Concat lr3e-5'},
     # 'transformer_iris_concat_pos_embd_lr1e-5': {
     #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_lr1e-5', 'epoch': '15000', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-5'},
+    #     'model_dir': 'transformer_iris_concat_pos_embd_lr1e-5', 'epoch': '8000', 'model_label': 'Iris Concat lr1e-5'},
+    # 'transformer_iris_default': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
+    #     'model_dir': 'transformer_iris_default', 'epoch': '8000', 'model_label': 'Iris Default'},
+    'transformer_iris_lr1e-4': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
+        'model_dir': 'transformer_iris_lr1e-4', 'epoch': '8000', 'model_label': 'Iris lr1e-4'},
+    'transformer_iris_lr1e-5/': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
+        'model_dir': 'transformer_iris_lr1e-5', 'epoch': '8000', 'model_label': 'Iris lr1e-5'},
+    'transformer_iris_lr3e-4': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
+        'model_dir': 'transformer_iris_lr3e-4', 'epoch': '8000', 'model_label': 'Iris lr3e-4'},
     # 'rfm_rnn': {
     #    'class': RFM, 'config': 'rfm_rnn_config.json', 
     #    'model_dir': 'rfm_rnn', 'model_label': 'RFM RNN'},
@@ -82,7 +97,7 @@ DEFAULT_VALUES = {
     # general pipeline parameters
     'analysis_dir': './', 
     # as of 5/30, all models are trained on dataset_5_25_23.pkl
-    'data_path': '/ccn2/u/ziyxiang/swm_data_and_results/data/dataset_5_25_23.pkl',    
+    'data_path': '/ccn2/u/ziyxiang/swm_data_and_results/data/dataset_5_25_23.pkl', 
     'data_dir': '/ccn2/u/ziyxiang/swm_data_and_results/data/',  
     'checkpoint_dir': '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint',
     'model_config_dir': './model_configs',

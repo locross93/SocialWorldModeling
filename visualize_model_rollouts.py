@@ -17,7 +17,8 @@ import matplotlib.pyplot as plt
 import moviepy.editor as mpy
 from moviepy.video.io.bindings import mplfig_to_npimage
 
-from analysis_utils import load_trained_model, get_data_columns, inverse_normalize
+from analysis_utils import init_model_class, get_data_columns, inverse_normalize, \
+    load_trained_model
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import annotate_goal_timepoints
 
@@ -168,13 +169,8 @@ def make_frame_compare(t):
     return mplfig_to_npimage(fig)
 
 if __name__ == '__main__':
-    args = load_args()
-    
-    model_info = MODEL_DICT_VAL[args.model_key]
-    model_name = model_info['model_label']
-    model = load_trained_model(model_info, args)
-    
-    # load data
+    args = load_args()   
+    """Load data"""
     dataset_file = os.path.join(args.data_dir, args.dataset)
     loaded_dataset = pickle.load(open(dataset_file, 'rb'))
     train_dataset, test_dataset = loaded_dataset
@@ -182,7 +178,7 @@ if __name__ == '__main__':
         input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     else:
         input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
-        
+    
     if args.dataset in DATASET_NUMS and DATASET_NUMS[args.dataset] == 1:
         # first dataset use states to define events
         # select trajectory where goal occurred
@@ -207,21 +203,13 @@ if __name__ == '__main__':
             # data is normalize, project it back into regular input space
             min_values, max_values = exp_info_dict['min_max_values']
             velocity = any('vel' in s for s in data_columns)
-            input_data = inverse_normalize(input_data, max_values.astype(np.float32), min_values.astype(np.float32), velocity)
-    
-    # input_data = input_data.numpy()
-    # min_values = np.min(input_data, axis=(0, 1))
-    # max_values = np.max(input_data, axis=(0, 1))
-    # ranges = max_values - min_values
-    # normalized_tensor = (input_data - min_values) / ranges
-    # input_data = inverse_normalize(normalized_tensor, max_values, min_values)
-    # input_data = torch.tensor(input_data)
-            
+            input_data = inverse_normalize(input_data, max_values.astype(np.float32), min_values.astype(np.float32), velocity)    
+    # select trial  
     if args.trial_type == 'single_goal':
         traj_ind = single_goal_trajs[args.trial_num]
         steps2pickup = np.max(pickup_timepoints[traj_ind,:]).astype(int)
         burn_in_length = steps2pickup
-    elif args.trial_type == 'multi_goal':
+    elif args.trial_type == 'multi_goal':        
         traj_ind = multi_goal_trajs[args.trial_num]
         goal_num = args.goal_num
         steps2pickup = np.sort(pickup_timepoints[traj_ind,:])[goal_num].astype(int)
@@ -232,14 +220,17 @@ if __name__ == '__main__':
         burn_in_length = args.burn_in_length
     
     rollout_length = input_data.size(1) - burn_in_length
-    # load model
+    print(f"burn_in_length: {burn_in_length}, traj_ind: {traj_ind}, rollout_length: {rollout_length}")
+    # load model        
     model_info = MODEL_DICT_VAL[args.model_key]
-    model_name = model_info['model_label']
-    config = load_config(os.path.join(args.model_config_dir, model_info['config_file'])) 
-    if args.model_type == "agent_former":
-        config['past_frames'] = args.burn_in_length
-        config['future_frames'] = args.rollout_length
-    model = load_trained_model(model_info, config, device=args.device, gnn_model=args.gnn_model)
+    config = load_config(os.path.join(args.model_config_dir, model_info['config']))
+    model_name = model_info['model_label']    
+    if args.model_key == "agent_former":
+        config['past_frames'] = burn_in_length
+        config['future_frames'] = rollout_length
+    # @TODO this needs to be updated for AgentFormer
+    model = load_trained_model(model_info, args)
+        
     # visualize
     x = input_data[traj_ind,:,:].unsqueeze(0)
     if x.dtype == torch.float64:
@@ -248,7 +239,7 @@ if __name__ == '__main__':
     x_pred = x_true.copy()    
     if args.model_key == 'transformer_wm':
         rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
-    else:
+    else:        
         rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()
     x_pred[burn_in_length:,:] = rollout_x 
     

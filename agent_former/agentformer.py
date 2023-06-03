@@ -418,8 +418,7 @@ class FutureDecoder(nn.Module):
             seq_out, _ = self.decode_traj_ar(dec_in, mode, context, agent_mask, z, sample_num, need_weights=need_weights)
             return seq_out, p_z_dist
         else:
-            self.decode_traj_batch(dec_in, mode, context, agent_mask, z, sample_num)
-        
+            self.decode_traj_batch(dec_in, mode, context, agent_mask, z, sample_num)                
 
 
 """ AgentFormer """
@@ -448,32 +447,7 @@ class AgentFormer(nn.Module):
         # models
         self.context_encoder = ContextEncoder(cfg)
         self.future_encoder = FutureEncoder(cfg)
-        self.future_decoder = FutureDecoder(cfg)
-        
-    def set_device(self, device):
-        self.device = device
-        self.to(device)
-
-    def set_data(self, data):
-        device = self.device
-        # rotate the scene
-        if self.rand_rot_scene and self.training:
-            if self.discrete_rot:
-                theta = torch.randint(high=24, size=(1,)).to(device) * (np.pi / 12)
-            else:
-                theta = torch.rand(1).to(device) * np.pi * 2
-        else:
-            theta = torch.zeros(1).to(device)        
-
-        # agent shuffling
-        if self.training and self.cfg['agent_enc_shuffle']:
-            self.cfg['agent_enc_shuffle'] = torch.randperm(self.cfg['max_a_len'])[:self.cfg['num_agent']].to(device)
-        else:
-            self.cfg['agent_enc_shuffle'] = None   
-
-    def step_annealer(self):
-        for anl in self.param_annealers:
-            anl.step()
+        self.future_decoder = FutureDecoder(cfg)    
 
     def forward(self, data):
         num_agent = self.cfg['num_agent']  
@@ -486,13 +460,27 @@ class AgentFormer(nn.Module):
         fut_trajs = rearrange(fut_trajs, 'b t a f  -> t a b f')
         agent_mask = torch.zeros([num_agent, num_agent]).to(data.device)
         
-        context_enc, agent_context = self.context_encoder(past_trajs, agent_mask)       
-        q_z_dist, q_z_samp = self.future_encoder(fut_trajs, context_enc, agent_mask)        
+        context_enc, agent_context = self.context_encoder(past_trajs, agent_mask)
+        q_z_dist, q_z_samp = self.future_encoder(fut_trajs, context_enc, agent_mask)
+        self.register_buffer('q_z_samp', q_z_dist)
         seq_out, p_z_dist = self.future_decoder(past_trajs, 'train', context_enc, agent_context, agent_mask, q_z_dist, q_z_samp, autoregress=self.ar_train)
+        self.register_buffer('p_z_dist', p_z_dist)
 
         #if self.compute_sample:
         #    self.inference(context_enc, sample_num=self.loss_cfg['sample']['k'])
         return seq_out, fut_trajs, q_z_dist, p_z_dist
+
+    def forward_rollout(self, data, burn_in_length, rollout_length):
+        num_agent = self.cfg['num_agent']
+        past_trajs = data[:, :burn_in_length].reshape(
+            data.size(0), burn_in_length, num_agent, -1)
+        future_trajs 
+        past_trajs = rearrange(past_trajs, 'b t a f  -> (t a) b f')
+        #future_trajs = 
+        agent_mask = torch.zeros([num_agent, num_agent]).to(data.device)
+        context_enc, agent_context = self.context_encoder(past_trajs, agent_mask)
+        q_z_dist, q_z_samp = self.future_encoder(fut_trajs, context_enc, agent_mask)
+        seq_out, p_z_dist = self.future_decoder(past_trajs, 'infer', context_enc, agent_context, agent_mask, autoregress=True)
 
     def inference(self, past_traj, context_enc=None, mode='infer', sample_num=20, need_weights=False):
         if context_enc is None:

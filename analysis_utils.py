@@ -43,43 +43,6 @@ def load_config(file):
     return config
 
 
-# def load_trained_model(model_info, device='cpu', gnn_model=False):
-#     model_class = model_info['class']
-#     # load config and initialize model class
-#     analysis_dir = DEFAULT_VALUES['analysis_dir']
-#     checkpoint_dir = DEFAULT_VALUES['checkpoint_dir']
-#     config_file = os.path.join(analysis_dir, 'model_configs/',model_info['config'])
-#     config = load_config(config_file)
-#     if gnn_model:
-#         args = argparse.Namespace()
-#         for key in config.keys():
-#             setattr(args, key, config[key])
-#         # set default values
-#         setattr(args, 'env', 'tdw')
-#         setattr(args, 'gt', False)
-#         setattr(args, 'device', device)
-#         model = model_class(args)
-#     else:
-#         model = model_class(config)
-#     # load checkpoint weights
-#     # checkpoints are in folder named after model
-#     model_dir = os.path.join(checkpoint_dir, 'models', model_info['model_dir'])
-#     if 'epoch' in model_info:
-#         model_file_name = os.path.join(model_dir, model_info['model_dir']+'_epoch'+model_info['epoch'])
-#         model.load_state_dict(torch.load(model_file_name))
-#         print('Loading model',model_file_name)
-#     else:
-#         latest_checkpoint, _ =  get_highest_numbered_file(model_info['model_dir'], model_dir)
-#         print('Loading from last checkpoint',latest_checkpoint)
-#         model.load_state_dict(torch.load(latest_checkpoint))
-
-#     model.eval()
-#     model.device = device
-#     model.to(device)
-        
-#     return model
-
-
 def get_highest_numbered_file(model_filename, directory):
     highest_number = -1
     highest_numbered_file = None
@@ -92,7 +55,7 @@ def get_highest_numbered_file(model_filename, directory):
     assert highest_number > -1,'No checkpoints found'
     return highest_numbered_file, highest_number
 
-def init_model_class(config, args):
+def init_model_class(config, args=None):
     gnn_models = ['imma', 'gat', 'rfm']
     model_type = config['model_type']
     model_class = model_dict[model_type]
@@ -104,10 +67,8 @@ def init_model_class(config, args):
     else:
         # init class with config
         model = model_class(config)
-        
     return model
 
-#def load_trained_model(model_info, config_dir, checkpoint_dir, device='cpu', gnn_model=False):
 def load_trained_model(model_info, args):
     gnn_models = ['imma', 'gat', 'rfm']
     # load config and initialize model class
@@ -138,8 +99,7 @@ def load_trained_model(model_info, args):
     model.eval()
     model.device = args.device
     model.to(args.device)
-        
-#     return model
+    return model
 
 # @TODO plot functions here
 # @TODO will need more work depending on the evaluation type
