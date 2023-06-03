@@ -230,6 +230,7 @@ if __name__ == '__main__':
         traj_ind = args.trial_num
         burn_in_length = args.burn_in_length
     
+    print(burn_in_length)
     rollout_length = input_data.size(1) - burn_in_length
     x = input_data[traj_ind,:,:].unsqueeze(0)
     if x.dtype == torch.float64:

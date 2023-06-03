@@ -1,0 +1,2 @@
+,model,score,MSE,epoch,dataset
+0,Transformer,0.17012448132780084,4.4033331871032715,/mnt/fs2/locross/analysis/models/transformer_wm/transformer_wm_epoch99999,train_test_splits_3D_dataset.pkl

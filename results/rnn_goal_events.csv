@@ -1,0 +1,4 @@
+,model,score,MSE,epoch,dataset
+0,Multistep Predictor,0.17616033755274263,2.071599006652832,/mnt/fs2/locross/analysis/models/multistep_predictor/multistep_predictor_epoch14000,dataset_5_25_23.pkl
+1,RSSM Discrete,0.41244725738396626,2.209904432296753,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch5500,dataset_5_25_23.pkl
+2,RSSM Continuous,0.052742616033755275,inf,/mnt/fs2/locross/analysis/models/rssm_cont_ds2/rssm_cont_ds2_epoch1000,dataset_5_25_23.pkl
