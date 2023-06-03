@@ -68,7 +68,7 @@ MODEL_DICT_VAL=  {
         'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
         'model_dir': 'mp_ds3', 'model_label': 'Multistep Predictor DS3'},
     'md_ds3': {
-        'class': MultistepDelta, 'config': 'multistep_delta_ds3.json',
+        'class': MultistepDelta, 'config': 'multistep_delta_ds2.json',
         'model_dir': 'multistep_delta_ds3', 'model_label': 'Multistep Delta DS3'},
     'mp_norm_vel': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_70.json',
