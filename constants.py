@@ -81,7 +81,7 @@ MODEL_DICT_VAL=  {
         'model_dir': 'transformer_iris_lr1e-5', 'epoch': '8000', 'model_label': 'Iris lr1e-5'},
     'transformer_iris_lr3e-4': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
-        'model_dir': 'transformer_iris_lr3e-4', 'epoch': '8000', 'model_label': 'Iris lr3e-4'},
+        'model_dir': 'transformer_iris_lr3e-4', 'epoch': '8000', 'model_label': 'Iris lr3e-4'},    
     # 'rfm_rnn': {
     #    'class': RFM, 'config': 'rfm_rnn_config.json', 
     #    'model_dir': 'rfm_rnn', 'model_label': 'RFM RNN'},
@@ -114,5 +114,5 @@ DEFAULT_VALUES = {
 
 DATASET_NUMS = {
     'train_test_splits_3D_dataset.pkl': 1,
-    'dataset_5_25_23.pkl': 2,    
+    'dataset_5_25_23.pkl': 2, 
 }
