@@ -195,8 +195,10 @@ def main():
                 batch_x = batch_x.float()
             if config['model_type'][:4] == 'rssm' or \
                 config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout', 
-                                         'sgnet_cvae', 'agent_former']:
+                                         'sgnet_cvae']:
                 loss = model.loss(batch_x)
+            elif config['model_type'] == 'agent_former':
+                loss, loss_dict, loss_unweighted_dict = model.loss(batch_x)
             elif config['model_type'] in ['multistep_predictor', 'multistep_delta']:
                 loss = model.loss(batch_x, burn_in_length, rollout_length)
             elif config['model_type'] == 'transformer_mp':
