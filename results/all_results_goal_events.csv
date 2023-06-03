@@ -1,0 +1,6 @@
+,model,score,MSE,epoch,dataset
+0,Multistep Predictor,0.1761603375527426,2.071599006652832,/mnt/fs2/locross/analysis/models/multistep_predictor/multistep_predictor_epoch14000,dataset_5_25_23.pkl
+1,RSSM Discrete,0.4124472573839662,2.209904432296753,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch5500,dataset_5_25_23.pkl
+2,RSSM Continuous,0.0527426160337552,inf,/mnt/fs2/locross/analysis/models/rssm_cont_ds2/rssm_cont_ds2_epoch1000,dataset_5_25_23.pkl
+0,Multistep Predictor DS3,0.0049099836333878,2.5033535957336426,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch1400,data_5_31_23.pkl
+0,Multistep Predictor DS3,0.09574468085106383,2.1988141536712646,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch2400,data_5_31_23.pkl
