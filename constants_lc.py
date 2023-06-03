@@ -64,6 +64,12 @@ MODEL_DICT_VAL=  {
     'mp_ds2': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json', 
         'model_dir': 'multistep_predictor', 'model_label': 'Multistep Predictor'},
+    'mp_ds3': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
+        'model_dir': 'mp_ds3', 'model_label': 'Multistep Predictor DS3'},
+    'mp_norm_vel': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_70.json',
+        'model_dir': 'mp_norm_vel', 'model_label': 'Multistep Predictor Norm Velocity'},
     'rssm_disc_ds2': {
         'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
         'model_dir': 'rssm_ds2', 'model_label': 'RSSM Discrete'},

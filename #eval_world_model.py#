@@ -20,7 +20,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 
 from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
-from analysis_utils import load_config, get_highest_numbered_file, get_data_columns, init_model_class
+from analysis_utils import load_config, get_highest_numbered_file, get_data_columns
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
 from plot_eval_world_model import plot_eval_wm_results
@@ -40,30 +40,18 @@ class Analysis(object):
         self.args = args
 
     def load_data(self) -> None:
-        if self.args.dataset == 'train_test_splits_3D_dataset.pkl':
-            self.ds_num = 1
-        else:
-            self.ds_num = 2
-        self.dataset_file = os.path.join(self.args.data_dir, self.args.dataset)
-        self.loaded_dataset = pickle.load(open(self.dataset_file, 'rb'))
-        train_dataset, test_dataset = self.loaded_dataset
-        if self.args.train_or_val == 'train':
-            self.input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
-        else:
-            self.input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
+        self.data_file = os.path.basename(args.data_path)        
+        self.ds_num = DATASET_NUMS[self.data_file]
+        self.loaded_dataset = pickle.load(open(args.data_path, 'rb'))        
+        _, test_dataset = self.loaded_dataset
+        self.input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
         self.num_timepoints = self.input_data.size(1)
         # if 2+ dataset, load event log
         if self.ds_num > 1:
             # load dataset info
-            exp_info_file = self.dataset_file[:-4]+'_exp_info.pkl'
+            exp_info_file = self.data_file[:-4]+'_exp_info.pkl'
             if os.path.isfile(exp_info_file):
-                with open(exp_info_file, 'rb') as f:
-                    self.exp_info_dict = pickle.load(f)
-            else:
-                print('DS info dict not found')
-            self.data_columns = self.exp_info_dict['data_columns']
-        else:
-            self.data_columns = get_data_columns(DATASET_NUMS[self.args.dataset])
+                self.exp_info_dict = pickle.load(open(exp_info_file, 'rb'))
 
 
     def load_model(self, model_key) -> torch.nn.Module:
@@ -74,23 +62,29 @@ class Analysis(object):
         self.model_name = model_info['model_label']
         # set device, this assumes only one gpu is available to the script
         DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-        setattr(args, 'device', DEVICE)
+        model_class = model_info['class']
         config_file = os.path.join(self.args.model_config_dir, model_info['config'])
         config = load_config(config_file)
-        model = init_model_class(config, args)
-            
+        if self.args.gnn_model:
+            for key in config.keys():
+                setattr(self.args, key, config[key])
+            # set default values
+            setattr(self.args, 'env', 'tdw')
+            setattr(self.args, 'gt', False)
+            setattr(self.args, 'device', DEVICE)
+            model = model_class(self.args)
+        else:
+            model = model_class(config)
         # load checkpoint weights
         # checkpoints are in folder named after model
         model_dir = os.path.join(self.args.checkpoint_dir, 'models', model_info['model_dir'])
         if 'epoch' in model_info:
-            self.epoch = model_info['epoch']
             model_file_name = os.path.join(model_dir, model_info['model_dir']+'_epoch'+model_info['epoch'])
             model.load_state_dict(torch.load(model_file_name))
             print('Loading model',model_file_name)
         else:
             latest_checkpoint, _ =  get_highest_numbered_file(model_info['model_dir'], model_dir)
             print('Loading from last checkpoint',latest_checkpoint)
-            self.epoch = latest_checkpoint
             model.load_state_dict(torch.load(latest_checkpoint))
 
         model.eval()
@@ -141,7 +135,6 @@ class Analysis(object):
         pickup_subset = pickup_timepoints[single_goal_trajs,:]
         indices = np.argwhere(pickup_subset > -1)
         accuracy = np.mean(y_recon[indices[:,0],indices[:,1]])
-        print(np.where(y_recon[indices[:,0],indices[:,1]] == 1))
         result = {'model': self.model_name, 'score': accuracy, 'MSE': mse}        
         return result
     
@@ -226,6 +219,7 @@ class Analysis(object):
             
         scores = {}
         
+        data_columns = get_data_columns(self.data_file)
         dims = ['x', 'y', 'z']
 
         num_trials = input_matrices.shape[0]
@@ -236,7 +230,7 @@ class Analysis(object):
         for i in range(num_trials):
             trial_x = input_matrices[i,:,:]
             for j in range(num_objs):
-                pos_inds = [self.data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
+                pos_inds = [data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
                 trial_obj_pos = trial_x[:,pos_inds]
                 obj_moved_flag[i,j] = detect_object_move(trial_obj_pos, move_thr_true)
                 
@@ -244,7 +238,7 @@ class Analysis(object):
         for i in range(num_trials):
             trial_x = recon_matrices[i,:,:]
             for j in range(num_objs):
-                pos_inds = [self.data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
+                pos_inds = [data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
                 trial_obj_pos = trial_x[:,pos_inds]
                 recon_moved_flag[i,j] = detect_object_move(trial_obj_pos, move_thr)
                 
@@ -461,11 +455,6 @@ class Analysis(object):
             result = self.eval_pickup_events_in_rollouts(model, self.input_data)  
         else:
             raise NotImplementedError(f'Evaluation type {self.args.eval_type} not implemented')    
-        
-        if self.args.append_results:
-            # add more information for this analysis
-            result['epoch'] = self.epoch
-            result['dataset'] = self.args.dataset
         return result
 
 
@@ -480,10 +469,7 @@ class Analysis(object):
     
 
     def save_results(self) -> None:
-        if args.save_file is None:
-            save_file = f'eval_{self.args.eval_type}'
-        else:
-            save_file = args.save_file
+        save_file = f'eval_{self.args.eval_type}'
         # if a training set eval, add suffix
         if self.args.train_or_val == 'train':
             save_file = save_file+'_train'
@@ -498,12 +484,7 @@ class Analysis(object):
             if not os.path.exists(figure_save_dir):
                 os.makedirs(figure_save_dir)                
             plot_save_file = os.path.join(self.args.analysis_dir, 'results', 'figures', save_file)
-            plot_eval_wm_results(df_results, self.args, plot_save_file)     
-        if self.args.append_results:
-            all_results_file = os.path.join(result_save_dir, 'all_results_'+self.args.eval_type+'.csv')
-            df_all_results = pd.read_csv(all_results_file, index_col=0)
-            df_all_results = df_all_results.append(df_results)
-            df_all_results.to_csv(all_results_file)
+            plot_eval_wm_results(df_results, self.args, plot_save_file)                             
 
 
     def run(self) -> None:
@@ -521,19 +502,13 @@ def load_args():
     parser.add_argument('--model_config_dir', type=str, action='store',
                         default=DEFAULT_VALUES['model_config_dir'],
                         help='Model config directory')   
-    parser.add_argument('--data_dir', type=str,
-                         default=DEFAULT_VALUES['data_dir'], 
-                         help='Data directory')
-    parser.add_argument('--dataset', type=str,
-                         default='dataset_5_25_23.pkl', 
-                         help='Dataset name')
+    parser.add_argument('--data_path', type=str, action='store',
+                        default=DEFAULT_VALUES['data_path'], 
+                        help='Data directory')
     parser.add_argument('--checkpoint_dir', type=str, action='store',
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
-    parser.add_argument('--save_file', type=str,
-                        default=None, 
-                        help='Filename for saving model')
-    parser.add_argument('--append_results', type=bool, default=True, help='Append to master dataframe of results')
+    parser.add_argument('--gnn_model', type=bool, default=False, help='GNN Model')
     parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--model_keys', nargs='+', action='store',
                         default=DEFAULT_VALUES['model_keys'], 
