@@ -501,7 +501,7 @@ class Analysis(object):
             plot_eval_wm_results(df_results, self.args, plot_save_file)     
         if self.args.append_results:
             all_results_file = os.path.join(result_save_dir, 'all_results_'+self.args.eval_type+'.csv')
-            df_all_results = pd.read(all_results_file, index_col=0)
+            df_all_results = pd.read_csv(all_results_file, index_col=0)
             df_all_results = df_all_results.append(df_results)
             df_all_results.to_csv(all_results_File)
 
