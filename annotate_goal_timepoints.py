@@ -64,6 +64,8 @@ def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_locati
             event_conditions = []
             pos_inds = [data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
             trial_obj_pos = trial_x[:,pos_inds]
+            # check for and replace NaNs
+            trial_obj_pos = np.nan_to_num(trial_obj_pos, nan=0.0, posinf=0.0, neginf=0.0)
             # check that final location is different than initial location
             start_end_dist = distance.euclidean(trial_obj_pos[0,:], trial_obj_pos[-1,:])
             if start_end_dist > 1.0:
