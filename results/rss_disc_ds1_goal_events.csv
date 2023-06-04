@@ -1,0 +1,2 @@
+,model,score,MSE,epoch,dataset
+0,RSSM Continuous DS1,0.11203319502074689,,/mnt/fs2/locross/analysis/models/rssm_cont_h1024_l2_mlp1024/rssm_cont_h1024_l2_mlp1024_epoch3500,train_test_splits_3D_dataset.pkl
