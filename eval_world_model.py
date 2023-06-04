@@ -345,8 +345,8 @@ class Analysis(object):
             
         if hasattr(recon_matrices, 'requires_grad') and recon_matrices.requires_grad:
             recon_matrices = recon_matrices.detach().numpy()
-        
-        data_columns = get_data_columns(DATASET_NUMS[args.dataset]) 
+            
+        data_columns = self.data_columns 
         dims = ['x', 'y', 'z']
     
         num_trials = input_matrices.shape[0]
