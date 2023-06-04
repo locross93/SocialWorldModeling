@@ -1443,7 +1443,7 @@ class ReplayBufferEarly:
             np.random.seed(random_seed)
         episode_inds = np.random.choice(self.buffer_size, batch_size, replace=False)
         #episode_starts = np.random.randint(0, (self.episode_length - self.sequence_length)+1, size=batch_size)
-        episode_starts = np.random.randint(0, 300, size=batch_size)
+        episode_starts = np.random.randint(0, 100, size=batch_size)
         batch_trajs = []
         for i,ep_ind in enumerate(episode_inds):
             start = episode_starts[i]
