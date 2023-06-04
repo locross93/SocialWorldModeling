@@ -65,7 +65,7 @@ def plot_pickup_events(df_results, save_file):
     plt.show()
 
 def plot_eval_wm_results(df_results, args, save_file=None):
-    if args.eval_type == 'goal_events':
+    if args.eval_type == 'goal_events' or 'goal_events_level2':
         plot_goal_events(df_results, save_file)
     elif args.eval_type == 'multigoal_events':
         plot_multigoal_events(df_results, save_file)
@@ -90,6 +90,5 @@ def load_args():
         
 if __name__ == "__main__":    
     args = load_args()
-    print(os.path.join(args.results_dir, args.results_file))
     df_results = pd.read_csv(os.path.join(args.results_dir, args.results_file))
     plot_eval_wm_results(df_results, args, args.save_file)

@@ -18,3 +18,7 @@
 16,RSSM Discrete DS2,0.4075286415711948,2.199857234954834,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch7500,data_5_31_23.pkl
 17,RSSM Discrete DS3,0.044189852700491,2.392019271850586,/mnt/fs2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch4200,data_5_31_23.pkl
 18,RSSM Continuous Replay Early,0.14157119476268412,5.669225692749023,/mnt/fs2/locross/analysis/models/rssm_cont_replay_early/rssm_cont_replay_early_epoch800,data_5_31_23.pkl
+19,MP Replay Early,0.1260229132569558,2.105642318725586,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/mp_replay_early/mp_replay_early_epoch1400,data_5_31_23.pkl
+20,Transformer Iris Concat Pos Embd lr1e-4,0.2978723404255319,4.334659099578857,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/transformer_iris_concat_pos_embd_lr1e-4/transformer_iris_concat_pos_embd_lr1e-4_epoch25600,data_5_31_23.pkl
+21,MP 4096 DS3,0.03927986906710311,2.3567092418670654,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/mp_4096_ds3/mp_4096_ds3_epoch600,data_5_31_23.pkl
+22,MD 4096 DS3,0.0,2.0349977016448975,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/multistep_delta_ds3/multistep_delta_ds3_epoch800,data_5_31_23.pkl

@@ -98,7 +98,7 @@ class Analysis(object):
         return model
 
 
-    def eval_goal_events_in_rollouts(self, model, input_data) -> Dict[str, typing.Any]:
+    def eval_goal_events_in_rollouts(self, model, input_data, level=1) -> Dict[str, typing.Any]:
         if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
@@ -119,6 +119,15 @@ class Analysis(object):
             x = input_data[row,:,:].unsqueeze(0)
             # get the only pick up point in the trajectory
             steps2pickup = np.max(pickup_timepoints[row,:]).astype(int)
+            if level == 2:
+                # burn in to several frames before pick up point
+                if steps2pickup > 15:
+                    steps2pickup = steps2pickup - 10
+                elif steps2pickup > 10:
+                    steps2pickup = steps2pickup - 5
+                else:
+                    # TO DO - don't include trial if not enough burn in available
+                    steps2pickup = steps2pickup - 1
             # store the steps before pick up with real frames in imagined_trajs
             imagined_trajs[i,:steps2pickup,:] = x[:,:steps2pickup,:].cpu()
             # rollout model for the rest of the trajectory
@@ -451,7 +460,9 @@ class Analysis(object):
         result['Model'] = MODEL_DICT_VAL[model_key]['model_label']
 
         if self.args.eval_type == 'goal_events':
-            result = self.eval_goal_events_in_rollouts(model, self.input_data)            
+            result = self.eval_goal_events_in_rollouts(model, self.input_data)      
+        if self.args.eval_type == 'goal_events_level2':
+            result = self.eval_goal_events_in_rollouts(model, self.input_data, level=2) 
         elif self.args.eval_type == 'multigoal_events':
             result = self.eval_multigoal_events_in_rollouts(model, self.input_data)
         elif self.args.eval_type == 'move_events':
