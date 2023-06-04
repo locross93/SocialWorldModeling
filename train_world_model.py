@@ -21,7 +21,7 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 
 from analysis_utils import init_model_class
-from constants import DEFAULT_VALUES, MODEL_DICT_TRAIN
+from constants_lc import DEFAULT_VALUES, MODEL_DICT_TRAIN
 #from models import ReplayBuffer
 # temp
 from models import ReplayBufferEarly as ReplayBuffer
@@ -219,7 +219,10 @@ def main():
             val_loss = val_loss.item()
             loss_dict['val'].append(val_loss)
             # get MSE on validation data
-            val_mse = val_loss / val_trajs.numel()
+            if config['model_type'] == 'dreamerv2':
+                val_mse = model.recon_loss / val_trajs[:,-rollout_length:,:].numel()
+            else:
+                val_mse = val_loss / val_trajs[:,-rollout_length:,:].numel()
             loss_dict['val_mse'].append(val_mse)
         # log to tensorboard
         writer.add_scalar('Train Loss/loss', epoch_loss, epoch)
