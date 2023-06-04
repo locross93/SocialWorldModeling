@@ -1,5 +1,6 @@
-,model,score,MSE
-0,IMMA,0.0,2.3179032802581787
-1,GAT,0.540084388185654,4.093798637390137
-2,RFM,0.24050632911392406,26.20601463317871
-3,RFM RNN,0.02109704641350211,4.031430244445801
+,model,score,MSE,epoch,dataset
+0,Multistep Predictor DS3,0.3829787234042553,2.3980209827423096,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch4200,data_5_31_23.pkl
+1,Multistep Delta DS3,0.006546644844517185,2.286868095397949,/mnt/fs2/locross/analysis/models/multistep_delta_ds3/multistep_delta_ds3_epoch5600,data_5_31_23.pkl
+2,RSSM Continuous,0.027004909983633387,3.526322364807129,/mnt/fs2/locross/analysis/models/rssm_cont_ds2/rssm_cont_ds2_epoch2600,data_5_31_23.pkl
+3,RSSM Discrete DS2,0.4075286415711948,2.199857234954834,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch7500,data_5_31_23.pkl
+4,RSSM Discrete DS3,0.044189852700491,2.392019271850586,/mnt/fs2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch4200,data_5_31_23.pkl
