@@ -501,7 +501,7 @@ class Analysis(object):
         if self.args.append_results:
             all_results_file = os.path.join(result_save_dir, 'all_results_'+self.args.eval_type+'.csv')
             df_all_results = pd.read_csv(all_results_file, index_col=0)
-            df_all_results = df_all_results.concat(df_results)
+            df_all_results = pd.concat([df_all_results, df_results], ignore_index=True)
             df_all_results.to_csv(all_results_file)
 
 
