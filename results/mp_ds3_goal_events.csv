@@ -1,2 +1,0 @@
-,model,score,MSE,epoch,dataset
-0,Multistep Predictor DS3,0.09574468085106383,2.1988141536712646,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch2400,data_5_31_23.pkl
