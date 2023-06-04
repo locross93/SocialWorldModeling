@@ -22,7 +22,7 @@ MODEL_DICT_VAL=  {
     'rssm_disc': {
         'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
         'model_dir': 'rssm_disc_bi50_2', 'model_label': 'RSSM Discrete DS1'},
-    'rssm_disc': {
+    'rssm_cont': {
         'class': DreamerV2, 'config': 'rssm_cont_default_config.json', 
         'model_dir': 'rssm_cont_h1024_l2_mlp1024', 'model_label': 'RSSM Continuous DS1'},
     'multistep_pred': {
