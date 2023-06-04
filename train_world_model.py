@@ -21,8 +21,10 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 
 from analysis_utils import init_model_class
-from constants import DEFAULT_VALUES, MODEL_DICT_TRAIN
-from models import ReplayBuffer
+from constants_lc import DEFAULT_VALUES, MODEL_DICT_TRAIN
+#from models import ReplayBuffer
+# temp
+from models import ReplayBufferEarly as ReplayBuffer
 
 
 """Global variables"""
@@ -171,6 +173,7 @@ def main():
     loss_dict = {}
     loss_dict['train'] = []
     loss_dict['val'] = []
+    loss_dict['val_mse'] = []
     loss_dict['epoch_times'] = []
 
     if config['model_type'] == 'dreamerv2':
@@ -250,9 +253,16 @@ def main():
 
             val_loss = val_loss.item()
             loss_dict['val'].append(val_loss)
+            # get MSE on validation data
+            if config['model_type'] == 'dreamerv2':
+                val_mse = model.recon_loss.item() / val_trajs[:,-rollout_length:,:].numel()
+            else:
+                val_mse = val_loss / val_trajs[:,-rollout_length:,:].numel()
+            loss_dict['val_mse'].append(val_mse)
         # log to tensorboard
         writer.add_scalar('Train Loss/loss', epoch_loss, epoch)
         writer.add_scalar('Val Loss/val', val_loss, epoch)
+        writer.add_scalar('Val Loss/val_mse', val_mse, epoch)
         if config['model_type'] == 'dreamerv2':
             writer.add_scalar('Train_Loss/recon_loss', np.mean(batch_recon_loss), epoch)
             writer.add_scalar('Train_Loss/kl_loss', np.mean(batch_kl_loss), epoch)
@@ -274,7 +284,7 @@ def main():
                 training_info[key] = loss_dict[key]
             df_training = pd.DataFrame.from_dict(training_info)
             df_training.to_csv(os.path.join(save_dir, f'training_info_{model_filename}.csv'))
-        print(f'Epoch {epoch}, Train Loss {epoch_loss}, Validation Loss {val_loss}')
+        print(f'Epoch {epoch}, Train Loss {epoch_loss}, Validation MSE {val_mse}')
 
 
 if __name__ == '__main__':    

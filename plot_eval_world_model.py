@@ -90,5 +90,6 @@ def load_args():
         
 if __name__ == "__main__":    
     args = load_args()
+    print(os.path.join(args.results_dir, args.results_file))
     df_results = pd.read_csv(os.path.join(args.results_dir, args.results_file))
     plot_eval_wm_results(df_results, args, args.save_file)

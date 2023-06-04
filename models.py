@@ -1427,6 +1427,33 @@ class ReplayBuffer:
         trajectories = torch.stack(batch_trajs, dim=0)
         
         return trajectories
+
+
+class ReplayBufferEarly:
+    def __init__(self, sequence_length):
+        self.sequence_length = sequence_length
+
+    def upload_training_set(self, training_set):
+        self.buffer_size = training_set.size(0)
+        self.episode_length = training_set.size(1)
+        self.buffer = training_set
+        
+    def sample(self, batch_size, random_seed=None):
+        if random_seed is not None:
+            np.random.seed(random_seed)
+        episode_inds = np.random.choice(self.buffer_size, batch_size, replace=False)
+        #episode_starts = np.random.randint(0, (self.episode_length - self.sequence_length)+1, size=batch_size)
+        episode_starts = np.random.randint(0, 100, size=batch_size)
+        batch_trajs = []
+        for i,ep_ind in enumerate(episode_inds):
+            start = episode_starts[i]
+            end = start + self.sequence_length
+            traj_sample = self.buffer[ep_ind,start:end,:]
+            assert traj_sample.size(0) == self.sequence_length
+            batch_trajs.append(traj_sample)
+        trajectories = torch.stack(batch_trajs, dim=0)
+        
+        return trajectories
     
     
 class TransformerMSPredictor(nn.Module):

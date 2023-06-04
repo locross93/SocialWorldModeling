@@ -207,14 +207,6 @@ if __name__ == '__main__':
             min_values, max_values = exp_info_dict['min_max_values']
             velocity = any('vel' in s for s in data_columns)
             input_data = inverse_normalize(input_data, max_values.astype(np.float32), min_values.astype(np.float32), velocity)
-    
-    # input_data = input_data.numpy()
-    # min_values = np.min(input_data, axis=(0, 1))
-    # max_values = np.max(input_data, axis=(0, 1))
-    # ranges = max_values - min_values
-    # normalized_tensor = (input_data - min_values) / ranges
-    # input_data = inverse_normalize(normalized_tensor, max_values, min_values)
-    # input_data = torch.tensor(input_data)
             
     if args.trial_type == 'single_goal':
         traj_ind = single_goal_trajs[args.trial_num]
