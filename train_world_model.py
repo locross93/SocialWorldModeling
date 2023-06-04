@@ -220,7 +220,7 @@ def main():
             loss_dict['val'].append(val_loss)
             # get MSE on validation data
             if config['model_type'] == 'dreamerv2':
-                val_mse = model.recon_loss / val_trajs[:,-rollout_length:,:].numel()
+                val_mse = model.recon_loss.item() / val_trajs[:,-rollout_length:,:].numel()
             else:
                 val_mse = val_loss / val_trajs[:,-rollout_length:,:].numel()
             loss_dict['val_mse'].append(val_mse)
