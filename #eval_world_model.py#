@@ -141,6 +141,7 @@ class Analysis(object):
         pickup_subset = pickup_timepoints[single_goal_trajs,:]
         indices = np.argwhere(pickup_subset > -1)
         accuracy = np.mean(y_recon[indices[:,0],indices[:,1]])
+        print(np.where(accuracy == 1)[0])
         result = {'model': self.model_name, 'score': accuracy, 'MSE': mse}        
         return result
     
@@ -532,7 +533,7 @@ def load_args():
     parser.add_argument('--save_file', type=str,
                         default=None, 
                         help='Filename for saving model')
-    parser.add_argument('--append_results', type=int, default=1, help='Append to master dataframe of results')
+    parser.add_argument('--append_results', type=bool, default=True, help='Append to master dataframe of results')parser.add_argument('--append_results', type=int, default=1, help='Append to master dataframe of results')
     parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--model_keys', nargs='+', action='store',
                         default=DEFAULT_VALUES['model_keys'], 

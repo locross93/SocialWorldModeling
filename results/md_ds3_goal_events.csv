@@ -1,2 +1,2 @@
 ,model,score,MSE,epoch,dataset
-0,Multistep Delta DS3,0.0024549918166939444,2.137028217315674,/mnt/fs2/locross/analysis/models/multistep_delta_ds3/multistep_delta_ds3_epoch3600,data_5_31_23.pkl
+0,Multistep Predictor DS3,0.18085106382978725,2.055659294128418,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch3200,data_5_31_23.pkl
