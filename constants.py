@@ -70,7 +70,7 @@ MODEL_DICT_VAL=  {
         'class': MultistepPredictor, 'config': 'mp_4096_ds3_rnn_hidden_size_4096.json',
         'model_dir': 'mp_4096_ds3', 'model_label': 'MP 4096 DS3'},
     'md_4096_ds3': {
-        'class': MultistepPredictor, 'config': 'big_md.json',
+        'class': MultistepPredictor, 'config': 'multistep_delta_ds3_rnn_hidden_size_4096.json',
         'model_dir': 'multistep_delta_ds3', 'model_label': 'MD 4096 DS3'},
     'mp_replay_early': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
