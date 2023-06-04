@@ -94,7 +94,7 @@ DEFAULT_VALUES = {
     'epochs': int(3e4),
     'save_every': 200,
     # eval parameters
-    'model_keys': ['mp_4096_ds3', 'md_4096_ds3', 'mp_replay_early', 'trans_wm_replay_early', 'transformer_iris_concat_pos_embd_lr1e-4']
+    'model_keys': ['mp_4096_ds3', 'md_4096_ds3', 'mp_replay_early', 'trans_wm_replay_early', 'transformer_iris_concat_pos_embd_lr1e-4'],
     #'model_keys': list(MODEL_DICT_VAL.keys()),
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events'],
     'move_threshold': 4.0,
