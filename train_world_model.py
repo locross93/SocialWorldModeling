@@ -163,6 +163,7 @@ def main():
     loss_dict = {}
     loss_dict['train'] = []
     loss_dict['val'] = []
+    loss_dict['val_mse'] = []
     loss_dict['epoch_times'] = []
     if config['model_type'] == 'dreamerv2':
         loss_dict['recon_loss'] = []
