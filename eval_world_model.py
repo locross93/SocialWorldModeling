@@ -500,9 +500,12 @@ class Analysis(object):
             plot_eval_wm_results(df_results, self.args, plot_save_file)     
         if self.args.append_results:
             all_results_file = os.path.join(result_save_dir, 'all_results_'+self.args.eval_type+'.csv')
-            df_all_results = pd.read_csv(all_results_file, index_col=0)
-            df_all_results = pd.concat([df_all_results, df_results], ignore_index=True)
-            df_all_results.to_csv(all_results_file)
+            if os.path.exists(all_results_file):
+                df_all_results = pd.read_csv(all_results_file, index_col=0)
+                df_all_results = pd.concat([df_all_results, df_results], ignore_index=True)
+                df_all_results.to_csv(all_results_file)
+            else:
+                df_results.to_csv(all_results_file)
 
 
     def run(self) -> None:
