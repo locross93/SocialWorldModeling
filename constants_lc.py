@@ -85,6 +85,15 @@ MODEL_DICT_VAL=  {
     'rssm_disc_ds3': {
         'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
         'model_dir': 'rssm_disc_ds3', 'model_label': 'RSSM Discrete DS3'},
+    'mp_replay_early': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
+        'model_dir': 'mp_replay_early', 'model_label': 'MP Replay Early'},
+    'trans_wm_replay_early': {
+       'class': TransformerWorldModel, 'config': 'transformer_wm_ds2.json', 
+       'model_dir': 'transformer_wm_replay_early', 'model_label': 'Transformer WM Replay Early'},
+    'rssm_cont_ds3': {
+        'class': DreamerV2, 'config': 'rssm_cont_ds2.json', 
+        'model_dir': 'rssm_cont_replay_early', 'model_label': 'RSSM Continuous Replay Early'},
 }
 DEFAULT_VALUES = {
     'analysis_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/',
