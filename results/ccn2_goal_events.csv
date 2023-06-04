@@ -1,0 +1,6 @@
+,model,score,epoch,dataset
+0,Transformer WM Replay Early,0.3903436988543372,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/transformer_wm_replay_early/transformer_wm_replay_early_epoch11400,data_5_31_23.pkl
+1,MP Replay Early,0.37479541734860883,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/mp_replay_early/mp_replay_early_epoch4200,data_5_31_23.pkl
+2,Transformer Iris Concat Pos Embd lr1e-4,0.5368248772504092,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/transformer_iris_concat_pos_embd_lr1e-4/transformer_iris_concat_pos_embd_lr1e-4_epoch27800,data_5_31_23.pkl
+3,MP 4096 DS3,0.39689034369885434,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/mp_4096_ds3/mp_4096_ds3_epoch1000,data_5_31_23.pkl
+4,MD 4096 DS3,0.35842880523731585,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/multistep_delta_ds3/multistep_delta_ds3_epoch1000,data_5_31_23.pkl
