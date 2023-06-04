@@ -1,0 +1,2 @@
+,model,score,MSE,epoch,dataset
+0,MP Replay Early,0.057283142389525366,2.493995428085327,/mnt/fs2/locross/analysis/models/mp_replay_early/mp_replay_early_epoch5000,data_5_31_23.pkl

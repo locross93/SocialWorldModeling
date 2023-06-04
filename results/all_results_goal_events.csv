@@ -17,4 +17,6 @@
 15,RSSM Continuous,0.0270049099836333,3.526322364807129,/mnt/fs2/locross/analysis/models/rssm_cont_ds2/rssm_cont_ds2_epoch2600,data_5_31_23.pkl
 16,RSSM Discrete DS2,0.4075286415711948,2.199857234954834,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch7500,data_5_31_23.pkl
 17,RSSM Discrete DS3,0.044189852700491,2.392019271850586,/mnt/fs2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch4200,data_5_31_23.pkl
-18,RSSM Continuous Replay Early,0.14157119476268412,5.669225692749023,/mnt/fs2/locross/analysis/models/rssm_cont_replay_early/rssm_cont_replay_early_epoch800,data_5_31_23.pkl
+18,RSSM Continuous Replay Early,0.1415711947626841,5.669225692749023,/mnt/fs2/locross/analysis/models/rssm_cont_replay_early/rssm_cont_replay_early_epoch800,data_5_31_23.pkl
+19,MP Replay Early,0.0572831423895253,2.493995428085327,/mnt/fs2/locross/analysis/models/mp_replay_early/mp_replay_early_epoch5000,data_5_31_23.pkl
+20,Transformer WM Replay Early,0.004909983633387889,3.3123326301574707,/mnt/fs2/locross/analysis/models/transformer_wm_replay_early/transformer_wm_replay_early_epoch13600,data_5_31_23.pkl
