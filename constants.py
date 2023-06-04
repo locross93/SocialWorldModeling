@@ -53,7 +53,7 @@ MODEL_DICT_VAL=  {
         'model_dir': 'transformer_iris_concat_pos_embd_default', 'epoch': '29000', 'model_label': 'Transformer Iris Concat Pos Embd'},
     'transformer_iris_concat_pos_embd_lr1e-4': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'epoch': '29000', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
+        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
     'transformer_iris_concat_pos_embd_lr1e-5': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
         'model_dir': 'transformer_iris_concat_pos_embd_lr1e-5', 'epoch': '15000', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-5'},
@@ -77,7 +77,7 @@ MODEL_DICT_VAL=  {
         'model_dir': 'mp_replay_early', 'model_label': 'MP Replay Early'},
     'trans_wm_replay_early': {
        'class': TransformerWorldModel, 'config': 'transformer_wm_ds2.json', 
-       'model_dir': 'transformer_wm', 'model_label': 'Transformer WM Replay Early'},
+       'model_dir': 'transformer_wm_replay_early', 'model_label': 'Transformer WM Replay Early'},
 }
 
 DEFAULT_VALUES = {
@@ -94,7 +94,7 @@ DEFAULT_VALUES = {
     'epochs': int(3e4),
     'save_every': 200,
     # eval parameters
-    'model_keys': ['mp_4096_ds3', 'md_4096_ds3', 'mp_replay_early', 'trans_wm_replay_early', 'transformer_iris_concat_pos_embd_lr1e-4'],
+    'model_keys': [ 'trans_wm_replay_early', 'mp_replay_early', 'transformer_iris_concat_pos_embd_lr1e-4', 'mp_4096_ds3', 'md_4096_ds3',],
     #'model_keys': list(MODEL_DICT_VAL.keys()),
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events'],
     'move_threshold': 4.0,
