@@ -532,7 +532,7 @@ def load_args():
     parser.add_argument('--save_file', type=str,
                         default=None, 
                         help='Filename for saving model')
-    parser.add_argument('--append_results', type=bool, default=True, help='Append to master dataframe of results')
+    parser.add_argument('--append_results', type=int, default=1, help='Append to master dataframe of results')
     parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--model_keys', nargs='+', action='store',
                         default=DEFAULT_VALUES['model_keys'], 

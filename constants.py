@@ -66,6 +66,18 @@ MODEL_DICT_VAL=  {
     # 'imma': {
     #    'class': IMMA, 'config': 'imma_default_config.json', 
     #    'model_dir': 'imma', 'model_label': 'IMMA'},
+    'mp_4096_ds3': {
+        'class': MultistepPredictor, 'config': 'big_mp.json',
+        'model_dir': 'mp_4096_ds3', 'model_label': 'MP 4096 DS3'},
+    'md_4096_ds3': {
+        'class': MultistepPredictor, 'config': 'big_md.json',
+        'model_dir': 'multistep_delta_ds3', 'model_label': 'MD 4096 DS3'},
+    'mp_replay_early': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
+        'model_dir': 'mp_replay_early', 'model_label': 'MP Replay Early'},
+    'trans_wm_replay_early': {
+       'class': TransformerWorldModel, 'config': 'transformer_wm_ds2.json', 
+       'model_dir': 'transformer_wm', 'model_label': 'Transformer WM Replay Early'},
 }
 
 DEFAULT_VALUES = {
@@ -82,7 +94,8 @@ DEFAULT_VALUES = {
     'epochs': int(3e4),
     'save_every': 200,
     # eval parameters
-    'model_keys': list(MODEL_DICT_VAL.keys()),
+    'model_keys': ['mp_4096_ds3', 'md_4096_ds3', 'mp_replay_early', 'trans_wm_replay_early', 'transformer_iris_concat_pos_embd_lr1e-4']
+    #'model_keys': list(MODEL_DICT_VAL.keys()),
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,

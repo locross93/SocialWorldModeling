@@ -78,10 +78,13 @@ MODEL_DICT_VAL=  {
         'model_dir': 'mp_norm_vel', 'model_label': 'Multistep Predictor Norm Velocity'},
     'rssm_disc_ds2': {
         'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
-        'model_dir': 'rssm_ds2', 'model_label': 'RSSM Discrete'},
+        'model_dir': 'rssm_ds2', 'model_label': 'RSSM Discrete DS2'},
     'rssm_cont_ds2': {
         'class': DreamerV2, 'config': 'rssm_cont_ds2.json', 
         'model_dir': 'rssm_cont_ds2', 'model_label': 'RSSM Continuous'},
+    'rssm_disc_ds3': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
+        'model_dir': 'rssm_disc_ds3', 'model_label': 'RSSM Discrete DS3'},
 }
 DEFAULT_VALUES = {
     'analysis_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/',
@@ -98,7 +101,7 @@ DEFAULT_VALUES = {
     #'model_keys': list(MODEL_DICT_VAL.keys()),
     #'model_keys': ['multistep_pred'],
     #'model_keys': ['imma','gat','rfm','rfm_rnn'],
-    'model_keys': ['mp_ds2', 'rssm_disc_ds2', 'rssm_cont_ds2'],
+    'model_keys': ['mp_ds3', 'md_ds3', 'rssm_cont_ds2', 'rssm_disc_ds2', 'rssm_disc_ds3'],
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
