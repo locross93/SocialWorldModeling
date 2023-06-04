@@ -20,10 +20,10 @@ MODEL_DICT_VAL=  {
     #     'class': DreamerV2, 'config': 'rssm_cont_default_config.json', 
     #     'model_dir': 'rssm_cont_h1024_l2_mlp1024', 'model_label': 'RSSM Continuous'},
     'rssm_disc': {
-        'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
+        'class': DreamerV2, 'config': 'rssm_disc_ds1.json', 
         'model_dir': 'rssm_disc_bi50_2', 'model_label': 'RSSM Discrete DS1'},
     'rssm_cont': {
-        'class': DreamerV2, 'config': 'rssm_cont_default_config.json', 
+        'class': DreamerV2, 'config': 'rssm_cont_ds1.json', 
         'model_dir': 'rssm_cont_h1024_l2_mlp1024', 'model_label': 'RSSM Continuous DS1'},
     'multistep_pred': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json', 
