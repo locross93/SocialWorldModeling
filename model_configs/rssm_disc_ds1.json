@@ -1,9 +1,10 @@
 {
-  "input_size": 35,
+  "input_size": 23,
   "deter_size": 1024,
   "dec_hidden_size": 1024,
-  "rssm_type": "continuous",
+  "rssm_type": "discrete",
   "rnn_type": "GRU",
-  "stoch_size": 1024,
+  "category_size": 32,
+  "class_size": 32,
   "model_type": "dreamerv2"
 }
