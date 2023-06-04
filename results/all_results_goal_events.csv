@@ -8,4 +8,7 @@
 6,Multistep Delta,0.4481327800829875,3.306190252304077,/mnt/fs2/locross/analysis/models/multistep_delta_h1024_l2_mlp1024_l2/multistep_delta_h1024_l2_mlp1024_l2_epoch421000,train_test_splits_3D_dataset.pkl
 7,Multistep Predictor,0.3360995850622407,3.7660412788391113,/mnt/fs2/locross/analysis/models/multistep_predictor_ds1/multistep_predictor_ds1_epoch127000,train_test_splits_3D_dataset.pkl
 8,RSSM Discrete DS1,0.7136929460580913,2.1622567176818848,/mnt/fs2/locross/analysis/models/rssm_disc_bi50_2/rssm_disc_bi50_2_epoch8500,train_test_splits_3D_dataset.pkl
-9,RSSM Continuous DS1,0.11203319502074689,,/mnt/fs2/locross/analysis/models/rssm_cont_h1024_l2_mlp1024/rssm_cont_h1024_l2_mlp1024_epoch3500,train_test_splits_3D_dataset.pkl
+9,RSSM Continuous DS1,0.1120331950207468,,/mnt/fs2/locross/analysis/models/rssm_cont_h1024_l2_mlp1024/rssm_cont_h1024_l2_mlp1024_epoch3500,train_test_splits_3D_dataset.pkl
+10,Multistep Predictor DS3,0.1808510638297872,2.055659294128418,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch3200,data_5_31_23.pkl
+11,Multistep Predictor DS3,0.1808510638297872,2.055659294128418,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch3200,data_5_31_23.pkl
+12,Multistep Predictor Norm Velocity,0.0,0.02219598926603794,/mnt/fs2/locross/analysis/models/mp_norm_vel/mp_norm_vel_epoch3400,data_norm_velocity.pkl
