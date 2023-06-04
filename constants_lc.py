@@ -21,13 +21,16 @@ MODEL_DICT_VAL=  {
     #     'model_dir': 'rssm_cont_h1024_l2_mlp1024', 'model_label': 'RSSM Continuous'},
     'rssm_disc': {
         'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
-        'model_dir': 'rssm_disc', 'model_label': 'RSSM Discrete'},
+        'model_dir': 'rssm_disc_bi50_2', 'model_label': 'RSSM Discrete DS1'},
+    'rssm_disc': {
+        'class': DreamerV2, 'config': 'rssm_cont_default_config.json', 
+        'model_dir': 'rssm_cont_h1024_l2_mlp1024', 'model_label': 'RSSM Continuous DS1'},
     'multistep_pred': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json', 
-        'model_dir': 'multistep_predictor_ds1', 'model_label': 'Multistep Predictor'},
+        'model_dir': 'multistep_predictor_ds1', 'model_label': 'Multistep Predictor DS1'},
     'multistep_delta': {
         'class': MultistepDelta, 'config': 'multistep_delta_default_config.json', 
-        'model_dir': 'multistep_delta_h1024_l2_mlp1024_l2', 'model_label': 'Multistep Delta'},
+        'model_dir': 'multistep_delta_h1024_l2_mlp1024_l2', 'model_label': 'Multistep Delta DS1'},
     # 'transformer': {
     #     'class': TransformerMSPredictor, 'config': 'transformer_default_config.json', 
     #     'model_dir': 'transformer_mp', 'model_label': 'Transformer MP'},
