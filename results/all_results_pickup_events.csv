@@ -1,6 +1,7 @@
 ,model,score,epoch,dataset
 0,Multistep Predictor DS3,0.353518821603928,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch3400,data_5_31_23.pkl
 1,Multistep Delta DS3,0.3027823240589198,/mnt/fs2/locross/analysis/models/multistep_delta_ds3/multistep_delta_ds3_epoch4600,data_5_31_23.pkl
-2,RSSM Continuous,0.32569558101472995,/mnt/fs2/locross/analysis/models/rssm_cont_ds2/rssm_cont_ds2_epoch2200,data_5_31_23.pkl
+2,RSSM Continuous,0.3256955810147299,/mnt/fs2/locross/analysis/models/rssm_cont_ds2/rssm_cont_ds2_epoch2200,data_5_31_23.pkl
 3,RSSM Discrete DS2,0.5613747954173486,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch7000,data_5_31_23.pkl
-4,RSSM Discrete DS3,0.34615384615384615,/mnt/fs2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch3400,data_5_31_23.pkl
+4,RSSM Discrete DS3,0.3461538461538461,/mnt/fs2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch3400,data_5_31_23.pkl
+5,Transformer Iris Concat Pos Embd lr1e-4,0.6350245499181669,/mnt/fs2/locross/analysis/models/transformer_iris_concat_pos_embd_lr1e-4/transformer_iris_concat_pos_embd_lr1e-4_epoch28800,data_5_31_23.pkl
