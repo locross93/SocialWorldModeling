@@ -1,2 +1,6 @@
 ,model,score,MSE,epoch,dataset
-0,RSSM Discrete DS2,0.009819967266775777,2.2804768085479736,/Users/locro/Documents/Stanford/SocialWorldModeling/models\rssm_ds2\rssm_ds2_epoch7500,data_5_31_23.pkl
+0,RSSM Discrete DS2,0.2692307692307692,2.292414665222168,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch7500,data_5_31_23.pkl
+1,RSSM Continuous Replay Early,0.13175122749590834,5.43795108795166,/mnt/fs2/locross/analysis/models/rssm_cont_replay_early/rssm_cont_replay_early_epoch800,data_5_31_23.pkl
+2,Multistep Predictor DS3,0.41080196399345337,2.5596871376037598,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch4600,data_5_31_23.pkl
+3,Multistep Delta DS3,0.004091653027823241,2.2697386741638184,/mnt/fs2/locross/analysis/models/multistep_delta_ds3/multistep_delta_ds3_epoch6200,data_5_31_23.pkl
+4,Transformer Iris Concat Pos Embd lr1e-4,0.2635024549918167,4.210020065307617,/mnt/fs2/locross/analysis/models/transformer_iris_concat_pos_embd_lr1e-4/transformer_iris_concat_pos_embd_lr1e-4_epoch28800,data_5_31_23.pkl
