@@ -1438,22 +1438,47 @@ class ReplayBufferEarly:
         self.episode_length = training_set.size(1)
         self.buffer = training_set
         
+    # def sample(self, batch_size, random_seed=None):
+    #     if random_seed is not None:
+    #         np.random.seed(random_seed)
+    #     episode_inds = np.random.choice(self.buffer_size, batch_size, replace=False)
+    #     #episode_starts = np.random.randint(0, (self.episode_length - self.sequence_length)+1, size=batch_size)
+    #     episode_starts = np.random.randint(0, 100, size=batch_size)
+    #     batch_trajs = []
+    #     for i,ep_ind in enumerate(episode_inds):
+    #         start = episode_starts[i]
+    #         end = start + self.sequence_length
+    #         traj_sample = self.buffer[ep_ind,start:end,:]
+    #         assert traj_sample.size(0) == self.sequence_length
+    #         batch_trajs.append(traj_sample)
+    #     trajectories = torch.stack(batch_trajs, dim=0)
+        
+    #     return trajectories
+    
     def sample(self, batch_size, random_seed=None):
         if random_seed is not None:
             np.random.seed(random_seed)
         episode_inds = np.random.choice(self.buffer_size, batch_size, replace=False)
-        #episode_starts = np.random.randint(0, (self.episode_length - self.sequence_length)+1, size=batch_size)
-        episode_starts = np.random.randint(0, 100, size=batch_size)
+        # generate probabilities that decrease linearly from start to end of the episode
+        p = np.linspace(1, 0, (self.episode_length - self.sequence_length) + 1)
+        p = p / p.sum()  # normalize probabilities
+        episode_starts = np.random.choice(
+            np.arange(0, (self.episode_length - self.sequence_length) + 1), 
+            size=batch_size, 
+            replace=True, 
+            p=p  # use the generated probabilities
+        )
         batch_trajs = []
-        for i,ep_ind in enumerate(episode_inds):
+        for i, ep_ind in enumerate(episode_inds):
             start = episode_starts[i]
             end = start + self.sequence_length
-            traj_sample = self.buffer[ep_ind,start:end,:]
+            traj_sample = self.buffer[ep_ind, start:end, :]
             assert traj_sample.size(0) == self.sequence_length
             batch_trajs.append(traj_sample)
         trajectories = torch.stack(batch_trajs, dim=0)
-        
+    
         return trajectories
+
     
     
 class TransformerMSPredictor(nn.Module):
