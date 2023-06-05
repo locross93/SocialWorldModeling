@@ -168,6 +168,7 @@ class Analysis(object):
         imagined_trajs = np.zeros([num_multi_goal_trajs, input_data.shape[1], input_data.shape[2]])
         real_trajs = []
         imag_trajs = []
+        breakpoint()
         for i,row in enumerate(multi_goal_trajs):
             if i%50 == 0:
                 print(i)
@@ -461,7 +462,7 @@ class Analysis(object):
 
         if self.args.eval_type == 'goal_events':
             result = self.eval_goal_events_in_rollouts(model, self.input_data)      
-        if self.args.eval_type == 'goal_events_level2':
+        elif self.args.eval_type == 'goal_events_level2':
             result = self.eval_goal_events_in_rollouts(model, self.input_data, level=2) 
         elif self.args.eval_type == 'multigoal_events':
             result = self.eval_multigoal_events_in_rollouts(model, self.input_data)

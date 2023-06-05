@@ -36,7 +36,7 @@ def load_args():
                          default=DEFAULT_VALUES['data_dir'], 
                          help='Data directory')
     parser.add_argument('--dataset', type=str,
-                         default='dataset_5_25_23.pkl', 
+                         default='data_5_31_23.pkl', 
                          help='Dataset name')
     parser.add_argument('--checkpoint_dir', type=str, 
                         default=DEFAULT_VALUES['checkpoint_dir'], 
@@ -59,7 +59,7 @@ def load_config(file):
         config = json.load(f)
     return config
 
-def make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_columns):
+def make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_columns, burn_in_length):
     # ie subplot_dims = (3,3)
     fig, ax = plt.subplots(subplot_dims[0], subplot_dims[1], figsize=(15, 15))
     colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
@@ -74,7 +74,10 @@ def make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_colu
         
         ax[row, col].set_xlim(-7, 7)
         ax[row, col].set_ylim(-7, 7)
-        ax[row, col].set_title('Frame: '+str(step))
+        if step <= burn_in_length:
+            ax[row, col].set_title('Burn-in: Frame: '+str(step))
+        else:
+            ax[row, col].set_title('Rollout: Frame: '+str(step))
         
         # plot real trajectory
         for obj_num in range(3):
@@ -101,6 +104,11 @@ def make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_colu
             x_ind = data_columns.index('agent'+str(agent_num)+'_x')
             z_ind = data_columns.index('agent'+str(agent_num)+'_z')
             ax[row, col].plot(x_pred[step,x_ind], x_pred[step,z_ind], marker='^', markersize=16, markerfacecolor=color, markeredgecolor=color, alpha=0.5)
+    
+        if step <= burn_in_length:
+            for spine in ax[row, col].spines.values():
+                spine.set_edgecolor('red')
+                spine.set_linewidth(2.5)
     # save
     plt.savefig(save_file, dpi=300)
     
@@ -255,7 +263,7 @@ if __name__ == '__main__':
         num_frames = x_true.shape[0]
         num_steps = subplot_dims[0] * subplot_dims[1]
         steps = np.linspace(0, num_frames-1, num_steps, endpoint=True).astype(int)
-        fig, ax = make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_columns)
+        fig, ax = make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_columns, burn_in_length)
     
     # make video - compare real and reconstructed traj side by side
     if args.make_video:

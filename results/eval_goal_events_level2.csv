@@ -1,0 +1,2 @@
+,model,score,MSE,epoch,dataset
+0,RSSM Discrete DS2,0.009819967266775777,2.2804768085479736,/Users/locro/Documents/Stanford/SocialWorldModeling/models\rssm_ds2\rssm_ds2_epoch7500,data_5_31_23.pkl
