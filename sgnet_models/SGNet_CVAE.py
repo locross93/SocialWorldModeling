@@ -209,8 +209,7 @@ class SGNet_CVAE(nn.Module):
     
     def forward_rollout(self, x, enc_steps, dec_steps):
         self.enc_steps = enc_steps
-        self.dec_steps = dec_steps
-        print('enc_steps: {}, dec_steps: {}'.format(self.enc_steps, self.dec_steps))
+        self.dec_steps = dec_steps        
         # this will produce the K trajectories with different probabilities
         all_goal_traj, cvae_dec_traj, KLD_loss, total_probabilities = self(x, training=False)
         # max prob index out of the K trajectories
