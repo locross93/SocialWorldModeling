@@ -30,13 +30,13 @@ MODEL_DICT_VAL=  {
     #     'model_dir': 'sgnet_cvae_default_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H512'},
     # 'sgnet_cvae_hidden64_lr1e-4': {
     #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
-    #     'model_dir': 'sgnet_cvae_hidden_size64_lr1e04', 'epoch': '200', 'model_label': 'SGNet-H64'},
+    #     'model_dir': 'sgnet_cvae_hidden_size64_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H64'},
     # 'sgnet_cvae_hidden128_lr1e-4': {
     #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size128_config.json',
-    #     'model_dir': 'sgnet_cvae_hidden_size128_lr1e04', 'epoch': '200', 'model_label': 'SGNet-H128'},
+    #     'model_dir': 'sgnet_cvae_hidden_size128_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H128'},
     # 'sgnet_cvae_hidden256_lr1e-4': {
     #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
-    #     'model_dir': 'sgnet_cvae_hidden_size256_lr1e04', 'epoch': '200', 'model_label': 'SGNet-H256'},
+    #     'model_dir': 'sgnet_cvae_hidden_size256_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H256'},
     # 'agent_former': {
     #     'class': AgentFormer, 'config': 'agent_former_default_config.json',
     #     'model_dir': 'agent_former_default', 'epoch': '200', 'model_label': 'AgentFormer'},
@@ -148,15 +148,15 @@ MODEL_DICT_VAL=  {
     #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2.json',
     #     'model_dir': 'multistep_delta_ds3_mlp_lr3e-5', 'model_label': 'MD D3 lr3e-5'},
 
-    'iris_vel_lr1e-4': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_input_size_70_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_input_size_70_lr1e-4', 'model_label': 'Iris Vel lr1e-4'},
-    'iris_vel_lr3e-4': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_input_size_70_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_input_size_70_lr3e-4', 'model_label': 'Iris Vel lr3e-4'},
-    'iris_vel_lr1e-5': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_input_size_70_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_input_size_70_lr3e-5', 'model_label': 'Iris Vel lr3e-5'},
+    # 'iris_vel_lr1e-4': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_input_size_70_config.json',
+    #     'model_dir': 'transformer_iris_concat_pos_embd_input_size_70_lr1e-4', 'model_label': 'Iris Vel lr1e-4'},
+    # 'iris_vel_lr3e-4': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_input_size_70_config.json',
+    #     'model_dir': 'transformer_iris_concat_pos_embd_input_size_70_lr3e-4', 'model_label': 'Iris Vel lr3e-4'},
+    # 'iris_vel_lr1e-5': {
+    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_input_size_70_config.json',
+    #     'model_dir': 'transformer_iris_concat_pos_embd_input_size_70_lr3e-5', 'model_label': 'Iris Vel lr3e-5'},
     # 'iris_norm_lr1e-4': {
     #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_norm_config.json',
     #     'model_dir': 'transformer_iris_concat_pos_embd_norm_lr1e-4', 'model_label': 'Iris Norm lr1e-4'},
