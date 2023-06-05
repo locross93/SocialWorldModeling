@@ -1,6 +1,6 @@
 ,model,score,MSE,epoch,dataset
-0,RSSM Discrete DS2,0.22176759410801963,2.2984323501586914,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch8500,data_5_31_23.pkl
-1,RSSM Discrete DS3,0.07610474631751228,2.272528648376465,/mnt/fs2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch5800,data_5_31_23.pkl
-2,RSSM Continuous Replay Early,0.1579378068739771,5.45341682434082,/mnt/fs2/locross/analysis/models/rssm_cont_replay_early/rssm_cont_replay_early_epoch800,data_5_31_23.pkl
-3,Multistep Predictor DS3,0.4001636661211129,2.477710247039795,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch5800,data_5_31_23.pkl
-4,Multistep Delta DS3,0.004909983633387889,2.3532655239105225,/mnt/fs2/locross/analysis/models/multistep_delta_ds3/multistep_delta_ds3_epoch8000,data_5_31_23.pkl
+0,RSSM Discrete DS2,0.2430441898527005,2.2942817211151123,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch8500,data_5_31_23.pkl
+1,RSSM Discrete DS3,0.058919803600654665,2.2776687145233154,/mnt/fs2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch5800,data_5_31_23.pkl
+2,RSSM Continuous Replay Early,0.13829787234042554,5.479874610900879,/mnt/fs2/locross/analysis/models/rssm_cont_replay_early/rssm_cont_replay_early_epoch800,data_5_31_23.pkl
+3,Multistep Predictor DS3,0.3739770867430442,2.6131179332733154,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch5800,data_5_31_23.pkl
+4,Multistep Delta DS3,0.0032733224222585926,2.3467886447906494,/mnt/fs2/locross/analysis/models/multistep_delta_ds3/multistep_delta_ds3_epoch8000,data_5_31_23.pkl
