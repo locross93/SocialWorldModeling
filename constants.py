@@ -78,6 +78,24 @@ MODEL_DICT_VAL=  {
     'trans_wm_replay_early': {
        'class': TransformerWorldModel, 'config': 'transformer_wm_ds2.json', 
        'model_dir': 'transformer_wm_replay_early', 'model_label': 'Transformer WM Replay Early'},
+    'rssm_disc_ds2': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
+        'model_dir': 'rssm_ds2', 'model_label': 'RSSM Discrete DS2'},
+    'rssm_disc_ds3': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
+        'model_dir': 'rssm_disc_ds3', 'model_label': 'RSSM Discrete DS3'},
+    'rssm_cont_ds3': {
+        'class': DreamerV2, 'config': 'rssm_cont_ds2.json', 
+        'model_dir': 'rssm_cont_replay_early', 'model_label': 'RSSM Continuous Replay Early'},
+    'transformer_iris': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
+        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
+    'mp_ds3': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
+        'model_dir': 'mp_ds3', 'model_label': 'Multistep Predictor DS3'},
+    'md_ds3': {
+        'class': MultistepDelta, 'config': 'multistep_delta_ds2.json',
+        'model_dir': 'multistep_delta_ds3', 'model_label': 'Multistep Delta DS3'},
 }
 
 DEFAULT_VALUES = {
@@ -94,7 +112,8 @@ DEFAULT_VALUES = {
     'epochs': int(3e4),
     'save_every': 200,
     # eval parameters
-    'model_keys': [ 'trans_wm_replay_early', 'mp_replay_early', 'transformer_iris_concat_pos_embd_lr1e-4', 'mp_4096_ds3', 'md_4096_ds3',],
+    'model_keys': ['rssm_disc_ds2', 'rssm_disc_ds3', 'rssm_cont_ds3', 'mp_ds3', 'md_ds3', 'transformer_iris'],
+    #'model_keys': [ 'trans_wm_replay_early', 'mp_replay_early', 'transformer_iris_concat_pos_embd_lr1e-4', 'mp_4096_ds3', 'md_4096_ds3',],
     #'model_keys': list(MODEL_DICT_VAL.keys()),
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events'],
     'move_threshold': 4.0,

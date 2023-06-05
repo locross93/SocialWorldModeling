@@ -51,7 +51,7 @@ def load_args():
     parser.add_argument('--burn_in_length', type=int, default=50, help='Burn in length when trial type == all')
     # which visualizations
     parser.add_argument('--plot_traj_subplots', type=bool, default=True, help='Make subplot of true vs predicted trajectory')
-    parser.add_argument('--make_video', type=bool, default=True, help='Make video - compare real and reconstructed traj side by side')
+    parser.add_argument('--make_video', type=int, default=1, help='Make video - compare real and reconstructed traj side by side')
     return parser.parse_args()
 
 def load_config(file):
@@ -104,7 +104,11 @@ def make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_colu
             x_ind = data_columns.index('agent'+str(agent_num)+'_x')
             z_ind = data_columns.index('agent'+str(agent_num)+'_z')
             ax[row, col].plot(x_pred[step,x_ind], x_pred[step,z_ind], marker='^', markersize=16, markerfacecolor=color, markeredgecolor=color, alpha=0.5)
-    
+            
+        # remove x and y tick labels
+        ax[row, col].set_xticks([])
+        ax[row, col].set_yticks([])
+
         if step <= burn_in_length:
             for spine in ax[row, col].spines.values():
                 spine.set_edgecolor('red')
@@ -263,6 +267,7 @@ if __name__ == '__main__':
         num_frames = x_true.shape[0]
         num_steps = subplot_dims[0] * subplot_dims[1]
         steps = np.linspace(0, num_frames-1, num_steps, endpoint=True).astype(int)
+        steps = np.linspace(0, 56, num_steps, endpoint=True).astype(int)
         fig, ax = make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_columns, burn_in_length)
     
     # make video - compare real and reconstructed traj side by side
