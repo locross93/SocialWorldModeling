@@ -51,7 +51,7 @@ class SGNet_CVAE(nn.Module):
         # This doesn't have to instatiate unless it's training
         if "enc_steps" in config:
             self.enc_steps = config["enc_steps"] # observation step
-        if "dec_step" in config:            
+        if "dec_steps" in config:            
             self.dec_steps = config["dec_steps"] # prediction step
         self.dropout = config["dropout"]
         self.feature_extractor = nn.Sequential(nn.Linear(self.input_dim, self.hidden_size),
