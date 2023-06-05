@@ -1,6 +1,13 @@
 ,model,g2_acc,g2_goal_num,g2_mse,g3_acc,g3_goal_num,g3_mse,epoch,dataset
-0,Multistep Predictor DS3,0.20041753653444677,2nd Goal,2.898799180984497,0.10647181628392484,3rd Goal,2.898799180984497,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch3400,data_5_31_23.pkl
-1,Multistep Delta DS3,0.18580375782881003,2nd Goal,2.7272236347198486,0.07515657620041753,3rd Goal,2.7272236347198486,/mnt/fs2/locross/analysis/models/multistep_delta_ds3/multistep_delta_ds3_epoch4600,data_5_31_23.pkl
-2,RSSM Continuous,0.018789144050104383,2nd Goal,4.253047466278076,0.018789144050104383,3rd Goal,4.253047466278076,/mnt/fs2/locross/analysis/models/rssm_cont_ds2/rssm_cont_ds2_epoch2000,data_5_31_23.pkl
-3,RSSM Discrete DS2,0.4091858037578288,2nd Goal,3.1815195083618164,0.031315240083507306,3rd Goal,3.1815195083618164,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch7000,data_5_31_23.pkl
-4,RSSM Discrete DS3,0.05010438413361169,2nd Goal,3.414088010787964,0.05845511482254697,3rd Goal,3.414088010787964,/mnt/fs2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch3400,data_5_31_23.pkl
+0,Multistep Predictor DS3,0.2004175365344467,2nd Goal,2.898799180984497,0.1064718162839248,3rd Goal,2.898799180984497,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch3400,data_5_31_23.pkl
+1,Multistep Delta DS3,0.18580375782881,2nd Goal,2.7272236347198486,0.0751565762004175,3rd Goal,2.7272236347198486,/mnt/fs2/locross/analysis/models/multistep_delta_ds3/multistep_delta_ds3_epoch4600,data_5_31_23.pkl
+2,RSSM Continuous,0.0187891440501043,2nd Goal,4.253047466278076,0.0187891440501043,3rd Goal,4.253047466278076,/mnt/fs2/locross/analysis/models/rssm_cont_ds2/rssm_cont_ds2_epoch2000,data_5_31_23.pkl
+3,RSSM Discrete DS2,0.4091858037578288,2nd Goal,3.1815195083618164,0.0313152400835073,3rd Goal,3.1815195083618164,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch7000,data_5_31_23.pkl
+4,RSSM Discrete DS3,0.0501043841336116,2nd Goal,3.414088010787964,0.0584551148225469,3rd Goal,3.414088010787964,/mnt/fs2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch3400,data_5_31_23.pkl
+5,RSSM Discrete DS2,0.4029227557411273,2nd Goal,3.1725471019744877,0.0271398747390396,3rd Goal,3.1725471019744877,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch8500,data_5_31_23.pkl
+6,RSSM Discrete DS3,0.1064718162839248,2nd Goal,3.311936855316162,0.0626304801670146,3rd Goal,3.311936855316162,/mnt/fs2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch6000,data_5_31_23.pkl
+7,RSSM Continuous Replay Early,0.1524008350730689,2nd Goal,6.192656993865967,0.1189979123173277,3rd Goal,6.192656993865967,/mnt/fs2/locross/analysis/models/rssm_cont_replay_early/rssm_cont_replay_early_epoch800,data_5_31_23.pkl
+8,Multistep Predictor DS3,0.2985386221294363,2nd Goal,2.7946910858154297,0.1461377870563674,3rd Goal,2.7946910858154297,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch6000,data_5_31_23.pkl
+9,Multistep Delta DS3,0.1899791231732776,2nd Goal,2.8547322750091557,0.068893528183716,3rd Goal,2.8547322750091557,/mnt/fs2/locross/analysis/models/multistep_delta_ds3/multistep_delta_ds3_epoch8200,data_5_31_23.pkl
+10,Transformer Iris Concat Pos Embd lr1e-4,0.3695198329853862,2nd Goal,4.754807472229004,0.3152400835073068,3rd Goal,4.754807472229004,/mnt/fs2/locross/analysis/models/transformer_iris_concat_pos_embd_lr1e-4/transformer_iris_concat_pos_embd_lr1e-4_epoch28800,data_5_31_23.pkl
+11,RSSM Continuous Replay Early,0.18580375782881003,2nd Goal,3.9541804790496826,0.21920668058455114,3rd Goal,3.9541804790496826,/mnt/fs2/locross/analysis/models/rssm_cont_replay_early/rssm_cont_replay_early_epoch2000,data_5_31_23.pkl

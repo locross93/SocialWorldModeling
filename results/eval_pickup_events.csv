@@ -1,2 +1,2 @@
 ,model,score,epoch,dataset
-0,Transformer Iris Concat Pos Embd lr1e-4,0.6350245499181669,/mnt/fs2/locross/analysis/models/transformer_iris_concat_pos_embd_lr1e-4/transformer_iris_concat_pos_embd_lr1e-4_epoch28800,data_5_31_23.pkl
+0,RSSM Continuous Replay Early,0.3150572831423895,/mnt/fs2/locross/analysis/models/rssm_cont_replay_early/rssm_cont_replay_early_epoch2000,data_5_31_23.pkl

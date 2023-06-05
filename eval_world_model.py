@@ -164,12 +164,11 @@ class Analysis(object):
             pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
             multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
             
-        breakpoint()
         num_multi_goal_trajs = len(multi_goal_trajs)
         imagined_trajs = np.zeros([num_multi_goal_trajs, input_data.shape[1], input_data.shape[2]])
         real_trajs = []
         imag_trajs = []
-        breakpoint()
+        
         for i,row in enumerate(multi_goal_trajs):
             if i%50 == 0:
                 print(i)
