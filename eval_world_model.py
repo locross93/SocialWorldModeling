@@ -40,7 +40,7 @@ class Analysis(object):
         self.args = args
 
     def load_data(self) -> None:
-        if self.args.dataset == 'train_test_splits_3D_dataset.pkl':
+        if self.args.dataset == 'train_test_splits_3D_dataset.pkl' or self.args.dataset == 'data_norm_velocity.pkl':
             self.ds_num = 1
         else:
             self.ds_num = 2
@@ -164,6 +164,7 @@ class Analysis(object):
             pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
             multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
             
+        breakpoint()
         num_multi_goal_trajs = len(multi_goal_trajs)
         imagined_trajs = np.zeros([num_multi_goal_trajs, input_data.shape[1], input_data.shape[2]])
         real_trajs = []

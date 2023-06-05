@@ -113,7 +113,7 @@ DEFAULT_VALUES = {
     #'model_keys': list(MODEL_DICT_VAL.keys()),
     #'model_keys': ['multistep_pred'],
     #'model_keys': ['imma','gat','rfm','rfm_rnn'],
-    'model_keys': ['rssm_disc_ds2', 'rssm_cont_ds3', 'mp_ds3', 'md_ds3', 'transformer_iris'],
+    'model_keys': ['rssm_disc_ds2', 'rssm_disc_ds3', 'rssm_cont_ds3', 'mp_ds3', 'md_ds3'],
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'goal_events_level2'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
