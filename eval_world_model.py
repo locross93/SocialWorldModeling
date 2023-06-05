@@ -122,7 +122,7 @@ class Analysis(object):
             if level == 2:
                 # burn in to several frames before pick up point
                 if steps2pickup > 15:
-                    steps2pickup = steps2pickup - 10
+                    steps2pickup = steps2pickup - 15
                 elif steps2pickup > 10:
                     steps2pickup = steps2pickup - 5
                 else:
