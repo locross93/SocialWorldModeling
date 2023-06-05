@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-#from .feature_extractor import build_feature_extractor
+from einops import rearrange
 from .bitrap_np import BiTraPNP
 import torch.nn.functional as F
 
@@ -48,8 +48,11 @@ class SGNet_CVAE(nn.Module):
         self.cvae = BiTraPNP(config)
         self.input_dim = config["obs_size"]
         self.hidden_size = config["hidden_size"] # GRU hidden size
-        self.enc_steps = config["enc_steps"] # observation step
-        self.dec_steps = config["dec_steps"] # prediction step
+        # This doesn't have to instatiate unless it's training
+        if "enc_steps" in config:
+            self.enc_steps = config["enc_steps"] # observation step
+        if "dec_step" in config:            
+            self.dec_steps = config["dec_steps"] # prediction step
         self.dropout = config["dropout"]
         self.feature_extractor = nn.Sequential(nn.Linear(self.input_dim, self.hidden_size),
                                               nn.ReLU(inplace=True))
@@ -203,3 +206,14 @@ class SGNet_CVAE(nn.Module):
             'kld_loss': kld_loss.cpu().detach().numpy()
         }
         return total_loss, loss_dict
+    
+    def forward_rollout(self, x, enc_steps, dec_steps):
+        self.enc_steps = enc_steps
+        self.dec_steps = dec_steps
+        print('enc_steps: {}, dec_steps: {}'.format(self.enc_steps, self.dec_steps))
+        # this will produce the K trajectories with different probabilities
+        all_goal_traj, cvae_dec_traj, KLD_loss, total_probabilities = self(x, training=False)
+        # max prob index out of the K trajectories
+        max_prob_idx = total_probabilities.mean(dim=1).argmax().item()        
+        rollouts = cvae_dec_traj[0, -1, :, max_prob_idx, :]
+        return rollouts

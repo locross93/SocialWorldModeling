@@ -25,9 +25,18 @@ MODEL_DICT_TRAIN = {
 }
 """Values for validation"""
 MODEL_DICT_VAL=  {
-    'sgnet_cvae': {
+    'sgnet_cvae_lr1e-4': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
-        'model_dir': 'sgnet_cvae_lr1e-5', 'epoch': '3000', 'model_label': 'SGNet CVAE'},
+        'model_dir': 'sgnet_cvae_default_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H512'},
+    'sgnet_cvae_hidden64_lr1e-4': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
+        'model_dir': 'sgnet_cvae_hidden_size64_lr1e04', 'epoch': '200', 'model_label': 'SGNet-H64'},
+    'sgnet_cvae_hidden128_lr1e-4': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size128_config.json',
+        'model_dir': 'sgnet_cvae_hidden_size128_lr1e04', 'epoch': '200', 'model_label': 'SGNet-H128'},
+    'sgnet_cvae_hidden256_lr1e-4': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
+        'model_dir': 'sgnet_cvae_hidden_size256_lr1e04', 'epoch': '200', 'model_label': 'SGNet-H256'},
     # 'agent_former': {
     #     'class': AgentFormer, 'config': 'agent_former_default_config.json',
     #     'model_dir': 'agent_former_default', 'epoch': '200', 'model_label': 'AgentFormer'},
@@ -80,18 +89,18 @@ MODEL_DICT_VAL=  {
     # 'imma': {
     #    'class': IMMA, 'config': 'imma_default_config.json', 
     #    'model_dir': 'imma', 'model_label': 'IMMA'},
-    'mp_4096_ds3': {
-        'class': MultistepPredictor, 'config': 'mp_4096_ds3_rnn_hidden_size_4096.json',
-        'model_dir': 'mp_4096_ds3', 'model_label': 'MP 4096 DS3'},
-    'md_4096_ds3': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds3_rnn_hidden_size_4096.json',
-        'model_dir': 'multistep_delta_ds3', 'model_label': 'MD 4096 DS3'},
-    'mp_replay_early': {
-        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
-        'model_dir': 'mp_replay_early', 'model_label': 'MP Replay Early'},
-    'trans_wm_replay_early': {
-       'class': TransformerWorldModel, 'config': 'transformer_wm_ds2.json', 
-       'model_dir': 'transformer_wm_replay_early', 'model_label': 'Transformer WM Replay Early'},
+    # 'mp_4096_ds3': {
+    #     'class': MultistepPredictor, 'config': 'mp_4096_ds3_rnn_hidden_size_4096.json',
+    #     'model_dir': 'mp_4096_ds3', 'model_label': 'MP 4096 DS3'},
+    # 'md_4096_ds3': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds3_rnn_hidden_size_4096.json',
+    #     'model_dir': 'multistep_delta_ds3', 'model_label': 'MD 4096 DS3'},
+    # 'mp_replay_early': {
+    #     'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
+    #     'model_dir': 'mp_replay_early', 'model_label': 'MP Replay Early'},
+    # 'trans_wm_replay_early': {
+    #    'class': TransformerWorldModel, 'config': 'transformer_wm_ds2.json', 
+    #    'model_dir': 'transformer_wm_replay_early', 'model_label': 'Transformer WM Replay Early'},
 }
 data_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/data/'
 checkpoint_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/'
@@ -110,8 +119,8 @@ DEFAULT_VALUES = {
     'epochs': int(3e4),
     'save_every': 200,
     # eval parameters
-    'model_keys': [ 'trans_wm_replay_early', 'mp_replay_early', 'transformer_iris_concat_pos_embd_lr1e-4', 'mp_4096_ds3', 'md_4096_ds3',],
-    #'model_keys': list(MODEL_DICT_VAL.keys()),
+    #'model_keys': [ 'trans_wm_replay_early', 'mp_replay_early', 'transformer_iris_concat_pos_embd_lr1e-4', 'mp_4096_ds3', 'md_4096_ds3',],
+    'model_keys': list(MODEL_DICT_VAL.keys()),
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,

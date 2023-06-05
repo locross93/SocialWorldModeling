@@ -71,12 +71,12 @@ class Analysis(object):
         Load the trained model from the checkpoint directory
         """
         model_info = MODEL_DICT_VAL[model_key]
-        self.model_name = model_info['model_label']
+        self.model_name = model_info['model_label']        
         # set device, this assumes only one gpu is available to the script
         DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
         setattr(args, 'device', DEVICE)
         config_file = os.path.join(self.args.model_config_dir, model_info['config'])
-        config = load_config(config_file)
+        config = load_config(config_file)        
         model = init_model_class(config, args)
             
         # load checkpoint weights
@@ -96,7 +96,6 @@ class Analysis(object):
         model.eval()
         model.to(DEVICE)
         return model
-
 
 
     def eval_goal_events_in_rollouts(self, model, input_data) -> Dict[str, typing.Any]:
@@ -289,7 +288,7 @@ class Analysis(object):
             # store the steps of burn in with real frames in imagined_trajs
             imagined_trajs[i,:burn_in_length,:] = x[:,:burn_in_length,:].cpu()
             # rollout model for the rest of the trajectory
-            rollout_length = self.num_timepoints - burn_in_length
+            rollout_length = self.num_timepoints - burn_in_length            
             if x.dtype == torch.float64:
                 x = x.float()
             rollout_x = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu().detach()
