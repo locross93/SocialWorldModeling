@@ -139,13 +139,13 @@ MODEL_DICT_VAL=  {
     #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_512.json',
     #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_512_lr3e-5', 'model_label': 'MD 512 D3 lr3e-5'},    
     # 'md_d3_lr1e-4': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp.json',
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2.json',
     #     'model_dir': 'multistep_delta_ds3_mlp_lr1e-4', 'model_label': 'MD D3 lr1e-4'},
     # 'md_d3_lr3e-4': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp.json',
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2.json',
     #     'model_dir': 'multistep_delta_ds3_mlp_lr3e-4', 'model_label': 'MD D3 lr3e-4'},
     # 'md_d3_lr3e-5': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp.json',
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2.json',
     #     'model_dir': 'multistep_delta_ds3_mlp_lr3e-5', 'model_label': 'MD D3 lr3e-5'},
 
     'iris_vel_lr1e-4': {
