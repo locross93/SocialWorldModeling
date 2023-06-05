@@ -215,5 +215,5 @@ class SGNet_CVAE(nn.Module):
         all_goal_traj, cvae_dec_traj, KLD_loss, total_probabilities = self(x, training=False)
         # max prob index out of the K trajectories
         max_prob_idx = total_probabilities.mean(dim=1).argmax().item()        
-        rollouts = cvae_dec_traj[0, -1, :, max_prob_idx, :]
+        rollouts = cvae_dec_traj[:, -1, :, max_prob_idx, :]
         return rollouts
