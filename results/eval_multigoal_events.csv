@@ -1,5 +1,2 @@
 ,model,g2_acc,g2_goal_num,g2_mse,g3_acc,g3_goal_num,g3_mse,epoch,dataset
-0,SGNet-H512,0.19148936170212766,2nd Goal,3.18068790435791,0.10638297872340426,3rd Goal,3.18068790435791,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default_lr1e-4/sgnet_cvae_default_lr1e-4_epoch600,data_5_31_23.pkl
-1,SGNet-H64,0.0,2nd Goal,3.550638198852539,0.0425531914893617,3rd Goal,3.550638198852539,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size64_lr1e-4/sgnet_cvae_hidden_size64_lr1e-4_epoch600,data_5_31_23.pkl
-2,SGNet-H128,0.06382978723404255,2nd Goal,3.520946741104126,0.0425531914893617,3rd Goal,3.520946741104126,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size128_lr1e-4/sgnet_cvae_hidden_size128_lr1e-4_epoch600,data_5_31_23.pkl
-3,SGNet-H256,0.14893617021276595,2nd Goal,3.2460315227508545,0.0851063829787234,3rd Goal,3.2460315227508545,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size256_lr1e-4/sgnet_cvae_hidden_size256_lr1e-4_epoch800,data_5_31_23.pkl
+0,SGNet-H512,0.1702127659574468,2nd Goal,3.2163214683532715,0.10638297872340426,3rd Goal,3.2163214683532715,600,data_5_31_23.pkl

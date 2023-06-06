@@ -152,6 +152,7 @@ class Analysis(object):
         pickup_subset = pickup_timepoints[single_goal_trajs,:]
         indices = np.argwhere(pickup_subset > -1)
         accuracy = np.mean(y_recon[indices[:,0],indices[:,1]])
+        print(np.where(y_recon[indices[:,0],indices[:,1]])[0])
         result = {'model': self.model_name, 'score': accuracy, 'MSE': mse}        
         return result
            
@@ -208,7 +209,10 @@ class Analysis(object):
             goals_obj3.append(y_recon[i,pickup_seq[2]])
 
         acc_g2 = np.mean(goals_obj2)
+        print('Goal 2 successes:',np.where(goals_obj2)[0])
         acc_g3 = np.mean(goals_obj3)
+        print('Goal 3 successes:',np.where(goals_obj3)[0])
+
         
         result = {
             'model': self.model_name,
