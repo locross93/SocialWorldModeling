@@ -503,7 +503,9 @@ class Analysis(object):
         result['Model'] = MODEL_DICT_VAL[model_key]['model_label']
 
         if self.args.eval_type == 'goal_events':
-            result = self.eval_goal_events_in_rollouts(model, self.input_data, partial=self.args.partial) 
+            result = self.eval_goal_events_in_rollouts(model, self.input_data, partial=self.args.partial)      
+        elif self.args.eval_type == 'goal_events_level2':
+            result = self.eval_goal_events_in_rollouts(model, self.input_data, level=2, partial=self.args.partial) 
         elif self.args.eval_type == 'multigoal_events':
             result = self.eval_multigoal_events_in_rollouts(model, self.input_data, partial=self.args.partial)
         elif self.args.eval_type == 'move_events':
