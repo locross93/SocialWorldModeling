@@ -22,9 +22,9 @@ from torch.utils.tensorboard import SummaryWriter
 
 from analysis_utils import init_model_class
 from constants import DEFAULT_VALUES, MODEL_DICT_TRAIN
-#from models import ReplayBuffer
+from models import ReplayBuffer
 # temp
-from models import ReplayBufferEarly as ReplayBuffer
+#from models import ReplayBufferEarly as ReplayBuffer
 
 
 """Global variables"""

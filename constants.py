@@ -31,18 +31,18 @@ MODEL_DICT_VAL=  {
     #     'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
     #     'model_dir': 'rssm_ds2', 'model_label': 'RSSM Discrete DS2'},
     # 5
-    'rssm_disc_ds3': {
-        'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
-        'model_dir': 'rssm_disc_ds3', 'model_label': 'RSSM Discrete DS3'},
-    'rssm_cont_ds3': {
-        'class': DreamerV2, 'config': 'rssm_cont_ds2.json', 
-        'model_dir': 'rssm_cont_replay_early', 'model_label': 'RSSM Continuous Replay Early'},
-    'mp_ds3': {
-        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
-        'model_dir': 'mp_ds3', 'model_label': 'Multistep Predictor DS3'},
-    'md_ds3': {
-        'class': MultistepDelta, 'config': 'multistep_delta_ds2.json',
-        'model_dir': 'multistep_delta_ds3', 'model_label': 'Multistep Delta DS3'},
+    # 'rssm_disc_ds3': {
+    #     'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
+    #     'model_dir': 'rssm_disc_ds3', 'model_label': 'RSSM Discrete DS3'},
+    # 'rssm_cont_ds3': {
+    #     'class': DreamerV2, 'config': 'rssm_cont_ds2.json', 
+    #     'model_dir': 'rssm_cont_replay_early', 'model_label': 'RSSM Continuous Replay Early'},
+    # 'mp_ds3': {
+    #     'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
+    #     'model_dir': 'mp_ds3', 'model_label': 'Multistep Predictor DS3'},
+    # 'md_ds3': {
+    #     'class': MultistepDelta, 'config': 'multistep_delta_ds2.json',
+    #     'model_dir': 'multistep_delta_ds3', 'model_label': 'Multistep Delta DS3'},
     # 'sgnet_cvae_lr1e-4': {
     #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
     #     'model_dir': 'sgnet_cvae_default_lr1e-4', 'model_label': 'SGNet-H512'},
@@ -71,72 +71,54 @@ MODEL_DICT_VAL=  {
     #    'class': TransformerWorldModel, 'config': 'transformer_wm_ds2.json', 
     #    'model_dir': 'transformer_wm_replay_early', 'model_label': 'Transformer WM Replay Early'},
 
-    'md_4096_d3_lr1e-5': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_4096.json', 
-        'model_dir': 'multistep_delta_ds3_mlp_hidden_size_4096_lr1e-5', 'model_label': 'MD 4096 D3 lr1e-5'},
-    'md_4096_d3_lr1e-4': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_4096.json',
-        'model_dir': 'multistep_delta_ds3_mlp_hidden_size_4096_lr1e-4', 'model_label': 'MD 4096 D3 lr1e-4'},
-    'md_4096_d3_lr3e-4': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_4096.json',
-        'model_dir': 'multistep_delta_ds3_mlp_hidden_size_4096_lr3e-4', 'model_label': 'MD 4096 D3 lr3e-4'},
-    'md_4096_d3_lr3e-5': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_4096.json',
-        'model_dir': 'multistep_delta_ds3_mlp_hidden_size_4096_lr3e-5', 'model_label': 'MD 4096 D3 lr3e-5'},
-    'md_2048_d3_lr1e-5': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
-        'model_dir': 'multistep_delta_ds3_mlp_hidden_size_2048_lr1e-5', 'model_label': 'MD 2048 D3 lr1e-5'},
-    'md_2048_d3_lr1e-4': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
-        'model_dir': 'multistep_delta_ds3_mlp_hidden_size_2048_lr1e-4', 'model_label': 'MD 2048 D3 lr1e-4'},
-    'md_2048_d3_lr3e-4': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
-        'model_dir': 'multistep_delta_ds3_mlp_hidden_size_2048_lr3e-4', 'model_label': 'MD 2048 D3 lr3e-4'},
-    'md_2048_d3_lr3e-5': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
-        'model_dir': 'multistep_delta_ds3_mlp_hidden_size_2048_lr3e-5', 'model_label': 'MD 2048 D3 lr3e-5'},
-    'md_512_d3_lr1e-5': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_512.json',
-        'model_dir': 'multistep_delta_ds3_mlp_hidden_size_512_lr1e-5', 'model_label': 'MD 512 D3 lr1e-5'},
-    'md_512_d3_lr1e-4': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_512.json',
-        'model_dir': 'multistep_delta_ds3_mlp_hidden_size_512_lr1e-4', 'model_label': 'MD 512 D3 lr1e-4'},
-    'md_512_d3_lr3e-4': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_512.json',
-        'model_dir': 'multistep_delta_ds3_mlp_hidden_size_512_lr3e-4', 'model_label': 'MD 512 D3 lr3e-4'},
-    'md_512_d3_lr3e-5': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_512.json',
-        'model_dir': 'multistep_delta_ds3_mlp_hidden_size_512_lr3e-5', 'model_label': 'MD 512 D3 lr3e-5'},    
-    'md_d3_lr1e-4': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds2.json',
-        'model_dir': 'multistep_delta_ds3_lr1e-4', 'model_label': 'MD D3 lr1e-4'},
-    'md_d3_lr3e-4': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds2.json',
-        'model_dir': 'multistep_delta_ds3_lr3e-4', 'model_label': 'MD D3 lr3e-4'},
-    'md_d3_lr3e-5': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds2.json',
-        'model_dir': 'multistep_delta_ds3_lr3e-5', 'model_label': 'MD D3 lr3e-5'},
-    # 'iris_vel_lr1e-4': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_input_size_70_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_input_size_70_lr1e-4', 'model_label': 'Iris Vel lr1e-4'},
-    # 'iris_vel_lr3e-4': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_input_size_70_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_input_size_70_lr3e-4', 'model_label': 'Iris Vel lr3e-4'},
-    # 'iris_vel_lr1e-5': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_input_size_70_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_input_size_70_lr3e-5', 'model_label': 'Iris Vel lr3e-5'},
-    # 'iris_norm_lr1e-4': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_norm_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_norm_lr1e-4', 'model_label': 'Iris Norm lr1e-4'},
-    # 'iris_norm_lr3e-4': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_norm_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_norm_lr3e-4', 'model_label': 'Iris Norm lr3e-4'},
-    # 'iris_norm_lr1e-5': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_norm_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_norm_lr3e-5', 'model_label': 'Iris Norm lr3e-5'},
-    'rssm_cont_h512_lr1e-4': {
-        'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_512.json',
-        'model_dir': 'rssm_cont_ds3_dec_hidden_size_512_lr1e-4', 'model_label': 'RSSM Cont H512_lr1e-4'},
+    # 'md_4096_d3_lr1e-5': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_4096.json', 
+    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_4096_lr1e-5', 'model_label': 'MD 4096 D3 lr1e-5'},
+    # 'md_4096_d3_lr1e-4': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_4096.json',
+    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_4096_lr1e-4', 'model_label': 'MD 4096 D3 lr1e-4'},
+    # 'md_4096_d3_lr3e-4': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_4096.json',
+    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_4096_lr3e-4', 'model_label': 'MD 4096 D3 lr3e-4'},
+    # 'md_4096_d3_lr3e-5': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_4096.json',
+    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_4096_lr3e-5', 'model_label': 'MD 4096 D3 lr3e-5'},
+    # 'md_2048_d3_lr1e-5': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
+    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_2048_lr1e-5', 'model_label': 'MD 2048 D3 lr1e-5'},
+    # 'md_2048_d3_lr1e-4': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
+    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_2048_lr1e-4', 'model_label': 'MD 2048 D3 lr1e-4'},
+    # 'md_2048_d3_lr3e-4': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
+    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_2048_lr3e-4', 'model_label': 'MD 2048 D3 lr3e-4'},
+    # 'md_2048_d3_lr3e-5': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
+    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_2048_lr3e-5', 'model_label': 'MD 2048 D3 lr3e-5'},
+    # 'md_512_d3_lr1e-5': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_512.json',
+    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_512_lr1e-5', 'model_label': 'MD 512 D3 lr1e-5'},
+    # 'md_512_d3_lr1e-4': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_512.json',
+    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_512_lr1e-4', 'model_label': 'MD 512 D3 lr1e-4'},
+    # 'md_512_d3_lr3e-4': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_512.json',
+    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_512_lr3e-4', 'model_label': 'MD 512 D3 lr3e-4'},
+    # 'md_512_d3_lr3e-5': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_512.json',
+    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_512_lr3e-5', 'model_label': 'MD 512 D3 lr3e-5'},    
+    # 'md_d3_lr1e-4': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2.json',
+    #     'model_dir': 'multistep_delta_ds3_lr1e-4', 'model_label': 'MD D3 lr1e-4'},
+    # 'md_d3_lr3e-4': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2.json',
+    #     'model_dir': 'multistep_delta_ds3_lr3e-4', 'model_label': 'MD D3 lr3e-4'},
+    # 'md_d3_lr3e-5': {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2.json',
+    #     'model_dir': 'multistep_delta_ds3_lr3e-5', 'model_label': 'MD D3 lr3e-5'},
+    # 'rssm_cont_h512_lr1e-4': {
+    #     'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_512.json',
+    #     'model_dir': 'rssm_cont_ds3_dec_hidden_size_512_lr1e-4', 'model_label': 'RSSM Cont H512_lr1e-4'},
     'rssm_cont_h1024_lr1e-4': {
         'class': DreamerV2, 'config': 'rssm_cont_ds2.json',
         'model_dir': 'rssm_cont_ds3_dec_hidden_size_1024_lr1e-4', 'model_label': 'RSSM Cont H1024_lr1e-4'},
