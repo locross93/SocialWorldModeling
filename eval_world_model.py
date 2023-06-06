@@ -512,7 +512,7 @@ class Analysis(object):
                 os.makedirs(figure_save_dir)                
             plot_save_file = os.path.join(self.args.analysis_dir, 'results', 'figures', save_file)
             plot_eval_wm_results(df_results, self.args, plot_save_file)     
-        if self.args.append_results:
+        if self.args.append_results and self.partial == 1.0:
             all_results_file = os.path.join(result_save_dir, 'all_results_'+self.args.eval_type+'.csv')
             if os.path.exists(all_results_file):
                 df_all_results = pd.read_csv(all_results_file, index_col=0)
@@ -564,7 +564,9 @@ def load_args():
                         help='Threshold for move event evaluation')
     parser.add_argument('--non_goal_burn_in', action='store',
                         default=DEFAULT_VALUES['non_goal_burn_in'],
-                        help='Number of frames to burn in for non-goal events')    
+                        help='Number of frames to burn in for non-goal events') 
+    parser.add_argument('--partial', type=float, default=1.0,         
+                        help='Partial evaluation')  
     return parser.parse_args()
 
 
