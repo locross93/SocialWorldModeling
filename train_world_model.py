@@ -206,7 +206,7 @@ def main():
             if batch_x.dtype == torch.int64:
                 batch_x = batch_x.float()
             if config['model_type'][:4] == 'rssm' or \
-                config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
+                config['model_type'] in ['dreamerv2', 'transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
                 loss = model.loss(batch_x)
             elif config['model_type'] in ['sgnet_cvae']:
                 loss, sgnet_loss_dict = model.loss(batch_x)
@@ -241,7 +241,7 @@ def main():
         with torch.no_grad():
             model.eval()
             if config['model_type'][:4] == 'rssm' or \
-                config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout', 
+                config['model_type'] in ['dreamerv2', 'transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout', 
                                          'agent_former']:
                 val_loss = model.loss(val_trajs)
             elif config['model_type'] in ['sgnet_cvae']:
