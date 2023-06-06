@@ -26,121 +26,46 @@ MODEL_DICT_TRAIN = {
 """Values for validation"""
 # Only using 5-31-23 for the paper
 MODEL_DICT_VAL=  {
-    # 'mp_d3_mlp_hidden_size_2048_lr3e-4': {
+    # 'mp_mlp_2048_lr3e-4': {
     #     'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
-    #     'model_dir': 'mp_d3_mlp_hidden_size_2048_lr3e-4', 'model_label': 'MP DS3 MLP HS2048 LR3e-4'},    
-    # 'rssm_disc_ds3': {
-    #     'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
-    #     'model_dir': 'rssm_disc_ds3', 'model_label': 'RSSM Discrete DS3'},
-    # 'rssm_cont_ds3': {
-    #     'class': DreamerV2, 'config': 'rssm_cont_ds2.json', 
-    #     'model_dir': 'rssm_cont_replay_early', 'model_label': 'RSSM Continuous Replay Early'},
-    # 'md_ds3': {
-    #     'class': MultistepDelta, 'config': 'multistep_delta_ds2.json',
-    #     'model_dir': 'multistep_delta_ds3', 'model_label': 'Multistep Delta DS3'},
+    #     'model_dir': 'mp_d3_mlp_hidden_size_2048_lr3e-4', 'model_label': 'MP DS3 MLP HS2048 LR3e-4'},    # running N5
+    # 'rssm_disc_h_2048_lr3e-4': {
+    #     'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json', 
+    #     'model_dir': 'rssm_disc_ds3', 'model_label': 'RSSM Discrete DS3'},    # running N5
+    # 'rssm_cont_h_2048_lr3e-4': {
+    #     'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_2048.json', 
+    #     'model_dir': 'rssm_cont_replay_early', 'model_label': 'RSSM Continuous Replay Early'},    # running N5, N1
+    # 'md_mlp_2048_lr3e-4': {
+    #     'class': MultistepDelta, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
+    #     'model_dir': 'multistep_delta_ds3', 'model_label': 'Multistep Delta DS3'},    # running N1, N2
+    # 'tf_emb512_lr1e-4': {
+    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_512_config.json',
+    #     'model_dir': 'tf_emb512_lr1e-4', 'model_label': 'TF WM Emb512 LR1e-4'},    # running N2, N4
+    # 'tf_emb1024_lr1e-4': {
+    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_1024_config.json',
+    #     'model_dir': 'tf_emb1024_lr1e-4', 'model_label': 'TF WM Emb1024 LR1e-4'},    # running N2, N4
+    # 'tf_emb2048_lr1e-4': {
+    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json', 
+    #     'model_dir': 'tf_emb2048_lr1e-4', 'model_label': 'TF WM DS3 Emb2048 LR1e-4'},  
+      
     'sgnet_cvae_lr1e-4': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
         'model_dir': 'sgnet_cvae_default_lr1e-4', 'model_label': 'SGNet-H512'},
     'sgnet_cvae_hidden64_lr1e-4': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
-        'model_dir': 'sgnet_cvae_hidden_size64_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H64'},
+        'model_dir': 'sgnet_cvae_hidden_size64_lr1e-4', 'model_label': 'SGNet-H64'},
     'sgnet_cvae_hidden128_lr1e-4': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size128_config.json',
-        'model_dir': 'sgnet_cvae_hidden_size128_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H128'},
+        'model_dir': 'sgnet_cvae_hidden_size128_lr1e-4', 'model_label': 'SGNet-H128'},
     'sgnet_cvae_hidden256_lr1e-4': {
-        'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
-        'model_dir': 'sgnet_cvae_hidden_size256_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H256'},
-    # 'agent_former': {
-    #     'class': AgentFormer, 'config': 'agent_former_default_config.json',
-    #     'model_dir': 'agent_former_default', 'epoch': '200', 'model_label': 'AgentFormer'},
-    # 'mp_4096_ds3': {
-    #     'class': MultistepPredictor, 'config': 'mp_4096_ds3_rnn_hidden_size_4096.json',
-    #     'model_dir': 'mp_4096_ds3', 'model_label': 'MP 4096 DS3'},
-    # 'md_4096_ds3': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds3_rnn_hidden_size_4096.json',
-    #     'model_dir': 'multistep_delta_ds3', 'model_label': 'MD 4096 DS3'},
-    # 'mp_replay_early': {
-    #     'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
-    #     'model_dir': 'mp_replay_early', 'model_label': 'MP Replay Early'},
-    # 'trans_wm_replay_early': {
-    #    'class': TransformerWorldModel, 'config': 'transformer_wm_ds2.json', 
-    #    'model_dir': 'transformer_wm_replay_early', 'model_label': 'Transformer WM Replay Early'},
-
-    # 'md_4096_d3_lr1e-5': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_4096.json', 
-    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_4096_lr1e-5', 'model_label': 'MD 4096 D3 lr1e-5'},
-    # 'md_4096_d3_lr1e-4': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_4096.json',
-    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_4096_lr1e-4', 'model_label': 'MD 4096 D3 lr1e-4'},
-    # 'md_4096_d3_lr3e-4': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_4096.json',
-    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_4096_lr3e-4', 'model_label': 'MD 4096 D3 lr3e-4'},
-    # 'md_4096_d3_lr3e-5': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_4096.json',
-    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_4096_lr3e-5', 'model_label': 'MD 4096 D3 lr3e-5'},
-    # 'md_2048_d3_lr1e-5': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
-    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_2048_lr1e-5', 'model_label': 'MD 2048 D3 lr1e-5'},
-    # 'md_2048_d3_lr1e-4': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
-    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_2048_lr1e-4', 'model_label': 'MD 2048 D3 lr1e-4'},
-    # 'md_2048_d3_lr3e-4': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
-    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_2048_lr3e-4', 'model_label': 'MD 2048 D3 lr3e-4'},
-    # 'md_2048_d3_lr3e-5': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
-    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_2048_lr3e-5', 'model_label': 'MD 2048 D3 lr3e-5'},
-    # 'md_512_d3_lr1e-5': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_512.json',
-    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_512_lr1e-5', 'model_label': 'MD 512 D3 lr1e-5'},
-    # 'md_512_d3_lr1e-4': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_512.json',
-    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_512_lr1e-4', 'model_label': 'MD 512 D3 lr1e-4'},
-    # 'md_512_d3_lr3e-4': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_512.json',
-    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_512_lr3e-4', 'model_label': 'MD 512 D3 lr3e-4'},
-    # 'md_512_d3_lr3e-5': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_512.json',
-    #     'model_dir': 'multistep_delta_ds3_mlp_hidden_size_512_lr3e-5', 'model_label': 'MD 512 D3 lr3e-5'},    
-    # 'md_d3_lr1e-4': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2.json',
-    #     'model_dir': 'multistep_delta_ds3_lr1e-4', 'model_label': 'MD D3 lr1e-4'},
-    # 'md_d3_lr3e-4': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2.json',
-    #     'model_dir': 'multistep_delta_ds3_lr3e-4', 'model_label': 'MD D3 lr3e-4'},
-    # 'md_d3_lr3e-5': {
-    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2.json',
-    #     'model_dir': 'multistep_delta_ds3_lr3e-5', 'model_label': 'MD D3 lr3e-5'},
-    # 'rssm_cont_h512_lr1e-4': {
-    #     'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_512.json',
-    #     'model_dir': 'rssm_cont_ds3_dec_hidden_size_512_lr1e-4', 'model_label': 'RSSM Cont H512_lr1e-4'},
-    # 'rssm_cont_h1024_lr1e-4': {
-    #     'class': DreamerV2, 'config': 'rssm_cont_ds2.json',
-    #     'model_dir': 'rssm_cont_ds3_dec_hidden_size_1024_lr1e-4', 'model_label': 'RSSM Cont H1024_lr1e-4'},
-    # 'rssm_cont_h2048_lr1e-4': {
-    #     'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_2048.json',
-    #     'model_dir': 'rssm_cont_ds3_dec_hidden_size_2048_lr1e-4', 'model_label': 'RSSM Cont H2048_lr1e-4'},
-    # 'rssm_cont_h2048_lr3e-4': {
-    #     'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_2048.json',
-    #     'model_dir': 'rssm_cont_ds3_dec_hidden_size_2048_lr3e-4', 'model_label': 'RSSM Cont H2048_lr3e-4'},
-    # 'rssm_cont_h2048_lr3e-5': {
-    #     'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_2048.json',
-    #     'model_dir': 'rssm_cont_ds3_dec_hidden_size_2048_lr3e-5', 'model_label': 'RSSM Cont H2048_lr3e-5'},    
-    # 'rssm_cont_h4096_lr1e-4': {
-    #     'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_4096.json',
-    #     'model_dir': 'rssm_cont_ds3_dec_hidden_size_4096_lr1e-4', 'model_label': 'RSSM Cont H4096_lr1e-4'},
-    # 'rssm_cont_h4096_lr3e-4': {
-    #     'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_4096.json',
-    #     'model_dir': 'rssm_cont_ds3_dec_hidden_size_4096_lr3e-4', 'model_label': 'RSSM Cont H4096_lr3e-4'},
-    # 'rssm_cont_h4096_lr3e-5': {
-    #     'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_4096.json',
-    #     'model_dir': 'rssm_cont_ds3_dec_hidden_size_4096_lr3e-5', 'model_label': 'RSSM Cont H4096_lr3e-5'},
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size256_config.json',
+        'model_dir': 'sgnet_cvae_hidden_size256_lr1e-4', 'model_label': 'SGNet-H256'},  
 }
 data_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/data/'
 checkpoint_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/'
 data_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/data/'
-#checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
-checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/'
+checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
+#checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/'
 
 
 DEFAULT_VALUES = {

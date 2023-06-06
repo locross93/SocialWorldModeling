@@ -98,7 +98,7 @@ class Analysis(object):
         return model
 
 
-    def eval_goal_events_in_rollouts(self, model, input_data, partial=1.0) -> Dict[str, typing.Any]:
+    def eval_goal_events_in_rollouts(self, model, input_data, level=1, partial=1.0) -> Dict[str, typing.Any]:
         if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
@@ -154,9 +154,7 @@ class Analysis(object):
         accuracy = np.mean(y_recon[indices[:,0],indices[:,1]])
         result = {'model': self.model_name, 'score': accuracy, 'MSE': mse}        
         return result
-    
-
-    def eval_multigoal_events_in_rollouts(self, model, input_data, partial=1.0) -> Dict[str, Any]:        
+           
     def eval_multigoal_events_in_rollouts(self, model, input_data, partial=1.0) -> Dict[str, Any]:        
         if self.ds_num == 1:
             # first dataset
