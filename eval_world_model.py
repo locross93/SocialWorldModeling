@@ -40,7 +40,7 @@ class Analysis(object):
         self.args = args
 
     def load_data(self) -> None:
-        if self.args.dataset == 'train_test_splits_3D_dataset.pkl':
+        if self.args.dataset == 'train_test_splits_3D_dataset.pkl' or self.args.dataset == 'data_norm_velocity.pkl':
             self.ds_num = 1
         else:
             self.ds_num = 2
@@ -109,6 +109,7 @@ class Analysis(object):
             single_goal_trajs = self.exp_info_dict[self.args.train_or_val]['single_goal_trajs']
         
         single_goal_trajs = single_goal_trajs[:int(partial*len(single_goal_trajs))]
+        single_goal_trajs = single_goal_trajs[:int(partial*len(single_goal_trajs))]
         num_single_goal_trajs = len(single_goal_trajs)
         imagined_trajs = np.zeros([num_single_goal_trajs, input_data.shape[1], input_data.shape[2]])        
         real_trajs = []
@@ -120,6 +121,15 @@ class Analysis(object):
             x = input_data[row,:,:].unsqueeze(0)
             # get the only pick up point in the trajectory
             steps2pickup = np.max(pickup_timepoints[row,:]).astype(int)
+            if level == 2:
+                # burn in to several frames before pick up point
+                if steps2pickup > 15:
+                    steps2pickup = steps2pickup - 15
+                elif steps2pickup > 10:
+                    steps2pickup = steps2pickup - 5
+                else:
+                    # TO DO - don't include trial if not enough burn in available
+                    steps2pickup = steps2pickup - 1
             # store the steps before pick up with real frames in imagined_trajs
             imagined_trajs[i,:steps2pickup,:] = x[:,:steps2pickup,:].cpu()
             # rollout model for the rest of the trajectory
@@ -147,6 +157,7 @@ class Analysis(object):
     
 
     def eval_multigoal_events_in_rollouts(self, model, input_data, partial=1.0) -> Dict[str, Any]:        
+    def eval_multigoal_events_in_rollouts(self, model, input_data, partial=1.0) -> Dict[str, Any]:        
         if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
@@ -161,6 +172,7 @@ class Analysis(object):
         imagined_trajs = np.zeros([num_multi_goal_trajs, input_data.shape[1], input_data.shape[2]])
         real_trajs = []
         imag_trajs = []
+        
         for i,row in enumerate(multi_goal_trajs):
             if i%50 == 0:
                 print(i)
@@ -557,7 +569,7 @@ class Analysis(object):
                 os.makedirs(figure_save_dir)                
             plot_save_file = os.path.join(self.args.analysis_dir, 'results', 'figures', save_file)
             plot_eval_wm_results(df_results, self.args, plot_save_file)     
-        if self.args.append_results:
+        if self.args.append_results and self.partial == 1.0:
             all_results_file = os.path.join(result_save_dir, 'all_results_'+self.args.eval_type+'.csv')
             if os.path.exists(all_results_file):
                 df_all_results = pd.read_csv(all_results_file, index_col=0)

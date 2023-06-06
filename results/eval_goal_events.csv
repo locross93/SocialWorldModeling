@@ -1,4 +1,5 @@
 ,model,score,MSE,epoch,dataset
+<<<<<<< HEAD
 0,RSSM Cont H1024_lr1e-4,0.09016393442622951,2.795559883117676,/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/models/rssm_cont_ds3_dec_hidden_size_1024_lr1e-4/rssm_cont_ds3_dec_hidden_size_1024_lr1e-4_epoch1200,data_5_31_23.pkl
 1,RSSM Cont H2048_lr1e-4,0.04918032786885246,2.4830567836761475,/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/models/rssm_cont_ds3_dec_hidden_size_2048_lr1e-4/rssm_cont_ds3_dec_hidden_size_2048_lr1e-4_epoch1000,data_5_31_23.pkl
 2,RSSM Cont H2048_lr3e-4,0.040983606557377046,3.0098462104797363,/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/models/rssm_cont_ds3_dec_hidden_size_2048_lr3e-4/rssm_cont_ds3_dec_hidden_size_2048_lr3e-4_epoch400,data_5_31_23.pkl
@@ -6,3 +7,6 @@
 4,RSSM Cont H4096_lr1e-4,0.00819672131147541,2.823040008544922,/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/models/rssm_cont_ds3_dec_hidden_size_4096_lr1e-4/rssm_cont_ds3_dec_hidden_size_4096_lr1e-4_epoch1200,data_5_31_23.pkl
 5,RSSM Cont H4096_lr3e-4,0.10655737704918032,2.452902528228015e+25,/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/models/rssm_cont_ds3_dec_hidden_size_4096_lr3e-4/rssm_cont_ds3_dec_hidden_size_4096_lr3e-4_epoch1200,data_5_31_23.pkl
 6,RSSM Cont H4096_lr3e-5,0.0,3.291006088256836,/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/models/rssm_cont_ds3_dec_hidden_size_4096_lr3e-5/rssm_cont_ds3_dec_hidden_size_4096_lr3e-5_epoch1000,data_5_31_23.pkl
+=======
+0,RSSM Continuous Replay Early,0.13911620294599017,3.629727602005005,/mnt/fs2/locross/analysis/models/rssm_cont_replay_early/rssm_cont_replay_early_epoch2000,data_5_31_23.pkl
+>>>>>>> main

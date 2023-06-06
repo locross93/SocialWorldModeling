@@ -1,5 +1,5 @@
 from models import DreamerV2, MultistepPredictor, \
-    TransformerMSPredictor, MultistepDelta, TransformerWorldModel
+    TransformerMSPredictor, MultistepDelta, TransformerWorldModel, TransformerIrisWorldModel
 from gnn_models.imma import IMMA
 from gnn_models.gat import GAT
 from gnn_models.rfm import RFM
@@ -85,6 +85,18 @@ MODEL_DICT_VAL=  {
     'rssm_disc_ds3': {
         'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
         'model_dir': 'rssm_disc_ds3', 'model_label': 'RSSM Discrete DS3'},
+    'mp_replay_early': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
+        'model_dir': 'mp_replay_early', 'model_label': 'MP Replay Early'},
+    'trans_wm_replay_early': {
+       'class': TransformerWorldModel, 'config': 'transformer_wm_ds2.json', 
+       'model_dir': 'transformer_wm_replay_early', 'model_label': 'Transformer WM Replay Early'},
+    'rssm_cont_ds3': {
+        'class': DreamerV2, 'config': 'rssm_cont_ds2.json', 
+        'model_dir': 'rssm_cont_replay_early', 'model_label': 'RSSM Continuous Replay Early'},
+    'transformer_iris': {
+        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
+        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
 }
 DEFAULT_VALUES = {
     'analysis_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/',
@@ -101,8 +113,8 @@ DEFAULT_VALUES = {
     #'model_keys': list(MODEL_DICT_VAL.keys()),
     #'model_keys': ['multistep_pred'],
     #'model_keys': ['imma','gat','rfm','rfm_rnn'],
-    'model_keys': ['mp_ds3', 'md_ds3', 'rssm_cont_ds2', 'rssm_disc_ds2', 'rssm_disc_ds3'],
-    'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events'],
+    'model_keys': ['rssm_disc_ds2', 'rssm_disc_ds3', 'rssm_cont_ds3', 'mp_ds3', 'md_ds3', 'transformer_iris'],
+    'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'goal_events_level2'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
 }
