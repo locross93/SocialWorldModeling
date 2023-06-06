@@ -96,6 +96,9 @@ MODEL_DICT_VAL=  {
     'md_ds3': {
         'class': MultistepDelta, 'config': 'multistep_delta_ds2.json',
         'model_dir': 'multistep_delta_ds3', 'model_label': 'Multistep Delta DS3'},
+    'rssm_replay_early': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
+        'model_dir': 'rssm_disc_seed3', 'model_label': 'RSSM Discrete DS3 Seed 3'},
 }
 
 DEFAULT_VALUES = {
