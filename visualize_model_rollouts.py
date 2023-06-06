@@ -267,7 +267,7 @@ if __name__ == '__main__':
         num_frames = x_true.shape[0]
         num_steps = subplot_dims[0] * subplot_dims[1]
         steps = np.linspace(0, num_frames-1, num_steps, endpoint=True).astype(int)
-        steps = np.linspace(0, 56, num_steps, endpoint=True).astype(int)
+        #steps = np.linspace(0, 56, num_steps, endpoint=True).astype(int)
         fig, ax = make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_columns, burn_in_length)
     
     # make video - compare real and reconstructed traj side by side

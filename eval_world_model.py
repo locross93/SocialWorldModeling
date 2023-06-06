@@ -98,7 +98,7 @@ class Analysis(object):
         return model
 
 
-    def eval_goal_events_in_rollouts(self, model, input_data, level=1) -> Dict[str, typing.Any]:
+    def eval_goal_events_in_rollouts(self, model, input_data, level=1, partial=1.0) -> Dict[str, typing.Any]:
         if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
@@ -108,6 +108,7 @@ class Analysis(object):
             pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
             single_goal_trajs = self.exp_info_dict[self.args.train_or_val]['single_goal_trajs']
         
+        single_goal_trajs = single_goal_trajs[:int(partial*len(single_goal_trajs))]
         num_single_goal_trajs = len(single_goal_trajs)
         imagined_trajs = np.zeros([num_single_goal_trajs, input_data.shape[1], input_data.shape[2]])        
         real_trajs = []
@@ -154,7 +155,7 @@ class Analysis(object):
         return result
     
 
-    def eval_multigoal_events_in_rollouts(self, model, input_data) -> Dict[str, Any]:        
+    def eval_multigoal_events_in_rollouts(self, model, input_data, partial=1.0) -> Dict[str, Any]:        
         if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
@@ -164,6 +165,7 @@ class Analysis(object):
             pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
             multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
             
+        multi_goal_trajs = multi_goal_trajs[:int(partial*len(multi_goal_trajs))]
         num_multi_goal_trajs = len(multi_goal_trajs)
         imagined_trajs = np.zeros([num_multi_goal_trajs, input_data.shape[1], input_data.shape[2]])
         real_trajs = []
