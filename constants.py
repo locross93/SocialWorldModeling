@@ -26,56 +26,30 @@ MODEL_DICT_TRAIN = {
 """Values for validation"""
 # Only using 5-31-23 for the paper
 MODEL_DICT_VAL=  {
-    'mp_ds3_lr3e-5': {
-        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
-        'model_dir': 'mp_ds3_lr3e-5', 'model_label': 'MP DS3 LR3e-5'},
-    'md_ds3_lr3e-4': {
-        'class': MultistepDelta, 'config': 'multistep_predictor_input_size_35.json',
-        'model_dir': 'mp_ds3_lr3e-4', 'model_label': 'MD DS3 LR3e-4'},
-    'mp_ds3_lr1e-4': {
-        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
-        'model_dir': 'mp_ds3_lr1e-4', 'model_label': 'MP DS3 LR1e-4'},
-    'mp_d3_mlp_hidden_size_2048_lr3e-5': {
-        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
-        'model_dir': 'mp_d3_mlp_hidden_size_2048_lr3e-5', 'model_label': 'MP DS3 MLP HS2048 LR3e-5'},
-    'mp_d3_mlp_hidden_size_2048_lr1e-4': {
-        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
-        'model_dir': 'mp_d3_mlp_hidden_size_2048_lr1e-4', 'model_label': 'MP DS3 MLP HS2048 LR1e-4'},
-    'mp_d3_mlp_hidden_size_2048_lr3e-4': {
-        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
-        'model_dir': 'mp_d3_mlp_hidden_size_2048_lr3e-4', 'model_label': 'MP DS3 MLP HS2048 LR3e-4'},
-    'mp_d3_mlp_hidden_size_4096_lr1e-5': {
-        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
-        'model_dir': 'mp_d3_mlp_hidden_size_4096_lr1e-5', 'model_label': 'MP DS3 MLP HS4096 LR1e-5'},
-    # 5-23
-    # 'rssm_disc_ds2': {
-    #     'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
-    #     'model_dir': 'rssm_ds2', 'model_label': 'RSSM Discrete DS2'},
-    # 5
+    # 'mp_d3_mlp_hidden_size_2048_lr3e-4': {
+    #     'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
+    #     'model_dir': 'mp_d3_mlp_hidden_size_2048_lr3e-4', 'model_label': 'MP DS3 MLP HS2048 LR3e-4'},    
     # 'rssm_disc_ds3': {
     #     'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
     #     'model_dir': 'rssm_disc_ds3', 'model_label': 'RSSM Discrete DS3'},
     # 'rssm_cont_ds3': {
     #     'class': DreamerV2, 'config': 'rssm_cont_ds2.json', 
     #     'model_dir': 'rssm_cont_replay_early', 'model_label': 'RSSM Continuous Replay Early'},
-    # 'mp_ds3': {
-    #     'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
-    #     'model_dir': 'mp_ds3', 'model_label': 'Multistep Predictor DS3'},
     # 'md_ds3': {
     #     'class': MultistepDelta, 'config': 'multistep_delta_ds2.json',
     #     'model_dir': 'multistep_delta_ds3', 'model_label': 'Multistep Delta DS3'},
-    # 'sgnet_cvae_lr1e-4': {
-    #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
-    #     'model_dir': 'sgnet_cvae_default_lr1e-4', 'model_label': 'SGNet-H512'},
-    # 'sgnet_cvae_hidden64_lr1e-4': {
-    #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
-    #     'model_dir': 'sgnet_cvae_hidden_size64_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H64'},
-    # 'sgnet_cvae_hidden128_lr1e-4': {
-    #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size128_config.json',
-    #     'model_dir': 'sgnet_cvae_hidden_size128_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H128'},
-    # 'sgnet_cvae_hidden256_lr1e-4': {
-    #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
-    #     'model_dir': 'sgnet_cvae_hidden_size256_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H256'},
+    'sgnet_cvae_lr1e-4': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
+        'model_dir': 'sgnet_cvae_default_lr1e-4', 'model_label': 'SGNet-H512'},
+    'sgnet_cvae_hidden64_lr1e-4': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
+        'model_dir': 'sgnet_cvae_hidden_size64_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H64'},
+    'sgnet_cvae_hidden128_lr1e-4': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size128_config.json',
+        'model_dir': 'sgnet_cvae_hidden_size128_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H128'},
+    'sgnet_cvae_hidden256_lr1e-4': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
+        'model_dir': 'sgnet_cvae_hidden_size256_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H256'},
     # 'agent_former': {
     #     'class': AgentFormer, 'config': 'agent_former_default_config.json',
     #     'model_dir': 'agent_former_default', 'epoch': '200', 'model_label': 'AgentFormer'},
@@ -165,7 +139,9 @@ MODEL_DICT_VAL=  {
 data_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/data/'
 checkpoint_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/'
 data_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/data/'
-checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
+#checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
+checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/'
+
 
 DEFAULT_VALUES = {
     # general pipeline parameters
