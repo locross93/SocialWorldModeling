@@ -444,20 +444,70 @@ class Analysis(object):
         result = {'model': self.model_name, 'score': accuracy}        
         return result
 
+    def compute_displacement_error(self, model, batch_size=None):
+        total_trials, traj_length, _ = self.input_data.shape
+        behavior_keys = list(self.exp_info_dict['val'].keys())[2: -5]
+        burn_in_lengths = [50]    #, 100, 150, 150, 200, 250]        
+        result = {}
+        analysis_behavior_keys = [
+            'adversarial_gathering', 'gathering_adversarial', 
+            'leader_follower', 'follower_leader'
+            'random_gathering', 'gathering_static', 'static_gathering', 'gathering_random',
+            'static_multistep', 'multistep_static', 'random_multistep', 'multistep_random',
+            'chaser_runner', 'runner_chaser',
+            'random_mimic', 'mimic_random', 
+            'anything with random']
+        for burn_in_length in burn_in_lengths:
+            print(f"Burn in length {burn_in_length}")            
+            rollout_length = traj_length - burn_in_length        
+            real_trajs = self.input_data[:, -rollout_length:, :]
+            with torch.no_grad():
+                if batch_size is None: 
+                    rollout_x = model.forward_rollout(real_trajs.cuda(), burn_in_length, rollout_length).cpu()
+                else:
+                    rollout_x = []
+                    for i in range(0, total_trials, batch_size):
+                        x = real_trajs[i: i+batch_size, :, :]
+                        y = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu()
+                        rollout_x.append(y)
+                        torch.cuda.empty_cache()
+                    rollout_x = torch.cat(rollout_x, dim=0)
+
+                    #rollout_x = rollout_x.reshape(rollout_x.size(0), -1)
+                    #real_trajs = real_trajs.reshape(real_trajs.size(0), -1)
+                    behavior_result = {}
+                    for behavior_key in behavior_keys:
+                        behavior_idxs = self.exp_info_dict['val'][behavior_key]
+                        behavior_rollout_x = rollout_x[behavior_idxs]
+                        behavior_real_trajs = real_trajs[behavior_idxs]                        
+                        # compute mean displacement error by computing euclidean distance between predicted and real trajectories
+                        mde = torch.mean(torch.norm(behavior_rollout_x - behavior_real_trajs, p=2, dim=-1))
+                        # compute final displacement error
+                        fde = torch.mean(torch.norm(behavior_rollout_x[:, -1] - behavior_real_trajs[:, -1], p=2, dim=-1))
+                        behavior_result[behavior_key] = {'mde': mde, 'fde': fde}
+                    result[burn_in_length] = behavior_result        
+        result['model'] = self.model_name        
+        return result
 
     def eval_one_model(self, model_key) -> Dict[str, Any]:        
-        model = self.load_model(model_key)
+        model = self.load_model(model_key)        
         result = {}
         result['Model'] = MODEL_DICT_VAL[model_key]['model_label']
 
         if self.args.eval_type == 'goal_events':
-            result = self.eval_goal_events_in_rollouts(model, self.input_data)            
+            result = self.eval_goal_events_in_rollouts(model, self.input_data) 
         elif self.args.eval_type == 'multigoal_events':
             result = self.eval_multigoal_events_in_rollouts(model, self.input_data)
         elif self.args.eval_type == 'move_events':
             result = self.eval_move_events_in_rollouts(model, self.input_data)        
         elif self.args.eval_type == 'pickup_events':
-            result = self.eval_pickup_events_in_rollouts(model, self.input_data)  
+            result = self.eval_pickup_events_in_rollouts(model, self.input_data)
+        elif self.args.eval_type == 'displacement':    # mean/final displacement error
+            if  'sgnet' in model_key:
+                batch_size = 32
+            else:
+                batch_size = 2048          
+            result = self.compute_displacement_error(model, batch_size=batch_size)
         else:
             raise NotImplementedError(f'Evaluation type {self.args.eval_type} not implemented')    
         
@@ -489,9 +539,16 @@ class Analysis(object):
         result_save_dir = os.path.join(self.args.analysis_dir, 'results')
         if not os.path.exists(result_save_dir):
             os.makedirs(result_save_dir)
-        save_path = os.path.join(result_save_dir, f'{save_file}.csv')
-        df_results = pd.DataFrame(self.results)
-        df_results.to_csv(save_path)
+        if self.args.eval_type == 'displacement':
+            save_path = os.path.join(result_save_dir, f'{save_file}.pkl')
+            breakpoint()
+            with open(save_path, 'wb') as f:
+                pickle.dump(self.results, f)
+        else:  
+            save_path = os.path.join(result_save_dir, f'{save_file}.csv')
+            df_results = pd.DataFrame(self.results)
+            df_results.to_csv(save_path)
+
         if self.args.plot:
             figure_save_dir = os.path.join(self.args.analysis_dir, 'results', 'figures')
             if not os.path.exists(figure_save_dir):
@@ -527,7 +584,7 @@ def load_args():
                          default=DEFAULT_VALUES['data_dir'], 
                          help='Data directory')
     parser.add_argument('--dataset', type=str,
-                         default='dataset_5_25_23.pkl', 
+                         default=DEFAULT_VALUES['dataset'], 
                          help='Dataset name')
     parser.add_argument('--checkpoint_dir', type=str, action='store',
                         default=DEFAULT_VALUES['checkpoint_dir'], 

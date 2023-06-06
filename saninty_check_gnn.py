@@ -40,7 +40,7 @@ def load_args():
                          default=DEFAULT_VALUES['data_dir'], 
                          help='Data directory')
     parser.add_argument('--dataset', type=str,
-                         default=DEFAULT_VALUES['dataset'], 
+                         default='dataset_5_25_23.pkl', 
                          help='Dataset name')
     parser.add_argument('--checkpoint_dir', type=str, 
                         default=DEFAULT_VALUES['checkpoint_dir'], 
@@ -138,14 +138,14 @@ if __name__ == '__main__':
     batches_per_epoch = np.min([replay_buffer.buffer_size // args.batch_size, 50])
     
     # make validation data
-    val_buffer = ReplayBuffer(sequence_length)
-    val_buffer.upload_training_set(val_data)
-    seed = 100 # set seed so every model sees the same randomization
-    val_batch_size = np.min([val_data.size(0), 1000])
-    val_trajs = val_buffer.sample(val_batch_size, random_seed=seed)
-    val_trajs = val_trajs.to(DEVICE)
-    val_trajs = val_trajs.to(torch.float32)
-    val_trajs = val_trajs.reshape(-1, sequence_length, 5, 7)
+    # val_buffer = ReplayBuffer(sequence_length)
+    # val_buffer.upload_training_set(val_data)
+    # seed = 100 # set seed so every model sees the same randomization
+    # val_batch_size = np.min([val_data.size(0), 1000])
+    # val_trajs = val_buffer.sample(val_batch_size, random_seed=seed)
+    # val_trajs = val_trajs.to(DEVICE)
+    # val_trajs = val_trajs.to(torch.float32)
+    # val_trajs = val_trajs.reshape(-1, sequence_length, 5, 7)
         
     print('Starting', model_filename, 'On DS', args.dataset)
     
@@ -165,39 +165,21 @@ if __name__ == '__main__':
         loss_dict['recon_loss'] = []
         loss_dict['kl_loss'] = []
     
+    batch_x = replay_buffer.sample(args.batch_size)
+    batch_x = batch_x.to(torch.float32)
+    batch_x = batch_x.to(DEVICE)
+    batch_x = batch_x.reshape(-1, sequence_length, 5, 7)
+    
     model.to(DEVICE)
     start_time = time.time()
     for epoch in tqdm(range(args.epochs)):
         model.train()
         batch_loss = []
-        if config['model_type'][:4] == 'rssm':
-            batch_recon_loss = []
-            batch_kl_loss = []
-        nsamples = 0
-        for i in tqdm(range(batches_per_epoch)):
-            batch_x = replay_buffer.sample(args.batch_size)
-            batch_x = batch_x.to(torch.float32)
-            batch_x = batch_x.to(DEVICE)
-            batch_x = batch_x.reshape(-1, sequence_length, 5, 7)
-            nsamples += batch_x.shape[0]
-            opt.zero_grad()
-            loss = model.loss(batch_x, burn_in_length, rollout_length)
-            loss.backward()
-            opt.step()
+        opt.zero_grad()
+        loss = model.loss(batch_x, burn_in_length, rollout_length)
+        loss.backward()
+        opt.step()
             
-            batch_loss.append(loss.item())
-        epoch_loss = np.mean(batch_loss)
-        loss_dict['train'].append(epoch_loss)
-        loss_dict['epoch_times'].append(time.time()-start_time)
-        # test on validation set
-        with torch.no_grad():
-            model.eval()
-            val_loss = model.loss(val_trajs, burn_in_length, rollout_length)
-            val_loss = val_loss.item()
-            loss_dict['val'].append(val_loss)
-        # log to tensorboard
-        writer.add_scalar('Train Loss/loss', epoch_loss, epoch)
-        writer.add_scalar('Val Loss/val', val_loss, epoch)
         if epoch % args.save_every == 0 or epoch == (args.epochs-1):
             # save checkpoints in checkpoint directory with plenty of storage
             save_dir = os.path.join(args.checkpoint_dir, 'models', model_filename)
@@ -212,5 +194,5 @@ if __name__ == '__main__':
                 training_info[key] = loss_dict[key]
             df_training = pd.DataFrame.from_dict(training_info)
             df_training.to_csv(os.path.join(save_dir, f'training_info_{model_filename}.csv'))
-        print(f'Epoch {epoch}, Train Loss {epoch_loss}, Validation Loss {val_loss}')
+        print(f'Epoch {epoch}, Train Loss {loss.item()}')
 

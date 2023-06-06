@@ -81,7 +81,7 @@ class GAT(nn.Module):
         embeddings = self.embedding(human_states)
         # dynamical
         normalized_A, next_H = self.dynamical(embeddings)
-
+        
         # decoder
         if batch_graph is None:
             prev_state = human_states[:, -1, ...]

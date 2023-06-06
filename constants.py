@@ -24,10 +24,28 @@ MODEL_DICT_TRAIN = {
     'agent_former': AgentFormer
 }
 """Values for validation"""
+# Only using 5-31-23 for the paper
 MODEL_DICT_VAL=  {
+    # 5-23
+    # 'rssm_disc_ds2': {
+    #     'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
+    #     'model_dir': 'rssm_ds2', 'model_label': 'RSSM Discrete DS2'},
+    # 5
+    'rssm_disc_ds3': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
+        'model_dir': 'rssm_disc_ds3', 'model_label': 'RSSM Discrete DS3'},
+    'rssm_cont_ds3': {
+        'class': DreamerV2, 'config': 'rssm_cont_ds2.json', 
+        'model_dir': 'rssm_cont_replay_early', 'model_label': 'RSSM Continuous Replay Early'},
+    'mp_ds3': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
+        'model_dir': 'mp_ds3', 'model_label': 'Multistep Predictor DS3'},
+    'md_ds3': {
+        'class': MultistepDelta, 'config': 'multistep_delta_ds2.json',
+        'model_dir': 'multistep_delta_ds3', 'model_label': 'Multistep Delta DS3'},
     # 'sgnet_cvae_lr1e-4': {
     #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
-    #     'model_dir': 'sgnet_cvae_default_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H512'},
+    #     'model_dir': 'sgnet_cvae_default_lr1e-4', 'model_label': 'SGNet-H512'},
     # 'sgnet_cvae_hidden64_lr1e-4': {
     #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
     #     'model_dir': 'sgnet_cvae_hidden_size64_lr1e-4', 'epoch': '200', 'model_label': 'SGNet-H64'},
@@ -40,55 +58,6 @@ MODEL_DICT_VAL=  {
     # 'agent_former': {
     #     'class': AgentFormer, 'config': 'agent_former_default_config.json',
     #     'model_dir': 'agent_former_default', 'epoch': '200', 'model_label': 'AgentFormer'},
-    # 'rssm_disc': {
-    #     'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
-    #     'model_dir': 'rssm_disc_default', 'epoch': '3000', 'model_label': 'RSSM Discrete'},
-    # 'multistep_predictor': {
-    #     'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json',
-    #     'model_dir': 'multistep_predictor_default', 'epoch': '3000', 'model_label': 'Multistep Predictor'},
-    # 'multistep_delta': {
-    #     'class': MultistepDelta, 'config': 'multistep_delta_default_config.json',
-    #     'model_dir': 'multistep_delta_default', 'epoch': '3000', 'model_label': 'Multistep Delta'},
-    # # 'transformer_iris_default': {
-    # #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
-    # #     'model_dir': 'transformer_iris_default', 'epoch': '29000', 'model_label': 'Transformer Iris'},
-    # 'gat_rnn_norm_vel': {
-    #    'class': GAT, 'config': 'gat_encoder_rnn_config.json', 
-    #    'model_dir': 'gat_rnn_norm_vel', 'model_label': 'GAT RNN Encoder'},
-    # 'transformer_iris_concat_pos_embd_lr3e-4': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_lr3e-4', 'epoch': '8000', 'model_label': 'Iris Concat lr3e-4'},
-    # """Best transformer model (5-23-23)"""
-    # 'transformer_iris_concat_pos_embd_lr1e-4': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
-    # 'transformer_iris_concat_pos_embd_lr1e-5': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_lr3e-5', 'epoch': '8000', 'model_label': 'Iris Concat lr3e-5'},
-    # 'transformer_iris_concat_pos_embd_lr1e-5': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_lr1e-5', 'epoch': '8000', 'model_label': 'Iris Concat lr1e-5'},
-    # 'transformer_iris_default': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
-    #     'model_dir': 'transformer_iris_default', 'epoch': '8000', 'model_label': 'Iris Default'},
-    # 'transformer_iris_lr1e-4': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
-    #     'model_dir': 'transformer_iris_lr1e-4', 'epoch': '8000', 'model_label': 'Iris lr1e-4'},
-    # 'transformer_iris_lr1e-5/': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
-    #     'model_dir': 'transformer_iris_lr1e-5', 'epoch': '8000', 'model_label': 'Iris lr1e-5'},
-    # 'transformer_iris_lr3e-4': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
-    #     'model_dir': 'transformer_iris_lr3e-4', 'epoch': '8000', 'model_label': 'Iris lr3e-4'},
-    # 'rfm_rnn': {
-    #    'class': RFM, 'config': 'rfm_rnn_config.json', 
-    #    'model_dir': 'rfm_rnn', 'model_label': 'RFM RNN'},
-    # 'gat': {
-    #    'class': GAT, 'config': 'gat_default_config.json', 
-    #    'model_dir': 'gat', 'model_label': 'GAT'},
-    # 'imma': {
-    #    'class': IMMA, 'config': 'imma_default_config.json', 
-    #    'model_dir': 'imma', 'model_label': 'IMMA'},
     # 'mp_4096_ds3': {
     #     'class': MultistepPredictor, 'config': 'mp_4096_ds3_rnn_hidden_size_4096.json',
     #     'model_dir': 'mp_4096_ds3', 'model_label': 'MP 4096 DS3'},
@@ -146,26 +115,7 @@ MODEL_DICT_VAL=  {
     #     'model_dir': 'multistep_delta_ds3_mlp_lr3e-4', 'model_label': 'MD D3 lr3e-4'},
     # 'md_d3_lr3e-5': {
     #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2.json',
-    #     'model_dir': 'multistep_delta_ds3_mlp_lr3e-5', 'model_label': 'MD D3 lr3e-5'},
-
-    # 'iris_vel_lr1e-4': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_input_size_70_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_input_size_70_lr1e-4', 'model_label': 'Iris Vel lr1e-4'},
-    # 'iris_vel_lr3e-4': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_input_size_70_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_input_size_70_lr3e-4', 'model_label': 'Iris Vel lr3e-4'},
-    # 'iris_vel_lr1e-5': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_input_size_70_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_input_size_70_lr3e-5', 'model_label': 'Iris Vel lr3e-5'},
-    # 'iris_norm_lr1e-4': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_norm_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_norm_lr1e-4', 'model_label': 'Iris Norm lr1e-4'},
-    # 'iris_norm_lr3e-4': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_norm_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_norm_lr3e-4', 'model_label': 'Iris Norm lr3e-4'},
-    # 'iris_norm_lr1e-5': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_norm_config.json',
-    #     'model_dir': 'transformer_iris_concat_pos_embd_norm_lr3e-5', 'model_label': 'Iris Norm lr3e-5'},
+    #     'model_dir': 'multistep_delta_ds3_mlp_lr3e-5', 'model_label': 'MD D3 lr3e-5'},    
 }
 data_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/data/'
 checkpoint_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/'
@@ -186,9 +136,10 @@ DEFAULT_VALUES = {
     # eval parameters
     #'model_keys': [ 'trans_wm_replay_early', 'mp_replay_early', 'transformer_iris_concat_pos_embd_lr1e-4', 'mp_4096_ds3', 'md_4096_ds3',],
     'model_keys': list(MODEL_DICT_VAL.keys()),
-    'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events'],
+    'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
+    'dataset': 'data_5_31_23.pkl'
 }
 
 DATASET_NUMS = {
