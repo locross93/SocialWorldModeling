@@ -1,12 +1,5 @@
 ,model,g2_acc,g2_goal_num,g2_mse,g3_acc,g3_goal_num,g3_mse,epoch,dataset
-<<<<<<< HEAD
-0,RSSM Cont H1024_lr1e-4,0.1276595744680851,2nd Goal,3.248384952545166,0.0851063829787234,3rd Goal,3.248384952545166,/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/models/rssm_cont_ds3_dec_hidden_size_1024_lr1e-4/rssm_cont_ds3_dec_hidden_size_1024_lr1e-4_epoch1200,data_5_31_23.pkl
-1,RSSM Cont H2048_lr1e-4,0.02127659574468085,2nd Goal,3.19360089302063,0.02127659574468085,3rd Goal,3.19360089302063,/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/models/rssm_cont_ds3_dec_hidden_size_2048_lr1e-4/rssm_cont_ds3_dec_hidden_size_2048_lr1e-4_epoch1000,data_5_31_23.pkl
-2,RSSM Cont H2048_lr3e-4,0.02127659574468085,2nd Goal,6.731053197642961e+24,0.0,3rd Goal,6.731053197642961e+24,/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/models/rssm_cont_ds3_dec_hidden_size_2048_lr3e-4/rssm_cont_ds3_dec_hidden_size_2048_lr3e-4_epoch400,data_5_31_23.pkl
-3,RSSM Cont H2048_lr3e-5,0.2765957446808511,2nd Goal,3.2217724323272705,0.2978723404255319,3rd Goal,3.2217724323272705,/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/models/rssm_cont_ds3_dec_hidden_size_2048_lr3e-5/rssm_cont_ds3_dec_hidden_size_2048_lr3e-5_epoch1000,data_5_31_23.pkl
-4,RSSM Cont H4096_lr1e-4,0.10638297872340426,2nd Goal,3.3677070140838623,0.14893617021276595,3rd Goal,3.3677070140838623,/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/models/rssm_cont_ds3_dec_hidden_size_4096_lr1e-4/rssm_cont_ds3_dec_hidden_size_4096_lr1e-4_epoch1200,data_5_31_23.pkl
-5,RSSM Cont H4096_lr3e-4,0.1276595744680851,2nd Goal,2.821967489196863e+20,0.10638297872340426,3rd Goal,2.821967489196863e+20,/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/models/rssm_cont_ds3_dec_hidden_size_4096_lr3e-4/rssm_cont_ds3_dec_hidden_size_4096_lr3e-4_epoch1200,data_5_31_23.pkl
-6,RSSM Cont H4096_lr3e-5,0.02127659574468085,2nd Goal,4.1079816818237305,0.02127659574468085,3rd Goal,4.1079816818237305,/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/models/rssm_cont_ds3_dec_hidden_size_4096_lr3e-5/rssm_cont_ds3_dec_hidden_size_4096_lr3e-5_epoch1000,data_5_31_23.pkl
-=======
-0,RSSM Continuous Replay Early,0.18580375782881003,2nd Goal,3.9541804790496826,0.21920668058455114,3rd Goal,3.9541804790496826,/mnt/fs2/locross/analysis/models/rssm_cont_replay_early/rssm_cont_replay_early_epoch2000,data_5_31_23.pkl
->>>>>>> main
+0,SGNet-H512,0.19148936170212766,2nd Goal,3.18068790435791,0.10638297872340426,3rd Goal,3.18068790435791,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default_lr1e-4/sgnet_cvae_default_lr1e-4_epoch600,data_5_31_23.pkl
+1,SGNet-H64,0.0,2nd Goal,3.550638198852539,0.0425531914893617,3rd Goal,3.550638198852539,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size64_lr1e-4/sgnet_cvae_hidden_size64_lr1e-4_epoch600,data_5_31_23.pkl
+2,SGNet-H128,0.06382978723404255,2nd Goal,3.520946741104126,0.0425531914893617,3rd Goal,3.520946741104126,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size128_lr1e-4/sgnet_cvae_hidden_size128_lr1e-4_epoch600,data_5_31_23.pkl
+3,SGNet-H256,0.14893617021276595,2nd Goal,3.2460315227508545,0.0851063829787234,3rd Goal,3.2460315227508545,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size256_lr1e-4/sgnet_cvae_hidden_size256_lr1e-4_epoch800,data_5_31_23.pkl

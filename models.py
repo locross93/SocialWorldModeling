@@ -2365,10 +2365,10 @@ class TransformerIrisWorldModel(nn.Module):
     def forward_rollout(self, x, burn_in_length, rollout_length):
         x_burn_in = x[:, :burn_in_length]
         x_rollout = []
-        for i in range(rollout_length):           
+        for i in range(rollout_length):          
            _, output_observations = self(x_burn_in)
            x_burn_in = output_observations
            x_rollout.append(output_observations[:, -1])
-           #print(f"rollout step {i}, mse is {F.mse_loss(x[:, burn_in_length + i], output_observations)}")
+           #print(f"rollout step {i}, mse is {F.mse_loss(x[:, burn_in_length + i], output_observations[:, -1])}")
         x_rollout = torch.stack(x_rollout, dim=1)        
         return x_rollout

@@ -460,15 +460,7 @@ class Analysis(object):
         total_trials, traj_length, _ = self.input_data.shape
         behavior_keys = list(self.exp_info_dict['val'].keys())[2: -5]
         burn_in_lengths = [50]    #, 100, 150, 150, 200, 250]        
-        result = {}
-        analysis_behavior_keys = [
-            'adversarial_gathering', 'gathering_adversarial', 
-            'leader_follower', 'follower_leader'
-            'random_gathering', 'gathering_static', 'static_gathering', 'gathering_random',
-            'static_multistep', 'multistep_static', 'random_multistep', 'multistep_random',
-            'chaser_runner', 'runner_chaser',
-            'random_mimic', 'mimic_random', 
-            'anything with random']
+        result = {}        
         for burn_in_length in burn_in_lengths:
             print(f"Burn in length {burn_in_length}")            
             rollout_length = traj_length - burn_in_length        
@@ -498,7 +490,7 @@ class Analysis(object):
                         fde = torch.mean(torch.norm(behavior_rollout_x[:, -1] - behavior_real_trajs[:, -1], p=2, dim=-1))
                         behavior_result[behavior_key] = {'mde': mde, 'fde': fde}
                     result[burn_in_length] = behavior_result        
-        result['model'] = self.model_name        
+        result['model'] = self.model_name              
         return result
 
     def eval_one_model(self, model_key) -> Dict[str, Any]:        
@@ -567,7 +559,7 @@ class Analysis(object):
                 os.makedirs(figure_save_dir)                
             plot_save_file = os.path.join(self.args.analysis_dir, 'results', 'figures', save_file)
             plot_eval_wm_results(df_results, self.args, plot_save_file)     
-        if self.args.append_results and self.partial == 1.0:
+        if self.args.append_results and self.args.partial == 1.0:
             all_results_file = os.path.join(result_save_dir, 'all_results_'+self.args.eval_type+'.csv')
             if os.path.exists(all_results_file):
                 df_all_results = pd.read_csv(all_results_file, index_col=0)
