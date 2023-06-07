@@ -1,0 +1,4 @@
+,model,g2_acc,g2_goal_num,g2_mse,g3_acc,g3_goal_num,g3_mse,epoch,dataset
+0,TF Emb2048 S1,0.18947368421052632,2nd Goal,4.370523929595947,0.17894736842105263,3rd Goal,4.370523929595947,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s1/tf_emb2048_lr1e-4_s1_epoch400,data_5_31_23.pkl
+1,TF Emb2048 S2,0.5368421052631579,2nd Goal,4.219907760620117,0.4421052631578947,3rd Goal,4.219907760620117,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s2/tf_emb2048_lr1e-4_s2_epoch400,data_5_31_23.pkl
+2,TF Emb2048 S3,0.4105263157894737,2nd Goal,4.28913688659668,0.43157894736842106,3rd Goal,4.28913688659668,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s3/tf_emb2048_lr1e-4_s3_epoch400,data_5_31_23.pkl

@@ -80,15 +80,15 @@ MODEL_DICT_VAL=  {
     # 'tf_emb1024_lr1e-4_s3': {
     #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_1024_config.json',
     #     'model_dir': 'tf_emb1024_lr1e-4_s3', 'model_label': 'TF Emb1024 S3'},
-    # 'tf_emb2048_lr1e-4_s1': {
-    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
-    #     'model_dir': 'tf_emb2048_lr1e-4_s1', 'model_label': 'TF Emb2048 S1'},
-    # 'tf_emb2048_lr1e-4_s2': {
-    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
-    #     'model_dir': 'tf_emb2048_lr1e-4_s2', 'model_label': 'TF Emb2048 S2'},
-    # 'tf_emb2048_lr1e-4_s3': {
-    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
-    #     'model_dir': 'tf_emb2048_lr1e-4_s3', 'model_label': 'TF Emb2048 S3'},      
+    'tf_emb2048_lr1e-4_s1': {
+        'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
+        'model_dir': 'tf_emb2048_lr1e-4_s1', 'model_label': 'TF Emb2048 S1'},
+    'tf_emb2048_lr1e-4_s2': {
+        'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
+        'model_dir': 'tf_emb2048_lr1e-4_s2', 'model_label': 'TF Emb2048 S2'},
+    'tf_emb2048_lr1e-4_s3': {
+        'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
+        'model_dir': 'tf_emb2048_lr1e-4_s3', 'model_label': 'TF Emb2048 S3'},
     # 'sgnet_cvae_lr1e-4': {
     #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
     #     'model_dir': 'sgnet_cvae_default_lr1e-4', 'model_label': 'SGNet-H512'},
@@ -105,8 +105,8 @@ MODEL_DICT_VAL=  {
 data_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/data/'
 checkpoint_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/'
 data_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/data/'
-checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
-#checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/'
+#checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
+checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/'
 
 
 DEFAULT_VALUES = {
@@ -143,6 +143,6 @@ BEHV_CATE_DICT = {
             'ms gatherinng': ['static_multistep', 'multistep_static', 'random_multistep', 'multistep_random'],
             'chasing': ['chaser_runner', 'runner_chaser'],
             'mimicry': ['random_mimic', 'mimic_random'],
-            'random': [] # anything with random
+            'random': ['random_gathering', 'random_mimic', 'mimic_random', 'random_multistep',
+                       'random_random', 'multistep_random', 'gathering_random']
 }
-

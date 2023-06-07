@@ -566,7 +566,8 @@ class Analysis(object):
             if not os.path.exists(figure_save_dir):
                 os.makedirs(figure_save_dir)                
             plot_save_file = os.path.join(self.args.analysis_dir, 'results', 'figures', save_file)
-            plot_eval_wm_results(df_results, self.args, plot_save_file)     
+            plot_eval_wm_results(save_path, plot_save_file)
+            
         if self.args.append_results and self.args.partial == 1.0:
             all_results_file = os.path.join(result_save_dir, 'all_results_'+self.args.eval_type+'.csv')
             if os.path.exists(all_results_file):
