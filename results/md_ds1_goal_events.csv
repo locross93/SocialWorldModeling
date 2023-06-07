@@ -1,2 +1,0 @@
-,model,score,MSE,epoch,dataset
-0,Multistep Delta,0.44813278008298757,3.306190252304077,/mnt/fs2/locross/analysis/models/multistep_delta_h1024_l2_mlp1024_l2/multistep_delta_h1024_l2_mlp1024_l2_epoch421000,train_test_splits_3D_dataset.pkl
