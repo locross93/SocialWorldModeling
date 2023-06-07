@@ -180,7 +180,8 @@ def make_frame_compare(t):
 
 if __name__ == '__main__':
     args = load_args()
-    
+    torch.manual_seed(DEFAULT_VALUES['eval_seed'])
+    print("Using seed: {}".format(DEFAULT_VALUES['eval_seed']))
     model_info = MODEL_DICT_VAL[args.model_key]
     model_name = model_info['model_label']
     model = load_trained_model(model_info, args)
@@ -234,7 +235,6 @@ if __name__ == '__main__':
         traj_ind = args.trial_num
         burn_in_length = args.burn_in_length
     
-    print(burn_in_length)
     rollout_length = input_data.size(1) - burn_in_length
     x = input_data[traj_ind,:,:].unsqueeze(0)
     if x.dtype == torch.float64:

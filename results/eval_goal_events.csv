@@ -1,2 +1,5 @@
 ,model,score,MSE,epoch,dataset
-0,SGNet-H512,0.0,3.019793748855591,600,data_5_31_23.pkl
+0,SGNet-H512,0.125,2.5412681102752686,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default_lr1e-4/sgnet_cvae_default_lr1e-4_epoch800,data_5_31_23.pkl
+1,SGNet-H64,0.0625,2.4866414070129395,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size64_lr1e-4/sgnet_cvae_hidden_size64_lr1e-4_epoch600,data_5_31_23.pkl
+2,SGNet-H128,0.0625,2.1854898929595947,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size128_lr1e-4/sgnet_cvae_hidden_size128_lr1e-4_epoch800,data_5_31_23.pkl
+3,SGNet-H256,0.10416666666666667,2.317227840423584,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size256_lr1e-4/sgnet_cvae_hidden_size256_lr1e-4_epoch800,data_5_31_23.pkl

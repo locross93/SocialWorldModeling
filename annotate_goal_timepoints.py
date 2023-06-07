@@ -27,7 +27,7 @@ def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_locati
     dims = ['x', 'y', 'z']
     fp1_pos = np.array([0.0, 0.5, -6.0])
     
-    for i in range(num_trials):
+    for i in range(num_trials):        
         trial_x = input_matrices[i,:,:]
         for j in range(num_goals):
             event_conditions = []
@@ -52,6 +52,7 @@ def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_locati
                 event_conditions.append(False)
             if all(event_conditions):
                 y_labels[i,j] = 1
+                #print('goal '+str(j)+' is a success')
             else:
                 y_labels[i,j] = 0
                 
@@ -85,6 +86,7 @@ def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_locati
                 event_conditions.append(False)
             if all(event_conditions):
                 y_recon[i,j] = 1
+                #print('goal '+str(j)+' is a success')
             else:
                 y_recon[i,j] = 0
                 

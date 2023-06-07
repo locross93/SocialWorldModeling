@@ -26,7 +26,6 @@ from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
 from plot_eval_world_model import plot_eval_wm_results
 
 
-#@typechecked
 class Analysis(object):
     """
     Class to perform analysis on the trained models
@@ -37,7 +36,9 @@ class Analysis(object):
     which_model : key indicating which model from MODEL_DICT_VAL to analyze
     """
     def __init__(self, args) -> None:        
-        self.args = args
+        self.args = args        
+        torch.manual_seed(args.eval_seed)
+        print(f"Eval seed: {args.eval_seed}")           
 
     def load_data(self) -> None:
         if self.args.dataset == 'train_test_splits_3D_dataset.pkl' or self.args.dataset == 'data_norm_velocity.pkl':
@@ -152,6 +153,7 @@ class Analysis(object):
         pickup_subset = pickup_timepoints[single_goal_trajs,:]
         indices = np.argwhere(pickup_subset > -1)
         accuracy = np.mean(y_recon[indices[:,0],indices[:,1]])
+        
         print(np.where(y_recon[indices[:,0],indices[:,1]])[0])
         result = {'model': self.model_name, 'score': accuracy, 'MSE': mse}        
         return result
@@ -584,6 +586,8 @@ class Analysis(object):
 def load_args():
     parser = argparse.ArgumentParser()
     # general pipeline parameters
+    parser.add_argument('--eval_seed', type=int, 
+                        default=DEFAULT_VALUES['eval_seed'], help='Random seed')
     parser.add_argument('--analysis_dir', type=str, action='store',
                         default=DEFAULT_VALUES['analysis_dir'], 
                         help='Analysis directory')
@@ -619,10 +623,8 @@ def load_args():
                         default=DEFAULT_VALUES['non_goal_burn_in'],
                         help='Number of frames to burn in for non-goal events')
     parser.add_argument('--partial', type=float, default=1.0,         
-                        help='Partial evaluation')        
+                        help='Partial evaluation')    
     return parser.parse_args()
-
-
 
 
 if __name__ == "__main__":    

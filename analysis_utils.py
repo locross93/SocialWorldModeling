@@ -4,18 +4,11 @@ Created on Mon Feb  6 12:00:58 2023
 
 @author: locro
 """
-
-import argparse
-import json
 import os
-import torch
-import pickle
-import pandas as pd
-import matplotlib.pylab as plt
-import seaborn as sns
+import json
 import torch
 
-from constants import DEFAULT_VALUES, MODEL_DICT_TRAIN, MODEL_DICT_VAL
+from constants import MODEL_DICT_TRAIN
 
 """Global variables"""
 model_dict = MODEL_DICT_TRAIN
@@ -90,10 +83,10 @@ def load_trained_model(model_info, args):
     if 'epoch' in model_info:
         model_file_name = os.path.join(model_dir, model_info['model_dir']+'_epoch'+model_info['epoch'])
         model.load_state_dict(torch.load(model_file_name))
-        print('Loading model',model_file_name)
+        print('Loading model', model_file_name)
     else:
         latest_checkpoint, _ =  get_highest_numbered_file(model_info['model_dir'], model_dir)
-        print('Loading from last checkpoint',latest_checkpoint)
+        print('Loading from last checkpoint', latest_checkpoint)
         model.load_state_dict(torch.load(latest_checkpoint))
 
     model.eval()
@@ -101,26 +94,6 @@ def load_trained_model(model_info, args):
     model.to(args.device)
     return model
 
-# @TODO plot functions here
-# @TODO will need more work depending on the evaluation type
-def plot_results(result_file):
-    df_plot = pd.read_csv(result_file)
-    # Plot the results using seaborn
-    fig = plt.figure()
-    sns.barplot(x='Model', y='Score', data=df_plot) 
-    plt.title('Evaluate Single Goal Events From Forward Rollouts', fontsize=14)
-    plt.xlabel('Model Name', fontsize=16) 
-    plt.ylabel('Accuracy', fontsize=16)
-    plt.ylim([0, 1])
-    save_name = os.path.basename(result_file).split('.')[0]
-    plt.savefig(f'{save_name}_acc.png', dpi=300, bbox_inches='tight')
-    plt.show()
-
-    fig = sns.barplot(x='Model', y='MSE', data=df_plot) 
-    plt.title('Prediction Error of Goal Events in Imagination', fontsize=18)
-    plt.xlabel('Model Name', fontsize=16) 
-    plt.ylabel('MSE', fontsize=16)
-    plt.savefig(f'{save_name}_mse.png', dpi=300, bbox_inches='tight')
     
 def inverse_normalize(normalized_tensor, max_values, min_values, velocity=False):
     ranges = max_values - min_values

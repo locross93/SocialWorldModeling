@@ -4,14 +4,9 @@ Defined classes:
     class BiTraPNP()
 Some utilities are cited from Trajectron++
 '''
-import sys
-import numpy as np
 import copy
-from collections import defaultdict
 import torch
-from torch import nn, optim
-from torch.nn import functional as F
-import torch.nn.utils.rnn as rnn
+from torch import nn
 from torch.distributions import Normal
 
 def reconstructed_probability(x):

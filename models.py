@@ -892,6 +892,10 @@ class DreamerV2(nn.Module):
                 post_rssm_state = RSSMContState(mean_post, std_post, z_post, deter_state)
                 posteriors.append(post_rssm_state)
 
+            #print(f"{self.rssm_type} noise_prior mean {noise_prior.mean()} std {noise_prior.std()}")
+            #print(f"noise_post mean {noise_post.mean()} std {noise_post.std()}")
+            #print(f"z_prior mean {z_prior.mean()} std {z_prior.std()}")
+
             # use z for input of next rnn iteration, resized for (B, T, Z)            
             z_post_in = z_post.reshape(z_post.size(0), 1, z_post.size(1))
         
