@@ -13,7 +13,7 @@ import pandas as pd
 import matplotlib.pylab as plt
 import seaborn as sns
 
-from constants import MODEL_DICT_TRAIN
+from constants import MODEL_DICT_TRAIN, behavior_category_dict
 #%%
 
 
@@ -114,4 +114,9 @@ plot_eval_wm_results(result_path)
 def plot_displacement_results(result_path, save_figs=True):
     results = pickle.load(open(result_path, 'rb'))    
     return 0
+#%%
+
+#%%
+result_path = 'results/eval_displacement.pkl'
+results = pickle.load(open(result_path, 'rb'))
 #%%
