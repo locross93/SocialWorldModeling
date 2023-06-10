@@ -16,6 +16,7 @@ from scipy.spatial import distance
 from typeguard import typechecked
 import typing
 from typing import List, Tuple, Dict, Any
+from tqdm import tqdm
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 
@@ -250,7 +251,7 @@ class Analysis(object):
         obj_moved_flag = np.zeros([num_trials, 3])
         # hard threshold to detect movement (unchangable by user)
         move_thr_true = 0.1
-        for i in range(num_trials):
+        for i in tqdm(range(num_trials)):
             trial_x = input_matrices[i,:,:]
             for j in range(num_objs):
                 pos_inds = [self.data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
@@ -258,7 +259,7 @@ class Analysis(object):
                 obj_moved_flag[i,j] = detect_object_move(trial_obj_pos, move_thr_true)
                 
         recon_moved_flag = np.zeros([num_trials, 3])
-        for i in range(num_trials):
+        for i in tqdm(range(num_trials)):
             trial_x = recon_matrices[i,:,:]
             for j in range(num_objs):
                 pos_inds = [self.data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
@@ -272,7 +273,7 @@ class Analysis(object):
         scores['recall'] = recall_score(obj_moved_flag.reshape(-1), recon_moved_flag.reshape(-1))        
         return scores, obj_moved_flag, recon_moved_flag
     
-    def eval_move_events_in_rollouts(self, model, input_data) -> Dict[str, Any]:
+    def eval_move_events_in_rollouts(self, model, input_data, partial=1.0) -> Dict[str, Any]:
         if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
@@ -287,8 +288,46 @@ class Analysis(object):
             multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
         
         imagined_trajs = np.zeros(input_data.shape)
-        for i in range(input_data.shape[0]):
-            if i%50 == 0:
+        
+        goal_inds = np.concatenate([single_goal_trajs, multi_goal_trajs])        
+        non_goal_trajs = [i for i in range(len(input_data)) if i not in goal_inds]
+        non_goal_trajs = non_goal_trajs[ :int(len(input_data)*partial)]
+        goal_inds =  np.random.choice(goal_inds, size=int(len(goal_inds)*partial), replace=False)                                    
+
+        # compute non goal trajs first with batches
+        counter = 0
+        batch_trajs = []
+        batch_inds = []
+        burn_in_length = self.args.non_goal_burn_in
+        rollout_length = self.num_timepoints - burn_in_length
+        for i in non_goal_trajs:
+            counter += 1
+            if counter % 100 == 0:
+                print(i)
+            x = input_data[i,:,:]#.unsqueeze(0)
+            batch_inds.append(i)
+            batch_trajs.append(x)
+            if counter > 0 and counter % self.args.batch_size == 0:
+                batch_x = torch.stack(batch_trajs, dim=0)
+                batch_x = torch.stack(batch_trajs, dim=0)
+                batch_x = batch_x.to(self.args.device)#model.DEVICE)
+                breakpoint()
+                rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
+                batch_inds = np.array(batch_inds)
+                imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
+                batch_trajs = []
+                batch_inds = []
+        # compute last batch that is less than batch_size
+        batch_x = torch.stack(batch_trajs, dim=0)
+        batch_x = batch_x.to(self.args.device)#model.DEVICE)
+        rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
+        batch_inds = np.array(batch_inds)
+        imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
+        
+        #imagined_trajs = np.zeros(input_data.shape)
+        for i in tqdm(goal_inds):
+            counter += 1
+            if counter % 100 == 0:
                 print(i)
             x = input_data[i,:,:].unsqueeze(0)
             if i in single_goal_trajs:
@@ -306,7 +345,7 @@ class Analysis(object):
             # store the steps of burn in with real frames in imagined_trajs
             imagined_trajs[i,:burn_in_length,:] = x[:,:burn_in_length,:].cpu()
             # rollout model for the rest of the trajectory
-            rollout_length = self.num_timepoints - burn_in_length            
+            rollout_length = self.num_timepoints - burn_in_length
             if x.dtype == torch.float64:
                 x = x.float()
             rollout_x = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu().detach()
@@ -476,7 +515,7 @@ class Analysis(object):
                     rollout_x = model.forward_rollout(real_trajs.cuda(), burn_in_length, rollout_length).cpu()
                 else:
                     rollout_x = []
-                    for i in range(0, total_trials, batch_size):
+                    for i in tqdm(range(0, total_trials, batch_size)):
                         x = real_trajs[i: i+batch_size, :, :]
                         y = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu()
                         rollout_x.append(y)
@@ -553,7 +592,6 @@ class Analysis(object):
             os.makedirs(result_save_dir)
         if self.args.eval_type == 'displacement':
             save_path = os.path.join(result_save_dir, f'{save_file}.pkl')
-            breakpoint()
             with open(save_path, 'wb') as f:
                 pickle.dump(self.results, f)
         else:  
@@ -587,6 +625,9 @@ class Analysis(object):
 def load_args():
     parser = argparse.ArgumentParser()
     # general pipeline parameters
+    parser.add_argument('--batch_size', type=int, action='store',
+                        default=DEFAULT_VALUES['batch_size'],
+                        help='Batch size')
     parser.add_argument('--eval_seed', type=int, 
                         default=DEFAULT_VALUES['eval_seed'], help='Random seed')
     parser.add_argument('--analysis_dir', type=str, action='store',

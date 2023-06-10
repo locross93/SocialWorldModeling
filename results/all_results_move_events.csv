@@ -1,0 +1,32 @@
+,accuracy,precision,recall,model,epoch,dataset
+0,0.6860741879966311,0.5830328009617036,0.8876590552553599,MP-S1,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s1/mp_mlp_2048_lr3e-4_s1_epoch4200,data_5_31_23.pkl
+1,0.6687905086235307,0.5656025495597689,0.9125849747254664,MP-S2,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s2/mp_mlp_2048_lr3e-4_s2_epoch4200,data_5_31_23.pkl
+2,0.6808744369987916,0.5776526878694062,0.8943698797280809,MP-S3,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s3/mp_mlp_2048_lr3e-4_s3_epoch4200,data_5_31_23.pkl
+3,0.7703687429052694,0.7022782054272607,0.7871709952937075,RSSM-S1,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s1/rssm_disc_h_2048_lr3e-4_s1_epoch2600,data_5_31_23.pkl
+4,0.787103152806767,0.7382957224654766,0.7641624542443786,RSSM-S2,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s2/rssm_disc_h_2048_lr3e-4_s2_epoch2800,data_5_31_23.pkl
+5,0.7887143432568018,0.7410005070136894,0.7642496078089593,RSSM-S3,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s3/rssm_disc_h_2048_lr3e-4_s3_epoch2800,data_5_31_23.pkl
+6,0.4203376176352118,0.4202256244963739,0.9999128464354192,RSSM-Cont-S1,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s1/rssm_cont_h_2048_lr1e-4_s1_epoch400,data_5_31_23.pkl
+7,0.4203009996704383,0.4202102333076951,0.9999128464354192,RSSM-Cont-S2,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s2/rssm_cont_h_2048_lr1e-4_s2_epoch400,data_5_31_23.pkl
+8,0.4203009996704383,0.4202102333076951,0.9999128464354192,RSSM-Cont-S3,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s3/rssm_cont_h_2048_lr1e-4_s3_epoch400,data_5_31_23.pkl
+9,0.7632282397744333,0.8696486566282846,0.5134216489454418,MD-S1,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s1/md_mlp_2048_lr3e-4_s1_epoch7800,data_5_31_23.pkl
+10,0.7666337104983705,0.8673484084689616,0.5248387659055256,MD-S2,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s2/md_mlp_2048_lr3e-4_s2_epoch7600,data_5_31_23.pkl
+11,0.7656450254494855,0.8803598200899551,0.5117657312184068,MD-S3,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s3/md_mlp_2048_lr3e-4_s3_epoch7600,data_5_31_23.pkl
+12,0.4204474715295324,0.4202659632926695,0.9998256928708384,TF-Emb2048-S1,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s1/tf_emb2048_lr1e-4_s1_epoch600,data_5_31_23.pkl
+13,0.4202277637408912,0.420179454312397,0.9999128464354192,TF-Emb2048-S2,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s2/tf_emb2048_lr1e-4_s2_epoch600,data_5_31_23.pkl
+14,0.6689369804826247,0.5655759797315508,0.9144151995816628,MP-S1,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s1/mp_mlp_2048_lr3e-4_s1_epoch5600,data_5_31_23.pkl
+15,0.6623457468233915,0.5600063921589516,0.9162454244378596,MP-S2,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s2/mp_mlp_2048_lr3e-4_s2_epoch5600,data_5_31_23.pkl
+16,0.6674356439269106,0.5651842162633529,0.9037824647028064,MP-S3,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s3/mp_mlp_2048_lr3e-4_s3_epoch5600,data_5_31_23.pkl
+17,0.8084148083049544,0.8048446962297323,0.7181453721457207,RSSM-S1,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s1/rssm_disc_h_2048_lr3e-4_s1_epoch3400,data_5_31_23.pkl
+18,0.8119301329232121,0.8330880807231449,0.6907791528673523,RSSM-S2,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s2/rssm_disc_h_2048_lr3e-4_s2_epoch3800,data_5_31_23.pkl
+19,0.6460873704639496,0.5474578939083897,0.909360292835977,RSSM-S3,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s3/rssm_disc_h_2048_lr3e-4_s3_epoch3800,data_5_31_23.pkl
+20,0.4260134021751071,0.4224993543150205,0.9979954680146418,RSSM-Cont-S1,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s1/rssm_cont_h_2048_lr1e-4_s1_epoch800,data_5_31_23.pkl
+21,0.4204108535647589,0.4202271894466837,0.9994770786125152,RSSM-Cont-S2,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s2/rssm_cont_h_2048_lr1e-4_s2_epoch800,data_5_31_23.pkl
+22,0.4245486835841664,0.4219170011415105,0.9986055429667072,RSSM-Cont-S3,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s3/rssm_cont_h_2048_lr1e-4_s3_epoch800,data_5_31_23.pkl
+23,0.7641803068585448,0.8849801162434996,0.5042705246644588,MP-S1,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s1/md_mlp_2048_lr3e-4_s1_epoch10400,data_5_31_23.pkl
+24,0.7652422278369768,0.879706014699265,0.5111556562663413,MD-S2,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s2/md_mlp_2048_lr3e-4_s2_epoch10200,data_5_31_23.pkl
+25,0.7641070709289978,0.8852986217457887,0.5038347568415548,MD-S3,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s3/md_mlp_2048_lr3e-4_s3_epoch10200,data_5_31_23.pkl
+26,0.4204474715295324,0.4202659632926695,0.9998256928708384,TF Emb2048 S1,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s1/tf_emb2048_lr1e-4_s1_epoch600,data_5_31_23.pkl
+27,0.4202277637408912,0.420179454312397,0.9999128464354192,TF Emb2048 S2,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s2/tf_emb2048_lr1e-4_s2_epoch600,data_5_31_23.pkl
+28,0.4204474715295324,0.4202659632926695,0.9998256928708384,TF Emb2048 S3,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s3/tf_emb2048_lr1e-4_s3_epoch600,data_5_31_23.pkl
+29,0.7547328719469771,0.9560733384262796,0.43629074429144155,SGNet-H512,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default_lr1e-4/sgnet_cvae_default_lr1e-4_epoch1000,data_5_31_23.pkl
+30,0.7508879856457578,0.862937062937063,0.4839637441171344,SGNet-H256,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size256_lr1e-4/sgnet_cvae_hidden_size256_lr1e-4_epoch1200,data_5_31_23.pkl

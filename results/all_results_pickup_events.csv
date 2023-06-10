@@ -1,0 +1,16 @@
+,model,score,epoch,dataset
+0,MP-S1,0.49427168576104746,5600,data_5_31_23.pkl
+1,MP-S2,0.5090016366612111,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s2/mp_mlp_2048_lr3e-4_s2_epoch6000,data_5_31_23.pkl
+2,MP-S3,0.5638297872340425,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s3/mp_mlp_2048_lr3e-4_s3_epoch6000,data_5_31_23.pkl
+3,RSSM-S1,0.4574468085106383,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s1/rssm_disc_h_2048_lr3e-4_s1_epoch3600,data_5_31_23.pkl
+4,RSSM-S2,0.5531914893617021,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s2/rssm_disc_h_2048_lr3e-4_s2_epoch3600,data_5_31_23.pkl
+5,RSSM-S3,0.5654664484451718,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s3/rssm_disc_h_2048_lr3e-4_s3_epoch3600,data_5_31_23.pkl
+6,RSSM-Cont-S1,0.40098199672667756,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s1/rssm_cont_h_2048_lr1e-4_s1_epoch600,data_5_31_23.pkl
+7,RSSM-Cont-S2,0.3330605564648118,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s2/rssm_cont_h_2048_lr1e-4_s2_epoch600,data_5_31_23.pkl
+8,RSSM-Cont-S3,0.40507364975450083,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s3/rssm_cont_h_2048_lr1e-4_s3_epoch600,data_5_31_23.pkl
+9,MD-S1,0.4075286415711948,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s1/md_mlp_2048_lr3e-4_s1_epoch9400,data_5_31_23.pkl
+10,MD-S2,0.41080196399345337,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s2/md_mlp_2048_lr3e-4_s2_epoch9200,data_5_31_23.pkl
+11,MD-S3,0.43453355155482815,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s3/md_mlp_2048_lr3e-4_s3_epoch9200,data_5_31_23.pkl
+12,TF-Emb2048-S1,0.3707037643207856,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s1/tf_emb2048_lr1e-4_s1_epoch600,data_5_31_23.pkl
+13,TF-Emb2048-S2,0.2618657937806874,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s2/tf_emb2048_lr1e-4_s2_epoch600,data_5_31_23.pkl
+14,TF-Emb2048-S3,0.251227495908347,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s3/tf_emb2048_lr1e-4_s3_epoch600,data_5_31_23.pkl

@@ -6,43 +6,50 @@ Created on Mon Feb  6 12:00:58 2023
 """
 #%%
 import pickle
+
 import numpy as np
 import pandas as pd
+
 import matplotlib.pylab as plt
+import matplotlib.patches as mpatches 
 import seaborn as sns
 from constants import BEHV_CATE_DICT
 #%%
 
-
+# Evaluation results
 #%%
 def process_plot_data(result_path):
     event_type = result_path.split('_')[-2]
     df = pd.read_csv(result_path, index_col=0)
+    df['base_model'] = df['model'].apply(lambda x: '_'.join(x.split('-')[: -1]))#x.split('-')[0])
+
+
     if event_type == 'goal':
-        inds2plot = [25, 18, 28, 26, 22]
-        df = df.loc[inds2plot]
+        grouped_df = df.groupby('base_model').agg(
+             mean_score=('score', np.mean),
+             standard_error=('score', lambda x: np.std(x, ddof=1)/np.sqrt(x.size)))
+        # Reset the index
+        df = grouped_df.reset_index()
     elif event_type == 'multigoal':
-        inds2plot = [0, 1, 2, 4, 10]
-        df = df.loc[inds2plot]  
-        df = pd.melt(df, id_vars="model", value_vars=["g2_acc", "g3_acc"], var_name="Goal Num", value_name="Accuracy")
+        df = pd.melt(df, id_vars="base_model", value_vars=["g2_acc", "g3_acc"], var_name="Goal Num", value_name="Accuracy")
         df["Goal Num"] = df["Goal Num"].replace({"g2_acc": "2nd Goal", "g3_acc": "3rd Goal"})
     elif event_type == 'move':
         f1_score = 2 * (df['precision'] * df['recall']) / (df['precision'] + df['recall'])
         df['f1_score'] = f1_score
-        df = pd.melt(df, id_vars="model", value_vars=["f1_score", "precision", "recall"], var_name="Metric", value_name="Score")
+        df = pd.melt(df, id_vars="base_model", value_vars=["f1_score", "precision", "recall"], var_name="Metric", value_name="Score")
     elif event_type == 'pickup':
-        inds2plot = [0, 1, 2, 4, 6]
-        df = df.loc[inds2plot]
+        df = df
     return df
 
 def plot_paper_eval_results(goal_path, multigoal_path, move_path, pickup_path):
     goal_df = process_plot_data(goal_path)
+    print(goal_df)
     multigoal_df = process_plot_data(multigoal_path)
     move_df = process_plot_data(move_path)
     pickup_df = process_plot_data(pickup_path)
 
     "Plot"
-    xlabels = ['RSSM Discrete', 'RSSM Continuous', 'Multistep Predictor', 'Multistep Delta', 'IRIS Transformer']
+    xlabels = ['Multistep Predictor', 'RSSM Discrete', 'RSSM Continuous', 'Multistep Delta', 'Transformer']
     # style
     sn_palette='Set2'
     title_fontsize = 40
@@ -51,15 +58,16 @@ def plot_paper_eval_results(goal_path, multigoal_path, move_path, pickup_path):
     legend_fontsize = 28
     fig, axs = plt.subplots(2, 2, figsize=(32, 21))
     # goal events plot
-    sns.barplot(ax=axs[0, 0], x='model', y='score', data=goal_df, palette=sn_palette)
+    sns.barplot(ax=axs[0, 0], x='base_model', y='mean_score', data=goal_df, palette=sn_palette)
+    axs[0, 0].errorbar(x=goal_df['base_model'], y=goal_df['mean_score'], yerr=goal_df['standard_error'], fmt='none', c='b', capsize=5)
     sns.despine(top=True, right=True)
     axs[0, 0].set_title('Single Goal Events', fontsize=title_fontsize)
     axs[0, 0].set_xlabel('Model Name', fontsize=label_fontsize)
-    axs[0, 0].set_xticklabels(xlabels, fontsize=xtick_fontsize, rotation=0, horizontalalignment='center')
+    axs[0, 0].set_xticklabels(xlabels, fontsize=xtick_fontsize, rotation=10, horizontalalignment='center')
     axs[0, 0].set_ylabel('Accuracy', fontsize=label_fontsize)
     axs[0, 0].set_ylim([0, 1])
     # multigoal events plot
-    sns.barplot(ax=axs[0, 1], x='model', y='Accuracy', hue='Goal Num', data=multigoal_df, palette="Paired")
+    sns.barplot(ax=axs[0, 1], x='base_model', y='Accuracy', hue='Goal Num', data=multigoal_df, palette="Paired")
     axs[0, 1].set_title('Multi Goal Events', fontsize=title_fontsize)
     axs[0, 1].set_xlabel("Model Name", fontsize=label_fontsize)
     axs[0, 1].set_xticklabels(xlabels, fontsize=xtick_fontsize, rotation=0, horizontalalignment='center')
@@ -68,14 +76,15 @@ def plot_paper_eval_results(goal_path, multigoal_path, move_path, pickup_path):
     axs[0, 1].legend(loc='upper right', bbox_to_anchor=(1, 1.05))
     axs[0, 1].get_legend().remove()
     # pickup events plot
-    sns.barplot(ax=axs[1, 0], x='model', y='score', data=pickup_df, palette=sn_palette)
+    sns.barplot(ax=axs[1, 0], x='base_model', y='score', data=pickup_df, palette=sn_palette)
     axs[1, 0].set_title("Move Events", fontsize=title_fontsize)
     axs[1, 0].set_xlabel('Model Name', fontsize=label_fontsize)
     axs[1, 0].set_xticklabels(xlabels, fontsize=xtick_fontsize, rotation=0, horizontalalignment='center')
     axs[1, 0].set_ylabel('Accuracy', fontsize=label_fontsize)
     axs[1, 0].set_ylim([0, 1])
     # move events plot
-    sns.barplot(ax=axs[1, 1], x='Metric', y='Score', hue='model', data=move_df, palette=sn_palette)
+    sns.barplot(ax=axs[1, 1], x='Metric', y='Score', hue='base_model', data=move_df, 
+                palette=sn_palette, capsize=.2, ci='68')
     axs[1, 1].set_title('Move Events', fontsize=title_fontsize)
     axs[1, 1].set_xlabel('Metric', fontsize=label_fontsize)
     axs[1, 1].set_xticklabels(['F1 Score', 'Precision', 'Recall'], fontsize=xtick_fontsize, rotation=0, horizontalalignment='center')
@@ -95,7 +104,17 @@ def plot_paper_eval_results(goal_path, multigoal_path, move_path, pickup_path):
     plt.show()
 #%%
 
+#%%
+goal_path = 'results/all_results_goal_events.csv'
+multigoal_path = 'results/all_results_multigoal_events.csv'
+move_path = 'results/eval_move_events.csv' #'results/all_results_move_events.csv'
+pickup_path = 'results/all_results_pickup_events.csv'
+plot_paper_eval_results(goal_path, multigoal_path, move_path, pickup_path)
+#%%
 
+
+
+# Displatment results
 #%%
 def get_displacement(displacement_vals, dis_type='mde'):
     disp_by_cate = {}
@@ -118,17 +137,60 @@ def create_data_df(data_dict):
             data.append({'Model': model, 'Behavior': behavior, 'Mean': mean, 'StdErr': sterr})
     return pd.DataFrame(data)
 
-def plot_placement(df):
+def plot_placement(df, legend=False):
+    title_dict = {
+        'chasing': 'Chasing',
+        'ss gathering': 'Single-step Gathering',
+        'ms gatherinng': 'Multi-step Gathering',
+        'random': 'Random',
+        'mimicry': 'Mimicry',
+        'colab_gathereing': 'Collaborative Gathering',
+        'adversarial_gathering': 'Adversarial Gathering'
+    }
     behavior_list = df['Behavior'].unique()
+    xlabels = ['Multistep Predictor', 'RSSM Discrete', 'RSSM Continuous', 'Multistep Delta', 'Transformer']
 
-    fig, axs = plt.subplots(nrows=len(behavior_list), figsize=(10, 10))
+    df['Model'] = df['Model'].replace('MP', 'Multistep Predictor')
+    df['Model'] = df['Model'].replace('RSSM', 'RSSM Discrete')
+    df['Model'] = df['Model'].replace('RSSM_Cont', 'RSSM Continuous')
+    df['Model'] = df['Model'].replace('MD', 'Multistep Delta')
+    df['Model'] = df['Model'].replace('TF_Emb2048', 'Transformer')
 
-    for ax, behavior in zip(axs, behavior_list):
+    fig, axs = plt.subplots(nrows=len(behavior_list), figsize=(10, 11))
+    palette = sns.color_palette('Set2', len(df['Model'].unique()))
+    bar_width = 0.3
+
+    handles = []  # to hold the legend handles
+    for i, (ax, behavior) in enumerate(zip(axs, behavior_list)):
         df_behavior = df[df['Behavior'] == behavior]
-        sns.barplot(x='Model', y='Mean', data=df_behavior, ax=ax, errorbar=None, palette="Set2")        
-        ax.errorbar(x=df_behavior['Model'], y=df_behavior['Mean'], yerr=df_behavior['StdErr'], fmt='none', c='b', capsize=5)
-        ax.set_title(behavior)
+        
+        #sns.barplot(x='Model', y='Mean', data=df_behavior, ax=ax, errorbar=None, palette="Set2", width=0.25)
+        if i != 6:
+            ax.set_xlabel('')
+            ax.set_xticklabels([])
+        else:   
+            ax.set_xlabel('Model', fontsize=20) 
+            ax.set_xticks(xs)
+            ax.set_xticklabels(xlabels, fontsize=12, rotation=10, horizontalalignment='center')
+        if i != 3:
+            ax.set_ylabel('')
+        else:
+            ax.set_ylabel('Displacement Error', fontsize=20)
 
+        df_behavior = df[df['Behavior'] == behavior]
+        xs = [0, 0.5, 1, 1.5, 2]
+        bars = ax.bar(xs, df_behavior['Mean'], color=palette, width=bar_width, )
+        ax.errorbar(x=xs, y=df_behavior['Mean'],
+                    yerr=df_behavior['StdErr'], fmt='none', c='black', capsize=5)
+        ax.set_title(title_dict[behavior])
+        ax.set_ylim([0, 15.0])
+        # Add to the legend handles
+        if i == 0:  # we only need to add handles once
+            for bar, model in zip(bars, df_behavior['Model']):
+                handles.append(mpatches.Patch(color=bar.get_facecolor(), label=model))
+
+    if legend:
+        plt.legend(handles=handles, loc='upper left', bbox_to_anchor=(1.15, 1.0), fontsize=12, title='Model Name')
     plt.tight_layout()
     plt.show()
 
@@ -188,7 +250,6 @@ for model in model_seed_ade_dict:
             np.std(model_seed_fde_dict[model][cat]) / np.sqrt(len(model_seed_fde_dict[model][cat])))
 
 
-
 #%%
 
 #%%
@@ -198,5 +259,5 @@ plot_placement(ade_df)
 
 #%%
 fde_df = create_data_df(model_seed_fde_dict)
-plot_placement(fde_df)  
+plot_placement(fde_df, legend=True)
 #%%

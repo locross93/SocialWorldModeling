@@ -1,0 +1,3 @@
+,model,score,epoch,dataset
+0,SGNet-H512,0.2855973813420622,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default_lr1e-4/sgnet_cvae_default_lr1e-4_epoch1000,data_5_31_23.pkl
+1,SGNet-H256,0.35515548281505727,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size256_lr1e-4/sgnet_cvae_hidden_size256_lr1e-4_epoch1000,data_5_31_23.pkl

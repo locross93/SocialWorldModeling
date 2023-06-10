@@ -1,0 +1,4 @@
+,accuracy,precision,recall,model,epoch,dataset
+0,0.4204474715295324,0.4202659632926695,0.9998256928708384,TF Emb2048 S1,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s1/tf_emb2048_lr1e-4_s1_epoch600,data_5_31_23.pkl
+1,0.42059394338862643,0.4202749770852429,0.9990413107896113,TF Emb2048 S2,400,data_5_31_23.pkl
+2,0.42022776374089127,0.420179454312397,0.9999128464354192,TF Emb2048 S3,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s3/tf_emb2048_lr1e-4_s3_epoch800,data_5_31_23.pkl

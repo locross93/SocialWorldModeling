@@ -173,6 +173,7 @@ class SGNet_CVAE(nn.Module):
     def compute_enc_targets(self, inputs):
         enc_targets = []
         for i in range(self.enc_steps):
+            # @TODO gotta sweep how far in the future the goal should be
             start_idx = i + 1
             end_idx = start_idx + self.dec_steps
             enc_targets.append(inputs[:, start_idx : end_idx, :])
