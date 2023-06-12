@@ -25,10 +25,13 @@ MODEL_DICT_TRAIN = {
 }
 """Values for validation"""
 # Only using 5-31-23 for the paper
+# @TODO Clean up config file in this format 
+# folder_name
+# in each folder we save a json/pickle file of model_info
 MODEL_DICT_VAL=  {
-    'mp_mlp_2048_lr3e-4_s1': {
-        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
-        'model_dir': 'mp_mlp_2048_lr3e-4_s1', 'model_label': 'MP-S1', 'epoch': '5600'},
+    # 'mp_mlp_2048_lr3e-4_s1': {
+    #     'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
+    #     'model_dir': 'mp_mlp_2048_lr3e-4_s1', 'model_label': 'MP-S1', 'epoch': '5600'},
     # 'mp_mlp_2048_lr3e-4_s2': {
     #     'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
     #     'model_dir': 'mp_mlp_2048_lr3e-4_s2', 'model_label': 'MP-S2'},
@@ -89,9 +92,9 @@ MODEL_DICT_VAL=  {
     # 'tf_emb2048_lr1e-4_s3': {
     #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
     #     'model_dir': 'tf_emb2048_lr1e-4_s3', 'model_label': 'TF Emb2048 S3'},
-    # 'sgnet_cvae_lr1e-4': {
-    #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
-    #     'model_dir': 'sgnet_cvae_default_lr1e-4', 'model_label': 'SGNet-H512'},
+    'sgnet_cvae_lr1e-4': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
+        'model_dir': 'sgnet_cvae_default_lr1e-4', 'model_label': 'SGNet-H512'},
     # 'sgnet_cvae_hidden64_lr1e-4': {
     #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
     #     'model_dir': 'sgnet_cvae_hidden_size64_lr1e-4', 'model_label': 'SGNet-H64'},
@@ -105,8 +108,8 @@ MODEL_DICT_VAL=  {
 data_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/data/'
 checkpoint_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/'
 data_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/data/'
-#checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
-checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/'
+checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
+#checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/'
 
 
 DEFAULT_VALUES = {

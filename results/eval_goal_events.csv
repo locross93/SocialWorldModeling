@@ -1,3 +1,2 @@
 ,model,score,MSE,epoch,dataset
-0,SGNet-H512,0.07528641571194762,2.47589373588562,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default_lr1e-4/sgnet_cvae_default_lr1e-4_epoch1000,data_5_31_23.pkl
-1,SGNet-H256,0.18166939443535188,2.254026174545288,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size256_lr1e-4/sgnet_cvae_hidden_size256_lr1e-4_epoch1000,data_5_31_23.pkl
+0,SGNet-H512,0.0,3.018923044204712,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default_lr1e-4/sgnet_cvae_default_lr1e-4_epoch1200,data_5_31_23.pkl
