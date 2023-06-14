@@ -2,6 +2,10 @@
 
 This repository contains code for training various types of world models on the Social World Modeling Benchmark, built in TDW.
 
+## Download dataset
+
+Data can be downloaded at https://drive.google.com/file/d/1H1Kj5iIuacVamzUTLhkKxxm1999Edtqv/view - this zip file includes swn_data.pkl with training and validation splits and swm_data_exp_info.pkl a dictionary of information about trial type, events, and more which is used in the evaluations.
+
 ## Training World Models
 
 You can train a world model using the `train_world_model.py` script. This script takes command line arguments to specify the model type and the configuration file.
