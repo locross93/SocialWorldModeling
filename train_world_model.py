@@ -54,6 +54,8 @@ def load_args():
     parser.add_argument('--batch_size', type=int, action='store',
                         default=DEFAULT_VALUES['batch_size'],
                         help='Batch size')
+    parser.add_argument('--train_seed', type=int, 
+                        default=DEFAULT_VALUES['train_seed'], help='Random seed')
     parser.add_argument('--model_filename', type=str,
                         default=None, 
                         help='Filename for saving model')
@@ -96,6 +98,8 @@ def save_config(config, filename):
 
 def main():
     args = load_args()
+    torch.manual_seed(args.train_seed)
+    print(f"Train seed: {args.train_seed}") 
     config = load_config(os.path.join(args.model_config_dir, args.config))
     
     # Update config with args and keep track of overridden parameters
@@ -112,9 +116,6 @@ def main():
     elif config['model_type'] == "agent_former":        
         config['past_frames'] = args.burn_in_length
         config['future_frames'] = args.rollout_length
-
-    # model_class = model_dict[config['model_type']]        
-    # model = model_class(config)
     
     model = init_model_class(config, args)
     

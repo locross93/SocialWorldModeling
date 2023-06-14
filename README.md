@@ -4,7 +4,7 @@ This repository contains code for training various types of world models on the 
 
 ## Download dataset
 
-Data can be downloaded at https://drive.google.com/file/d/1H1Kj5iIuacVamzUTLhkKxxm1999Edtqv/view - this zip file includes swn_data.pkl with training and validation splits and swm_data_exp_info.pkl a dictionary of information about trial type, events, and more which is used in the evaluations.
+Data can be downloaded at https://drive.google.com/file/d/1sHiTBOCtfqFPk1P_5rzZ8Cl61B_5Nj-A/view - this zip file includes swn_data.pkl with training and validation splits and swm_data_exp_info.pkl a dictionary of information about trial type, events, and more which is used in the evaluations.
 
 ## Training World Models
 
@@ -29,12 +29,14 @@ Here is an example of what a configuration file might look like:
 
 ```bash
 {
-    "input_size": 64,
-    "deter_size": 256,
-    "dec_hidden_size": 512,
+    "input_size": 35,
+    "deter_size": 1024,
+    "dec_hidden_size": 2048,
     "rssm_type": "discrete",
     "rnn_type": "GRU",
-    ...
+    "category_size": 32,
+    "class_size": 32,
+    "model_type": "dreamerv2"
 }
 ```
 

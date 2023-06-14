@@ -310,7 +310,6 @@ class Analysis(object):
                 batch_x = torch.stack(batch_trajs, dim=0)
                 batch_x = torch.stack(batch_trajs, dim=0)
                 batch_x = batch_x.to(self.args.device)#model.DEVICE)
-                breakpoint()
                 rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
                 batch_inds = np.array(batch_inds)
                 imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x

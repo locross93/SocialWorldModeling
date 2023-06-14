@@ -113,6 +113,7 @@ checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/'
 
 
 DEFAULT_VALUES = {
+    'train_seed': 911320,
     'eval_seed': 911320, #834869, #(good for SGNet & RSSM Discrete) 
     #254438,  (18%),# 911320 (16.6%),# 665218 (#2), #87172, (#1)
     # general pipeline parameters
