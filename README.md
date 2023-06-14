@@ -18,6 +18,7 @@ python train_world_model.py --config rssm_disc_default_config.json
 
 In this example, dreamerv2 is the model class and rssm_disc_default_config.json is the configuration file.
 
+Paths for the dataset directory, checkpoint directory, etc. should be specified in constants.py
 
 ### Model Configuration
 
