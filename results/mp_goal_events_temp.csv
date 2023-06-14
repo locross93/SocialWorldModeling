@@ -1,0 +1,2 @@
+,model,score,MSE,epoch,dataset
+0,MP-S1,0.1885245901639344,2.1894304752349854,5600,swm_data.pkl
