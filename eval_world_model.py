@@ -110,7 +110,6 @@ class Analysis(object):
             single_goal_trajs = self.exp_info_dict[self.args.train_or_val]['single_goal_trajs']
         
         single_goal_trajs = single_goal_trajs[:int(partial*len(single_goal_trajs))]
-        single_goal_trajs = single_goal_trajs[:int(partial*len(single_goal_trajs))]
         num_single_goal_trajs = len(single_goal_trajs)
         imagined_trajs = np.zeros([num_single_goal_trajs, input_data.shape[1], input_data.shape[2]])        
         real_trajs = []
@@ -154,7 +153,6 @@ class Analysis(object):
         indices = np.argwhere(pickup_subset > -1)
         accuracy = np.mean(y_recon[indices[:,0],indices[:,1]])
         
-        print(np.where(y_recon[indices[:,0],indices[:,1]])[0])
         result = {'model': self.model_name, 'score': accuracy, 'MSE': mse}        
         return result
            
