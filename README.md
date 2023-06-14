@@ -13,7 +13,7 @@ You can train a world model using the `train_world_model.py` script. This script
 Example usage:
 
 ```bash
-python train_world_model.py --model dreamerv2 --config rssm_disc_default_config.json
+python train_world_model.py --config rssm_disc_default_config.json
 ```
 
 In this example, dreamerv2 is the model class and rssm_disc_default_config.json is the configuration file.
