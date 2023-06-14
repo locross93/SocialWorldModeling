@@ -50,13 +50,13 @@ Example usage:
 python eval_world_model.py --eval_type goal_events --model_key rssm_disc
 ```
 
-1. Prediction error of forward rollouts on validation set (ADE and FDE) --eval_type displacement
+1. Prediction error of forward rollouts on validation set (ADE and FDE): --eval_type displacement
 2. Simulating events in forward rollouts 
-    1. Evaluate single goal events --eval_type goal_events
-    2. Evaluate multi goal events --eval_type multigoal_events
-    2. Evaluate move events --eval_type move_events
-    3. Evaluate pick up events --eval_type pickup_events
-3. Visualizing forward rollouts - visualize_model_rollouts.py
+    1. Evaluate single goal events: --eval_type goal_events
+    2. Evaluate multi goal events: --eval_type multigoal_events
+    2. Evaluate move events: --eval_type move_events
+    3. Evaluate pick up events: --eval_type pickup_events
+3. Visualizing forward rollouts: visualize_model_rollouts.py
 
 In the constants.py file, specify the models you want to test in a dictionary of dicts, MODEL_DICT_VAL. Here's an example of what this might look like:
 
