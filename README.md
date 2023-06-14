@@ -44,22 +44,30 @@ Here is an example of what a configuration file might look like:
 
 The evaluation pipeline contains various tests on validation data, to probe the world model's understanding of events and goal-directed behavior, in addition to more traditional metrics for trajectory prediction.
 
-1. Prediction error of forward rollouts on validation set - eval_val_rollouts.py
+Example usage:
+
+```bash
+python eval_world_model.py --eval_type goal_events --model_key rssm_disc
+```
+
+1. Prediction error of forward rollouts on validation set (ADE and FDE) --eval_type displacement
 2. Simulating events in forward rollouts 
-    1. Evaluate single goal events - eval_rollouts_goal_events.py
-    2. Evaluate multi goal events - eval_rollouts_multigoal_events.py
-    2. Evaluate move events - eval_rollouts_move_events.py
-    3. Evaluate pick up events
+    1. Evaluate single goal events --eval_type goal_events
+    2. Evaluate multi goal events --eval_type multigoal_events
+    2. Evaluate move events --eval_type move_events
+    3. Evaluate pick up events --eval_type pickup_events
 3. Visualizing forward rollouts - visualize_model_rollouts.py
 
-In each evaluation file, specify the models you want to test in a dictionary of dicts, model_dict. Here's an example of what this might look like:
+In the constants.py file, specify the models you want to test in a dictionary of dicts, MODEL_DICT_VAL. Here's an example of what this might look like:
 
 ```
-model_dict = {
+MODEL_DICT_VAL = {
         'rssm_disc': {'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
                       'model_dir': 'rssm_disc', 'epoch': '1000', 'model_label': 'RSSM Discrete'},
         }
 ```
 
+## Generating More Data
 
+Data generating code will be added to this repo soon
 
