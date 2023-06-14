@@ -65,7 +65,6 @@ def plot_pickup_events(df_results, save_file):
     plt.show()
 
 def plot_eval_wm_results(df_results, args, save_file=None):
-    breakpoint()
     if args.eval_type == 'goal_events' or args.eval_type == 'goal_events_level2':
         plot_goal_events(df_results, save_file)
     elif args.eval_type == 'multigoal_events':
