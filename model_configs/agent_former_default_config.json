@@ -1,0 +1,64 @@
+{
+    "num_agent": 5,    
+
+    "model_type": "agent_former",
+    "obs_size": 7,
+    "max_t_len": 200,
+    "max_a_len": 128,    
+        
+    "tf_cfg" : {
+        "gaussian_kernel": false,
+        "sep_attn": true
+    },
+
+    "tf_model_dim": 256,
+    "tf_ff_dim": 512,
+    "tf_nhead": 8,
+    "tf_dropout": 0.1,
+    
+    "context_encoder": {
+        "nlayer": 2
+    },
+    "pos_concat": true,
+    "use_agent_enc": true,
+    "agent_enc_learn": true,
+    "ar_detach": true,
+    "pooling": "mean",
+    "agent_enc_shuffle": null,
+    "use_map": false,
+    "rand_rot_scene": true,
+    "discrete_rot": false,
+    "map_global_rot": false,
+    "ar_train": true,
+    "max_train_agent": 32,
+
+    "future_encoder": {
+        "nlayer": 2,
+        "out_mlp_dim": [512, 256]
+    },
+
+    "future_decoder" : {
+        "nlayer": 2, 
+        "out_mlp_dim": [512, 256]
+    },
+    "pred_scale": 1.0,
+    "pos_offset": false,
+
+    "nz": 32,
+    "learn_prior": false,
+    "z_type": "gaussian",
+
+    "loss_cfg" : {
+        "mse" : {
+            "weight": 1.0
+        },
+        "kld" : {
+            "weight": 1.0,
+            "min_clip": 2.0
+        },
+        "sample" : {
+            "weight": 1.0,
+            "k": 20
+        }
+    }
+}

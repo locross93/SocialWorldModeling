@@ -1,2 +1,0 @@
-,model,score,MSE,epoch,dataset
-0,Multistep Predictor Norm Velocity,0.0,0.02219598926603794,/mnt/fs2/locross/analysis/models/mp_norm_vel/mp_norm_vel_epoch3400,data_norm_velocity.pkl

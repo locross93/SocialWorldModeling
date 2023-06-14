@@ -1,6 +1,3 @@
 ,accuracy,precision,recall,model,epoch,dataset
-0,0.7620198469369073,0.7986553007563933,0.5797455115914241,Multistep Predictor DS3,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch3400,data_5_31_23.pkl
-1,0.7607748361346076,0.8390284067517497,0.5328568938469583,Multistep Delta DS3,/mnt/fs2/locross/analysis/models/multistep_delta_ds3/multistep_delta_ds3_epoch4800,data_5_31_23.pkl
-2,0.49163279504925117,0.4519487772768979,0.9873627331357853,RSSM Continuous,/mnt/fs2/locross/analysis/models/rssm_cont_ds2/rssm_cont_ds2_epoch2200,data_5_31_23.pkl
-3,0.801384159068439,0.9201388888888888,0.5773923653477427,RSSM Discrete DS2,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch7000,data_5_31_23.pkl
-4,0.4204474715295324,0.42026012090126397,0.9997385393062577,RSSM Discrete DS3,/mnt/fs2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch3600,data_5_31_23.pkl
+0,0.7547328719469771,0.9560733384262796,0.43629074429144155,SGNet-H512,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default_lr1e-4/sgnet_cvae_default_lr1e-4_epoch1000,data_5_31_23.pkl
+1,0.7508879856457578,0.862937062937063,0.4839637441171344,SGNet-H256,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size256_lr1e-4/sgnet_cvae_hidden_size256_lr1e-4_epoch1200,data_5_31_23.pkl

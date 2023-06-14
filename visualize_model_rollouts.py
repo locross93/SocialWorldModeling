@@ -21,7 +21,7 @@ from analysis_utils import load_trained_model, get_data_columns, inverse_normali
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import annotate_goal_timepoints
 
-from constants_lc import MODEL_DICT_VAL, DEFAULT_VALUES, DATASET_NUMS
+from constants import MODEL_DICT_VAL, DEFAULT_VALUES, DATASET_NUMS
     
     
 def load_args():
@@ -36,7 +36,7 @@ def load_args():
                          default=DEFAULT_VALUES['data_dir'], 
                          help='Data directory')
     parser.add_argument('--dataset', type=str,
-                         default='data_5_31_23.pkl', 
+                         default=DEFAULT_VALUES['dataset'], 
                          help='Dataset name')
     parser.add_argument('--checkpoint_dir', type=str, 
                         default=DEFAULT_VALUES['checkpoint_dir'], 
@@ -180,7 +180,8 @@ def make_frame_compare(t):
 
 if __name__ == '__main__':
     args = load_args()
-    
+    torch.manual_seed(DEFAULT_VALUES['eval_seed'])
+    print("Using seed: {}".format(DEFAULT_VALUES['eval_seed']))
     model_info = MODEL_DICT_VAL[args.model_key]
     model_name = model_info['model_label']
     model = load_trained_model(model_info, args)
@@ -234,7 +235,6 @@ if __name__ == '__main__':
         traj_ind = args.trial_num
         burn_in_length = args.burn_in_length
     
-    print(burn_in_length)
     rollout_length = input_data.size(1) - burn_in_length
     x = input_data[traj_ind,:,:].unsqueeze(0)
     if x.dtype == torch.float64:

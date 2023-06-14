@@ -1,22 +1,12 @@
+import os
 from models import DreamerV2, MultistepPredictor, MultistepDelta, \
-    TransformerMSPredictor, TransformerIrisWorldModel, TransformerWorldModel
+    TransformerMSPredictor, TransformerIrisWorldModel, TransformerWorldModel    
+from agent_former.agentformer import AgentFormer
+from sgnet_models.SGNet_CVAE import SGNet_CVAE
 from gnn_models.imma import IMMA
 from gnn_models.gat import GAT
 from gnn_models.rfm import RFM
 
-
-"""Valus for discretization data"""
-DISCRETIZATION_DICT_SMALL = {
-    'max': [
-        6.7625, 1.8597, 6.8753, 6.7313, 1.6808, 6.8558, 6.3460, 1.0356, 
-        6.8317, 6.8851, 0.3761, 6.8929, 0.7643, 1.0000, 0.7607, 1.0000, 
-        6.8764, 0.3719, 6.8717, 0.7659, 1.0000, 0.7655, 1.0000],
-    'min': [
-        -6.7398, -0.0123, -6.8303, -6.8838, -0.0220, -6.7574, -6.8617, -0.0117, 
-        -6.7947, -6.8901, -0.0426, -6.8758, -0.7560, -1.0000, -0.7604, -1.0000,
-        -6.8851, -0.0326, -6.8671, -0.7600, -1.0000, -0.7641, -1.0000]
-}
-DISCRETIZATION_DICT_BIG = {}
 
 """Values for training"""
 MODEL_DICT_TRAIN = {
@@ -29,85 +19,106 @@ MODEL_DICT_TRAIN = {
     'transformer_iris': TransformerIrisWorldModel,
     'imma': IMMA,
     'gat': GAT,
-    'rfm': RFM
+    'rfm': RFM,
+    'sgnet_cvae': SGNet_CVAE,
+    'agent_former': AgentFormer
 }
 """Values for validation"""
+# Only using 5-31-23 for the paper
+# @TODO Clean up config file in this format 
+# folder_name
+# in each folder we save a json/pickle file of model_info
 MODEL_DICT_VAL=  {
-    # 'rssm_disc': {
-    #     'class': DreamerV2, 'config': 'rssm_disc_default_config.json', 
-    #     'model_dir': 'rssm_disc_default', 'epoch': '3000', 'model_label': 'RSSM Discrete'},
-    # 'multistep_predictor': {
-    #     'class': MultistepPredictor, 'config': 'multistep_predictor_default_config.json',
-    #     'model_dir': 'multistep_predictor_default', 'epoch': '3000', 'model_label': 'Multistep Predictor'},
-    # 'multistep_delta': {
-    #     'class': MultistepDelta, 'config': 'multistep_delta_default_config.json',
-    #     'model_dir': 'multistep_delta_default', 'epoch': '3000', 'model_label': 'Multistep Delta'},
-    # 'transformer_iris_default': {
-    #     'class': TransformerIrisWorldModel, 'config': 'transformer_iris_default_config.json',
-    #     'model_dir': 'transformer_iris_default', 'epoch': '29000', 'model_label': 'Transformer Iris'},
-    'gat_rnn_norm_vel': {
-       'class': GAT, 'config': 'gat_encoder_rnn_config.json', 
-       'model_dir': 'gat_rnn_norm_vel', 'model_label': 'GAT RNN Encoder'},
-    'transformer_iris_concat_pos_embd_default': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_default', 'epoch': '29000', 'model_label': 'Transformer Iris Concat Pos Embd'},
-    'transformer_iris_concat_pos_embd_lr1e-4': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
-    'transformer_iris_concat_pos_embd_lr1e-5': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-5', 'epoch': '15000', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-5'},
-    # 'rfm_rnn': {
-    #    'class': RFM, 'config': 'rfm_rnn_config.json', 
-    #    'model_dir': 'rfm_rnn', 'model_label': 'RFM RNN'},
-    # 'gat': {
-    #    'class': GAT, 'config': 'gat_default_config.json', 
-    #    'model_dir': 'gat', 'model_label': 'GAT'},
-    # 'imma': {
-    #    'class': IMMA, 'config': 'imma_default_config.json', 
-    #    'model_dir': 'imma', 'model_label': 'IMMA'},
-    'mp_4096_ds3': {
-        'class': MultistepPredictor, 'config': 'mp_4096_ds3_rnn_hidden_size_4096.json',
-        'model_dir': 'mp_4096_ds3', 'model_label': 'MP 4096 DS3'},
-    'md_4096_ds3': {
-        'class': MultistepPredictor, 'config': 'multistep_delta_ds3_rnn_hidden_size_4096.json',
-        'model_dir': 'multistep_delta_ds3', 'model_label': 'MD 4096 DS3'},
-    'mp_replay_early': {
-        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
-        'model_dir': 'mp_replay_early', 'model_label': 'MP Replay Early'},
-    'trans_wm_replay_early': {
-       'class': TransformerWorldModel, 'config': 'transformer_wm_ds2.json', 
-       'model_dir': 'transformer_wm_replay_early', 'model_label': 'Transformer WM Replay Early'},
-    'rssm_disc_ds2': {
-        'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
-        'model_dir': 'rssm_ds2', 'model_label': 'RSSM Discrete DS2'},
-    'rssm_disc_ds3': {
-        'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
-        'model_dir': 'rssm_disc_ds3', 'model_label': 'RSSM Discrete DS3'},
-    'rssm_cont_ds3': {
-        'class': DreamerV2, 'config': 'rssm_cont_ds2.json', 
-        'model_dir': 'rssm_cont_replay_early', 'model_label': 'RSSM Continuous Replay Early'},
-    'transformer_iris': {
-        'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
-        'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
-    'mp_ds3': {
-        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
-        'model_dir': 'mp_ds3', 'model_label': 'Multistep Predictor DS3'},
-    'md_ds3': {
-        'class': MultistepDelta, 'config': 'multistep_delta_ds2.json',
-        'model_dir': 'multistep_delta_ds3', 'model_label': 'Multistep Delta DS3'},
-    'rssm_replay_early': {
-        'class': DreamerV2, 'config': 'rssm_disc_ds2.json', 
-        'model_dir': 'rssm_disc_seed3', 'model_label': 'RSSM Discrete DS3 Seed 3'},
+    # 'mp_mlp_2048_lr3e-4_s1': {
+    #     'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
+    #     'model_dir': 'mp_mlp_2048_lr3e-4_s1', 'model_label': 'MP-S1', 'epoch': '5600'},
+    # 'mp_mlp_2048_lr3e-4_s2': {
+    #     'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
+    #     'model_dir': 'mp_mlp_2048_lr3e-4_s2', 'model_label': 'MP-S2'},
+    # 'mp_mlp_2048_lr3e-4_s3': {
+    #     'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
+    #     'model_dir': 'mp_mlp_2048_lr3e-4_s3', 'model_label': 'MP-S3'},
+    # 'rssm_disc_h_2048_lr3e-4_s1': {
+    #     'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json', 
+    #     'model_dir': 'rssm_disc_h_2048_lr3e-4_s1', 'model_label': 'RSSM-S1'},
+    # 'rssm_disc_h_2048_lr3e-4_s2': {
+    #     'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
+    #     'model_dir': 'rssm_disc_h_2048_lr3e-4_s2', 'model_label': 'RSSM-S2'},
+    # 'rssm_disc_h_2048_lr3e-4_s3': {
+    #     'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
+    #     'model_dir': 'rssm_disc_h_2048_lr3e-4_s3', 'model_label': 'RSSM-S3'},
+    # 'rssm_cont_h_2048_lr1e-4_s1': {
+    #     'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_2048.json',
+    #     'model_dir': 'rssm_cont_h_2048_lr1e-4_s1', 'model_label': 'RSSM-Cont-S1'},
+    # 'rssm_cont_h_2048_lr1e-4_s2': {
+    #     'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_2048.json',
+    #     'model_dir': 'rssm_cont_h_2048_lr1e-4_s2', 'model_label': 'RSSM-Cont-S2'},
+    # 'rssm_cont_h_2048_lr1e-4_s3': {
+    #     'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_2048.json',
+    #     'model_dir': 'rssm_cont_h_2048_lr1e-4_s3', 'model_label': 'RSSM-Cont-S3'},
+    # 'md_mlp_2048_lr3e-4_s1' : {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
+    #     'model_dir': 'md_mlp_2048_lr3e-4_s1', 'model_label': 'MP-S1'},
+    # 'md_mlp_2048_lr3e-4_s2' : {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
+    #     'model_dir': 'md_mlp_2048_lr3e-4_s2', 'model_label': 'MD-S2'},
+    # 'md_mlp_2048_lr3e-4_s3' : {
+    #     'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
+    #     'model_dir': 'md_mlp_2048_lr3e-4_s3', 'model_label': 'MD-S3'},
+    # 'tf_emb512_lr1e-4_s1': {
+    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_512_config.json',
+    #     'model_dir': 'tf_emb512_lr1e-4_s1', 'model_label': 'TF Emb512 S1'},
+    # 'tf_emb512_lr1e-4_s2': {
+    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_512_config.json',
+    #     'model_dir': 'tf_emb512_lr1e-4_s2', 'model_label': 'TF Emb512 S2'},
+    # 'tf_emb512_lr1e-4_s3': {
+    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_512_config.json',
+    #     'model_dir': 'tf_emb512_lr1e-4_s3', 'model_label': 'TF Emb512 S3'},
+    # 'tf_emb1024_lr1e-4_s1': {
+    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_1024_config.json',
+    #     'model_dir': 'tf_emb1024_lr1e-4_s1', 'model_label': 'TF Emb1024 S1'},
+    # 'tf_emb1024_lr1e-4_s2': {
+    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_1024_config.json',
+    #     'model_dir': 'tf_emb1024_lr1e-4_s2', 'model_label': 'TF Emb1024 S2'},
+    # 'tf_emb1024_lr1e-4_s3': {
+    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_1024_config.json',
+    #     'model_dir': 'tf_emb1024_lr1e-4_s3', 'model_label': 'TF Emb1024 S3'},
+    # 'tf_emb2048_lr1e-4_s1': {
+    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
+    #     'model_dir': 'tf_emb2048_lr1e-4_s1', 'model_label': 'TF Emb2048 S1'},
+    # 'tf_emb2048_lr1e-4_s2': {
+    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
+    #     'model_dir': 'tf_emb2048_lr1e-4_s2', 'model_label': 'TF Emb2048 S2', "epoch": "400"},
+    # 'tf_emb2048_lr1e-4_s3': {
+    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
+    #     'model_dir': 'tf_emb2048_lr1e-4_s3', 'model_label': 'TF Emb2048 S3'},
+    'sgnet_cvae_lr1e-4': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
+        'model_dir': 'sgnet_cvae_default_lr1e-4', 'model_label': 'SGNet-H512'},
+    # 'sgnet_cvae_hidden64_lr1e-4': {
+    #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
+    #     'model_dir': 'sgnet_cvae_hidden_size64_lr1e-4', 'model_label': 'SGNet-H64'},
+    # 'sgnet_cvae_hidden128_lr1e-4': {
+    #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size128_config.json',
+    #     'model_dir': 'sgnet_cvae_hidden_size128_lr1e-4', 'model_label': 'SGNet-H128'},
+    # 'sgnet_cvae_hidden256_lr1e-4': {
+    #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size256_config.json',
+    #     'model_dir': 'sgnet_cvae_hidden_size256_lr1e-4', 'model_label': 'SGNet-H256'},  
 }
+data_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/data/'
+checkpoint_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/'
+data_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/data/'
+#checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'   # this has SGNet
+checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/'
+
 
 DEFAULT_VALUES = {
+    'eval_seed': 911320, #834869, #(good for SGNet & RSSM Discrete) 
+    #254438,  (18%),# 911320 (16.6%),# 665218 (#2), #87172, (#1)
     # general pipeline parameters
-    'analysis_dir': './', 
-    # as of 5/30, all models are trained on dataset_5_25_23.pkl
-    'data_path': '/ccn2/u/ziyxiang/swm_data_and_results/data/dataset_5_25_23.pkl',    
-    'data_dir': '/ccn2/u/ziyxiang/swm_data_and_results/data/',  
-    'checkpoint_dir': '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint',
+    'analysis_dir': './',    
+    'data_dir': data_dir_ccn2 if os.path.isdir(data_dir_ccn2) else data_dir_ccn,
+    'checkpoint_dir': checkpoint_dir_ccn2 if os.path.isdir(checkpoint_dir_ccn2) else checkpoint_dir_ccn,
     'model_config_dir': './model_configs',
     # general training parameters for all models
     'batch_size': 2048,
@@ -115,15 +126,26 @@ DEFAULT_VALUES = {
     'epochs': int(3e4),
     'save_every': 200,
     # eval parameters
-    'model_keys': ['rssm_disc_ds2', 'rssm_disc_ds3', 'rssm_cont_ds3', 'mp_ds3', 'md_ds3', 'transformer_iris'],
     #'model_keys': [ 'trans_wm_replay_early', 'mp_replay_early', 'transformer_iris_concat_pos_embd_lr1e-4', 'mp_4096_ds3', 'md_4096_ds3',],
-    #'model_keys': list(MODEL_DICT_VAL.keys()),
-    'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events'],
+    'model_keys': list(MODEL_DICT_VAL.keys()),
+    'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
+    'dataset': 'data_5_31_23.pkl'
 }
 
 DATASET_NUMS = {
     'train_test_splits_3D_dataset.pkl': 1,
-    'dataset_5_25_23.pkl': 2,
+    'dataset_5_25_23.pkl': 2, 
+}
+
+BEHV_CATE_DICT = {
+            'colab_gathereing': ['leader_follower', 'follower_leader'],
+            'adversarial_gathering': ['adversarial_gathering', 'gathering_adversarial'],
+            'ss gathering': ['random_gathering', 'gathering_static', 'static_gathering', 'gathering_random'],
+            'ms gatherinng': ['static_multistep', 'multistep_static', 'random_multistep', 'multistep_random'],
+            'chasing': ['chaser_runner', 'runner_chaser'],
+            'mimicry': ['random_mimic', 'mimic_random'],
+            'random': ['random_gathering', 'random_mimic', 'mimic_random', 'random_multistep',
+                       'random_random', 'multistep_random', 'gathering_random']
 }

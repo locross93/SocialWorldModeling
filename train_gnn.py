@@ -40,7 +40,7 @@ def load_args():
                          default=DEFAULT_VALUES['data_dir'], 
                          help='Data directory')
     parser.add_argument('--dataset', type=str,
-                         default='dataset_5_25_23.pkl', 
+                         default=DEFAULT_VALUES['dataset'], 
                          help='Dataset name')
     parser.add_argument('--checkpoint_dir', type=str, 
                         default=DEFAULT_VALUES['checkpoint_dir'], 

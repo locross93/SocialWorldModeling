@@ -21,10 +21,10 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 
 from analysis_utils import init_model_class
-from constants_lc import DEFAULT_VALUES, MODEL_DICT_TRAIN
-#from models import ReplayBuffer
+from constants import DEFAULT_VALUES, MODEL_DICT_TRAIN
+from models import ReplayBuffer
 # temp
-from models import ReplayBufferEarly as ReplayBuffer
+#from models import ReplayBufferEarly as ReplayBuffer
 
 
 """Global variables"""
@@ -43,7 +43,7 @@ def load_args():
                          default=DEFAULT_VALUES['data_dir'], 
                          help='Data directory')
     parser.add_argument('--dataset', type=str,
-                         default='dataset_5_25_23.pkl', 
+                         default=DEFAULT_VALUES['dataset'], 
                          help='Dataset name')
     parser.add_argument('--checkpoint_dir', type=str, 
                         default=DEFAULT_VALUES['checkpoint_dir'], 
@@ -105,6 +105,16 @@ def main():
             config[k] = v
             overridden_parameters.append(f"{k}_{v}")
             print(f"{k}_{v}")
+
+    if config['model_type'] == "sgnet_cvae":
+        config['enc_steps'] = args.burn_in_length
+        config['dec_steps'] = args.rollout_length
+    elif config['model_type'] == "agent_former":        
+        config['past_frames'] = args.burn_in_length
+        config['future_frames'] = args.rollout_length
+
+    # model_class = model_dict[config['model_type']]        
+    # model = model_class(config)
     
     model = init_model_class(config, args)
     
@@ -165,9 +175,14 @@ def main():
     loss_dict['val'] = []
     loss_dict['val_mse'] = []
     loss_dict['epoch_times'] = []
+
     if config['model_type'] == 'dreamerv2':
         loss_dict['recon_loss'] = []
         loss_dict['kl_loss'] = []
+    elif config['model_type'] == 'sgnet_cvae':
+        loss_dict['cvae_loss'] = []
+        loss_dict['kld_loss'] = []
+        loss_dict['goal_loss'] = []
     
     model.to(DEVICE)
     start_time = time.time()
@@ -177,6 +192,10 @@ def main():
         if config['model_type'] == 'dreamerv2':
             batch_recon_loss = []
             batch_kl_loss = []
+        elif config['model_type'] == 'sgnet_cvae':
+            batch_cvae_loss = []
+            batch_kld_loss = []
+            batch_goal_loss = []
         nsamples = 0
         for i in tqdm(range(batches_per_epoch)):
             batch_x = replay_buffer.sample(batch_size)
@@ -186,9 +205,14 @@ def main():
             opt.zero_grad()
             if batch_x.dtype == torch.int64:
                 batch_x = batch_x.float()
-            if config['model_type'] == 'dreamerv2' or \
-                config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
+            if config['model_type'][:4] == 'rssm' or \
+                config['model_type'] in ['dreamerv2', 'transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
                 loss = model.loss(batch_x)
+            elif config['model_type'] in ['sgnet_cvae']:
+                loss, sgnet_loss_dict = model.loss(batch_x)
+                batch_cvae_loss.append(sgnet_loss_dict['cvae_loss'])
+                batch_goal_loss.append(sgnet_loss_dict['goal_loss'])
+                batch_kld_loss.append(sgnet_loss_dict['kld_loss'])
             elif config['model_type'] in ['multistep_predictor', 'multistep_delta']:
                 loss = model.loss(batch_x, burn_in_length, rollout_length)
             elif config['model_type'] == 'transformer_mp':
@@ -203,19 +227,30 @@ def main():
         epoch_loss = np.mean(batch_loss) # TO DO IS THIS REALLY MSE?
         loss_dict['train'].append(epoch_loss)
         loss_dict['epoch_times'].append(time.time()-start_time)
+
+        # loss multiple losses
         if config['model_type'] == 'dreamerv2':
             loss_dict['recon_loss'].append(np.sum(batch_recon_loss))
             loss_dict['kl_loss'].append(np.sum(batch_kl_loss))
+        elif config['model_type'] == 'sgnet_cvae':
+            loss_dict['cvae_loss'].append(np.mean(batch_cvae_loss))
+            loss_dict['goal_loss'].append(np.mean(batch_goal_loss))
+            loss_dict['kld_loss'].append(np.mean(batch_kld_loss))
+            
         # test on validation set
         with torch.no_grad():
             model.eval()
-            if config['model_type'] == 'dreamerv2' or \
-                config['model_type'] in ['transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout']:
+            if config['model_type'][:4] == 'rssm' or \
+                config['model_type'] in ['dreamerv2', 'transformer_wm', 'transformer_iris', 'transformer_iris_low_dropout', 
+                                         'agent_former']:
                 val_loss = model.loss(val_trajs)
+            elif config['model_type'] in ['sgnet_cvae']:
+                val_loss, _ = model.loss(val_trajs)
             elif config['model_type'] in ['multistep_predictor', 'multistep_delta']:
                 val_loss = model.loss(val_trajs, burn_in_length, rollout_length)
             elif config['model_type'] == 'transformer_mp':
                 val_loss = model.loss(val_trajs, burn_in_length, rollout_length, mask_type='triangular')
+
             val_loss = val_loss.item()
             loss_dict['val'].append(val_loss)
             # get MSE on validation data
@@ -229,8 +264,12 @@ def main():
         writer.add_scalar('Val Loss/val', val_loss, epoch)
         writer.add_scalar('Val Loss/val_mse', val_mse, epoch)
         if config['model_type'] == 'dreamerv2':
-            writer.add_scalar('Train_Loss/recon_loss', np.sum(batch_recon_loss), epoch)
-            writer.add_scalar('Train_Loss/kl_loss', np.sum(batch_kl_loss), epoch)
+            writer.add_scalar('Train_Loss/recon_loss', np.mean(batch_recon_loss), epoch)
+            writer.add_scalar('Train_Loss/kl_loss', np.mean(batch_kl_loss), epoch)
+        elif config['model_type'] == 'sgnet_cvae':
+            writer.add_scalar('Train_Loss/cvae_loss', np.mean(batch_cvae_loss), epoch)
+            writer.add_scalar('Train_Loss/goal_loss', np.mean(batch_goal_loss), epoch)
+            writer.add_scalar('Train_Loss/kld_loss', np.mean(batch_kld_loss), epoch)
         if epoch % args.save_every == 0 or epoch == (args.epochs-1):
             # save checkpoints in checkpoint directory with plenty of storage
             save_dir = os.path.join(args.checkpoint_dir, 'models', model_filename)            

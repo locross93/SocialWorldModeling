@@ -16,17 +16,17 @@ from scipy.spatial import distance
 from typeguard import typechecked
 import typing
 from typing import List, Tuple, Dict, Any
+from tqdm import tqdm
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 
-from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
+from constants import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
 from analysis_utils import load_config, get_highest_numbered_file, get_data_columns, init_model_class
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
 from plot_eval_world_model import plot_eval_wm_results
 
 
-#@typechecked
 class Analysis(object):
     """
     Class to perform analysis on the trained models
@@ -37,7 +37,9 @@ class Analysis(object):
     which_model : key indicating which model from MODEL_DICT_VAL to analyze
     """
     def __init__(self, args) -> None:        
-        self.args = args
+        self.args = args        
+        torch.manual_seed(args.eval_seed)
+        print(f"Eval seed: {args.eval_seed}")           
 
     def load_data(self) -> None:
         if self.args.dataset == 'train_test_splits_3D_dataset.pkl' or self.args.dataset == 'data_norm_velocity.pkl':
@@ -71,12 +73,12 @@ class Analysis(object):
         Load the trained model from the checkpoint directory
         """
         model_info = MODEL_DICT_VAL[model_key]
-        self.model_name = model_info['model_label']
+        self.model_name = model_info['model_label']        
         # set device, this assumes only one gpu is available to the script
         DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
         setattr(args, 'device', DEVICE)
         config_file = os.path.join(self.args.model_config_dir, model_info['config'])
-        config = load_config(config_file)
+        config = load_config(config_file)        
         model = init_model_class(config, args)
             
         # load checkpoint weights
@@ -108,6 +110,7 @@ class Analysis(object):
             pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
             single_goal_trajs = self.exp_info_dict[self.args.train_or_val]['single_goal_trajs']
         
+        single_goal_trajs = single_goal_trajs[:int(partial*len(single_goal_trajs))]
         single_goal_trajs = single_goal_trajs[:int(partial*len(single_goal_trajs))]
         num_single_goal_trajs = len(single_goal_trajs)
         imagined_trajs = np.zeros([num_single_goal_trajs, input_data.shape[1], input_data.shape[2]])        
@@ -151,10 +154,11 @@ class Analysis(object):
         pickup_subset = pickup_timepoints[single_goal_trajs,:]
         indices = np.argwhere(pickup_subset > -1)
         accuracy = np.mean(y_recon[indices[:,0],indices[:,1]])
+        
+        print(np.where(y_recon[indices[:,0],indices[:,1]])[0])
         result = {'model': self.model_name, 'score': accuracy, 'MSE': mse}        
         return result
-    
-
+           
     def eval_multigoal_events_in_rollouts(self, model, input_data, partial=1.0) -> Dict[str, Any]:        
         if self.ds_num == 1:
             # first dataset
@@ -164,7 +168,7 @@ class Analysis(object):
             # 2+ dataset use event logger to define events
             pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
             multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
-            
+        
         multi_goal_trajs = multi_goal_trajs[:int(partial*len(multi_goal_trajs))]
         num_multi_goal_trajs = len(multi_goal_trajs)
         imagined_trajs = np.zeros([num_multi_goal_trajs, input_data.shape[1], input_data.shape[2]])
@@ -208,7 +212,10 @@ class Analysis(object):
             goals_obj3.append(y_recon[i,pickup_seq[2]])
 
         acc_g2 = np.mean(goals_obj2)
+        print('Goal 2 successes:',np.where(goals_obj2)[0])
         acc_g3 = np.mean(goals_obj3)
+        print('Goal 3 successes:',np.where(goals_obj3)[0])
+
         
         result = {
             'model': self.model_name,
@@ -244,7 +251,7 @@ class Analysis(object):
         obj_moved_flag = np.zeros([num_trials, 3])
         # hard threshold to detect movement (unchangable by user)
         move_thr_true = 0.1
-        for i in range(num_trials):
+        for i in tqdm(range(num_trials)):
             trial_x = input_matrices[i,:,:]
             for j in range(num_objs):
                 pos_inds = [self.data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
@@ -252,7 +259,7 @@ class Analysis(object):
                 obj_moved_flag[i,j] = detect_object_move(trial_obj_pos, move_thr_true)
                 
         recon_moved_flag = np.zeros([num_trials, 3])
-        for i in range(num_trials):
+        for i in tqdm(range(num_trials)):
             trial_x = recon_matrices[i,:,:]
             for j in range(num_objs):
                 pos_inds = [self.data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
@@ -266,7 +273,7 @@ class Analysis(object):
         scores['recall'] = recall_score(obj_moved_flag.reshape(-1), recon_moved_flag.reshape(-1))        
         return scores, obj_moved_flag, recon_moved_flag
     
-    def eval_move_events_in_rollouts(self, model, input_data) -> Dict[str, Any]:
+    def eval_move_events_in_rollouts(self, model, input_data, partial=1.0) -> Dict[str, Any]:
         if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
@@ -281,8 +288,46 @@ class Analysis(object):
             multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
         
         imagined_trajs = np.zeros(input_data.shape)
-        for i in range(input_data.shape[0]):
-            if i%50 == 0:
+        
+        goal_inds = np.concatenate([single_goal_trajs, multi_goal_trajs])        
+        non_goal_trajs = [i for i in range(len(input_data)) if i not in goal_inds]
+        non_goal_trajs = non_goal_trajs[ :int(len(input_data)*partial)]
+        goal_inds =  np.random.choice(goal_inds, size=int(len(goal_inds)*partial), replace=False)                                    
+
+        # compute non goal trajs first with batches
+        counter = 0
+        batch_trajs = []
+        batch_inds = []
+        burn_in_length = self.args.non_goal_burn_in
+        rollout_length = self.num_timepoints - burn_in_length
+        for i in non_goal_trajs:
+            counter += 1
+            if counter % 100 == 0:
+                print(i)
+            x = input_data[i,:,:]#.unsqueeze(0)
+            batch_inds.append(i)
+            batch_trajs.append(x)
+            if counter > 0 and counter % self.args.batch_size == 0:
+                batch_x = torch.stack(batch_trajs, dim=0)
+                batch_x = torch.stack(batch_trajs, dim=0)
+                batch_x = batch_x.to(self.args.device)#model.DEVICE)
+                breakpoint()
+                rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
+                batch_inds = np.array(batch_inds)
+                imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
+                batch_trajs = []
+                batch_inds = []
+        # compute last batch that is less than batch_size
+        batch_x = torch.stack(batch_trajs, dim=0)
+        batch_x = batch_x.to(self.args.device)#model.DEVICE)
+        rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
+        batch_inds = np.array(batch_inds)
+        imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
+        
+        #imagined_trajs = np.zeros(input_data.shape)
+        for i in tqdm(goal_inds):
+            counter += 1
+            if counter % 100 == 0:
                 print(i)
             x = input_data[i,:,:].unsqueeze(0)
             if i in single_goal_trajs:
@@ -456,9 +501,45 @@ class Analysis(object):
         result = {'model': self.model_name, 'score': accuracy}        
         return result
 
+    def compute_displacement_error(self, model, batch_size=None):
+        total_trials, traj_length, _ = self.input_data.shape
+        behavior_keys = list(self.exp_info_dict['val'].keys())[2: -5]
+        burn_in_lengths = [50]    #, 100, 150, 150, 200, 250]        
+        result = {}        
+        for burn_in_length in burn_in_lengths:
+            print(f"Burn in length {burn_in_length}")            
+            rollout_length = traj_length - burn_in_length        
+            real_trajs = self.input_data[:, -rollout_length:, :]
+            with torch.no_grad():
+                if batch_size is None: 
+                    rollout_x = model.forward_rollout(real_trajs.cuda(), burn_in_length, rollout_length).cpu()
+                else:
+                    rollout_x = []
+                    for i in tqdm(range(0, total_trials, batch_size)):
+                        x = real_trajs[i: i+batch_size, :, :]
+                        y = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu()
+                        rollout_x.append(y)
+                        torch.cuda.empty_cache()
+                    rollout_x = torch.cat(rollout_x, dim=0)
+
+                    #rollout_x = rollout_x.reshape(rollout_x.size(0), -1)
+                    #real_trajs = real_trajs.reshape(real_trajs.size(0), -1)
+                    behavior_result = {}
+                    for behavior_key in behavior_keys:
+                        behavior_idxs = self.exp_info_dict['val'][behavior_key]
+                        behavior_rollout_x = rollout_x[behavior_idxs]
+                        behavior_real_trajs = real_trajs[behavior_idxs]                        
+                        # compute mean displacement error by computing euclidean distance between predicted and real trajectories
+                        mde = torch.mean(torch.norm(behavior_rollout_x - behavior_real_trajs, p=2, dim=-1))
+                        # compute final displacement error
+                        fde = torch.mean(torch.norm(behavior_rollout_x[:, -1] - behavior_real_trajs[:, -1], p=2, dim=-1))
+                        behavior_result[behavior_key] = {'mde': mde, 'fde': fde}
+                    result[burn_in_length] = behavior_result        
+        result['model'] = self.model_name              
+        return result
 
     def eval_one_model(self, model_key) -> Dict[str, Any]:        
-        model = self.load_model(model_key)
+        model = self.load_model(model_key)        
         result = {}
         result['Model'] = MODEL_DICT_VAL[model_key]['model_label']
 
@@ -471,7 +552,13 @@ class Analysis(object):
         elif self.args.eval_type == 'move_events':
             result = self.eval_move_events_in_rollouts(model, self.input_data)        
         elif self.args.eval_type == 'pickup_events':
-            result = self.eval_pickup_events_in_rollouts(model, self.input_data)  
+            result = self.eval_pickup_events_in_rollouts(model, self.input_data)
+        elif self.args.eval_type == 'displacement':    # mean/final displacement error
+            if  'sgnet' in model_key:
+                batch_size = 32
+            else:
+                batch_size = 2048          
+            result = self.compute_displacement_error(model, batch_size=batch_size)
         else:
             raise NotImplementedError(f'Evaluation type {self.args.eval_type} not implemented')    
         
@@ -503,15 +590,22 @@ class Analysis(object):
         result_save_dir = os.path.join(self.args.analysis_dir, 'results')
         if not os.path.exists(result_save_dir):
             os.makedirs(result_save_dir)
-        save_path = os.path.join(result_save_dir, f'{save_file}.csv')
-        df_results = pd.DataFrame(self.results)
-        df_results.to_csv(save_path)
+        if self.args.eval_type == 'displacement':
+            save_path = os.path.join(result_save_dir, f'{save_file}.pkl')
+            with open(save_path, 'wb') as f:
+                pickle.dump(self.results, f)
+        else:  
+            save_path = os.path.join(result_save_dir, f'{save_file}.csv')
+            df_results = pd.DataFrame(self.results)
+            df_results.to_csv(save_path)
+
         if self.args.plot:
             figure_save_dir = os.path.join(self.args.analysis_dir, 'results', 'figures')
             if not os.path.exists(figure_save_dir):
                 os.makedirs(figure_save_dir)                
             plot_save_file = os.path.join(self.args.analysis_dir, 'results', 'figures', save_file)
-            plot_eval_wm_results(df_results, self.args, plot_save_file)     
+            plot_eval_wm_results(save_path, plot_save_file)
+            
         if self.args.append_results and self.args.partial == 1.0:
             all_results_file = os.path.join(result_save_dir, 'all_results_'+self.args.eval_type+'.csv')
             if os.path.exists(all_results_file):
@@ -531,6 +625,11 @@ class Analysis(object):
 def load_args():
     parser = argparse.ArgumentParser()
     # general pipeline parameters
+    parser.add_argument('--batch_size', type=int, action='store',
+                        default=DEFAULT_VALUES['batch_size'],
+                        help='Batch size')
+    parser.add_argument('--eval_seed', type=int, 
+                        default=DEFAULT_VALUES['eval_seed'], help='Random seed')
     parser.add_argument('--analysis_dir', type=str, action='store',
                         default=DEFAULT_VALUES['analysis_dir'], 
                         help='Analysis directory')
@@ -541,7 +640,7 @@ def load_args():
                          default=DEFAULT_VALUES['data_dir'], 
                          help='Data directory')
     parser.add_argument('--dataset', type=str,
-                         default='dataset_5_25_23.pkl', 
+                         default=DEFAULT_VALUES['dataset'], 
                          help='Dataset name')
     parser.add_argument('--checkpoint_dir', type=str, action='store',
                         default=DEFAULT_VALUES['checkpoint_dir'], 
@@ -564,12 +663,10 @@ def load_args():
                         help='Threshold for move event evaluation')
     parser.add_argument('--non_goal_burn_in', action='store',
                         default=DEFAULT_VALUES['non_goal_burn_in'],
-                        help='Number of frames to burn in for non-goal events') 
+                        help='Number of frames to burn in for non-goal events')
     parser.add_argument('--partial', type=float, default=1.0,         
-                        help='Partial evaluation')  
+                        help='Partial evaluation')    
     return parser.parse_args()
-
-
 
 
 if __name__ == "__main__":    

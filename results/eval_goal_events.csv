@@ -1,2 +1,2 @@
 ,model,score,MSE,epoch,dataset
-0,RSSM Continuous Replay Early,0.13911620294599017,3.629727602005005,/mnt/fs2/locross/analysis/models/rssm_cont_replay_early/rssm_cont_replay_early_epoch2000,data_5_31_23.pkl
+0,SGNet-H512,0.0,3.018923044204712,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default_lr1e-4/sgnet_cvae_default_lr1e-4_epoch1200,data_5_31_23.pkl

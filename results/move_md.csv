@@ -1,0 +1,4 @@
+,accuracy,precision,recall,model,epoch,dataset
+0,0.7652788458017503,0.8740029542097489,0.5156876416245424,MP-S1,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s1/md_mlp_2048_lr3e-4_s1_epoch11600,data_5_31_23.pkl
+1,0.7619099930425867,0.8775820170109356,0.5035732961478124,MD-S2,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s2/md_mlp_2048_lr3e-4_s2_epoch11400,data_5_31_23.pkl
+2,0.7610311618880222,0.8787507654623392,0.5002614606937423,MD-S3,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s3/md_mlp_2048_lr3e-4_s3_epoch11600,data_5_31_23.pkl

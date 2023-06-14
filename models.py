@@ -4,7 +4,7 @@ Created on Wed Nov 16 15:09:25 2022
 
 @author: locro
 """
-
+# %%
 from collections import namedtuple
 from typing import Tuple, Dict
 import math
@@ -13,7 +13,7 @@ import torch
 import torch.nn.functional as F
 import torch.nn as nn
 import torch.distributions as td
-
+# %%
 
 class MlpAutoencoder(torch.nn.Module):
     def __init__(self, config):
@@ -891,6 +891,10 @@ class DreamerV2(nn.Module):
                 z_post = noise_post * std_post + mean_post
                 post_rssm_state = RSSMContState(mean_post, std_post, z_post, deter_state)
                 posteriors.append(post_rssm_state)
+
+            #print(f"{self.rssm_type} noise_prior mean {noise_prior.mean()} std {noise_prior.std()}")
+            #print(f"noise_post mean {noise_post.mean()} std {noise_post.std()}")
+            #print(f"z_prior mean {z_prior.mean()} std {z_prior.std()}")
 
             # use z for input of next rnn iteration, resized for (B, T, Z)            
             z_post_in = z_post.reshape(z_post.size(0), 1, z_post.size(1))
@@ -2365,24 +2369,10 @@ class TransformerIrisWorldModel(nn.Module):
     def forward_rollout(self, x, burn_in_length, rollout_length):
         x_burn_in = x[:, :burn_in_length]
         x_rollout = []
-        for i in range(rollout_length):
+        for i in range(rollout_length):          
            _, output_observations = self(x_burn_in)
            x_burn_in = output_observations
            x_rollout.append(output_observations[:, -1])
+           #print(f"rollout step {i}, mse is {F.mse_loss(x[:, burn_in_length + i], output_observations[:, -1])}")
         x_rollout = torch.stack(x_rollout, dim=1)        
-            #print(f"rollout step {i}, mse is {F.mse_loss(x[:, burn_in_length + i], output_observations)}")
-        # for i in range(rollout_length):
-        #     x_burn_in = x_burn_in[:, -burn_in_length:]
-        #     # roll out one step at a time
-        #     # takes in burn in, returns one step ahead
-        #     _, output_observations = self(x_burn_in)
-        #     # only take the last observation from the output
-        #     output_observations = output_observations[:, -1]            
-        #     # updates the burn in with the new observation
-        #     x_burn_in = torch.cat((x_burn_in, output_observations.unsqueeze(1)), dim=1)
-        #     # updates the rollout with the new observation
-        #     x_rollout.append(output_observations)
-        #     #print(f"rollout step {i}, mse is {F.mse_loss(x[:, burn_in_length + i], output_observations)}")
-        # x_rollout = torch.stack(x_rollout)
-        # x_rollout = rearrange(x_rollout, 't b o -> b t o')
         return x_rollout
