@@ -117,8 +117,10 @@ DEFAULT_VALUES = {
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'goal_events_level2'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
+    'dataset': 'swm_data.pkl'
 }
 DATASET_NUMS = {
     'train_test_splits_3D_dataset.pkl': 1,
     'dataset_5_25_23.pkl': 2,
+    'swm_data': 3
 }
