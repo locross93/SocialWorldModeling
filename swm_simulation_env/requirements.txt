@@ -1,0 +1,5 @@
+tdw==1.11.0.0
+numpy
+pandas
+opencv-python
+magnebot==2.2.2
