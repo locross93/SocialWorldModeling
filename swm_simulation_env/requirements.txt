@@ -1,5 +1,5 @@
 tdw==1.11.0.0
-numpy
+numpy==1.23.1
 pandas
 opencv-python
 magnebot==2.2.2

@@ -48,10 +48,6 @@ class Environment(Controller):
         for cmd in self.object_output_commands:
             if cmd['$type'] == 'make_nav_mesh_obstacle' and not added_mesh_cmds:
                 cmd['id'] = self.obj_ids[-1]
-                # for id_num in self.obj_ids[1:]:
-                #     id_mesh_cmd = cmd.copy()
-                #     id_mesh_cmd['id'] = id_num
-                #     self.object_output_commands.append(id_mesh_cmd)
                 added_mesh_cmds = True
             elif cmd['$type'] != 'make_nav_mesh_obstacle':
                 cmd['ids'] = self.obj_ids
@@ -75,7 +71,6 @@ class Environment(Controller):
             "Number of cfgs doesn\'t equal to number of funcs"
         all_agent_ids = []
         for agent_id, cfg in self.agent_cfgs.items():
-            print(agent_id)
             all_agent_ids.append(agent_id)
             if cfg['is_async']:
                 self.async_agent_ids.append(agent_id)
@@ -84,34 +79,17 @@ class Environment(Controller):
             avatar, cmds = cfg_func(agent_id, cfg)            
             _add_avatar_func_to_dict(agent_id, avatar, agent_funcs, self.agents)
             self.add_ons.append(avatar)
-        self.capture = ImageCapture(avatar_ids=all_agent_ids, path=self.img_settings['img_path'])
-        #self.capture.set(save=self.img_settings['save_img'])  
+        self.capture = ImageCapture(avatar_ids=all_agent_ids, path=self.img_settings['img_path']) 
         self.capture.set(save=self.img_settings['save_img'], frequency="once")  
-        #self.add_ons.append(self.capture)
         # step physics
         self.step_physics = StepPhysics(num_frames=20)
-        #self.step_physics = StepPhysics(num_frames=1)
         # camera 
-        # self.cam = ThirdPersonCamera(position={"x": 0, "y": 5.0, "z": -7.0},
-        #                 look_at={"x": 0, "y": 0, "z": 0})
-        # self.cam = ThirdPersonCamera(position={"x": 0, "y": 8.0, "z": -8.0},
-        #                 look_at={"x": 0, "y": 0, "z": 0})
-        # self.cam = ThirdPersonCamera(position={"x": 0, "y": 3.0, "z": -5.0}, 
-        #                 look_at={'x': 2.5, 'y': 1.0, 'z': -1})
-        self.cam = ThirdPersonCamera(position={"x": 0, "y": 3.0, "z": -5.0}, 
-                        look_at=3434)
-        # self.cam = ThirdPersonCamera(position={"x": 0, "y": 3.0, "z": 0.0}, 
-        #                 look_at=6767)
-        # self.cam = ThirdPersonCamera(position={"x": 0, "y": 1.0, "z": -6.0}, 
-        #                 look_at=6767)
-        # self.cam = ThirdPersonCamera(position={"x": -4, "y": 3.0, "z": -2.0},
-        #                 look_at={"x": 0, "y": 0, "z": -2.0})
+        self.cam = ThirdPersonCamera(position={"x": 0, "y": 5.0, "z": -7.0},
+                        look_at={"x": 0, "y": 0, "z": 0})
         if 'disable_cameras' in self.cfg['img_settings'] and self.cfg['img_settings']['disable_cameras']:
-            #self.add_ons.extend([self.step_physics])
             self.add_ons.extend([self.capture, self.step_physics])
         else:
             self.add_ons.extend([self.capture, self.step_physics, self.cam])
-            #self.add_ons.extend([self.capture, self.step_physics])
         
     def _process_agent_imgs(self):
         agent_imgs = {}

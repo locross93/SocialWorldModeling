@@ -76,14 +76,10 @@ class Room(ABC):
         obs_comm = None
         obs_path = None
         obs_path_dict = None
-        # self.obs = self.env.step(self.agent_cmds)
-        # self.add_agent_data_to_obs()
+
         # if applicable, copy over information communicated globally for coordinating multi agent behavior
         if self.obs and 'comm' in self.obs.keys():
             obs_comm = self.obs['comm']
-        # if self.obs and 'path' in self.obs.keys():
-        #     print('Here')
-        #     obs_path = self.obs['path']
         if self.obs and 'path_dict' in self.obs.keys():
             obs_path_dict = self.obs['path_dict']
         elif self.obs:
@@ -98,8 +94,6 @@ class Room(ABC):
             self.obs['path_dict'] = obs_path_dict
         if obs_path is not None:
             self.obs['path_dict']['latest'] = obs_path
-        # if obs_path is not None:
-        #     self.obs['path'] = obs_path
         self.all_actions.append(self.actions)
         self.all_obs.append(self.obs)
       
@@ -115,8 +109,6 @@ class Room(ABC):
                 cmds.append({"$type": "enable_image_sensor", "enable": False, 
                              "sensor_name": "SensorContainer", "avatar_id": str(agent_id)})
             resp = self.env.communicate(cmds)
-        # cmds = [{"$type": "send_images", "frequency": "once", "ids": ["fp1"]}]
-        # resp = self.env.communicate(cmds)
         self.run()
         
     def run(self):        
@@ -139,16 +131,23 @@ def save_config(config):
     save_file = config['img_settings']['img_path']+'config.pkl'
     with open(save_file, 'wb') as handle:
         pickle.dump(config, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        
+        
+def load_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--scenario_num', type=int, default=-1, help='Behavior types')
+    parser.add_argument('--num_trials2gen', type=int, default=1000, help='Number of trials to generate')
+    
+    return parser.parse_args()
 
     
 if __name__ == '__main__':
+    args = load_args()
     # time limit of simulation
     time_limit = 1500
-    # number of trials to generate
-    num_trials2gen = 1000
-    for i in range(num_trials2gen):
-        config = generate_config()
-        # print behaviors and timestamp
+    for i in range(args.num_trials2gen):
+        config = generate_config(args.scenario_num)
+        # print output folder, indicating behaviors and timestamp
         print(config['img_settings']['img_path'])
         
         room = Room(1, config, time_limit)  

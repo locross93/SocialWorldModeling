@@ -14,17 +14,8 @@ import itertools
 from scipy.spatial import distance
 import random
 import datetime
-import platform
-
-if platform.system() == 'Windows':
-    # We are running on Windows
-    save_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/img_out/'
-elif os.getcwd() == '/home/locross/AttentionAgent-kanefsky':
-    save_dir = '/home/locross/AttentionAgent-kanefsky/img_out/'
-elif platform.system() == 'Linux':
-    # We are running on Linux
-    save_dir = '/mnt/fs2/locross/AttentionAgent/img_out/'
-
+    
+save_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/swm_simulation_env/img_out/'
 
 def generate_config(scenario_num=-1):
     scenario_set = [

@@ -70,5 +70,39 @@ MODEL_DICT_VAL = {
 
 ## Generating More Data
 
-Data generating code will be added to this repo soon
+Data generating code is located in the swm_simulation_env folder
 
+To install code and necessary dependencies:
+
+```bash
+cd swm_simulation_env
+pip install -r requirements.txt
+pip install -e .
+```
+
+To generate data:
+
+```bash
+cd swm_simulation_env
+python data_generation/generate_swm_data.py
+```
+
+Data is stored in swm_simulation_env/img_out folder
+
+To generate data of particular behavior types, use the scenario_num flag with the corresponding numbers for each scenario. Each scenario includes two agents and behavior types.
+
+0 - gathering + random
+1 - multistep + random
+2 - leader + follower (collaborative gathering)
+3 - gathering + adversarial (adversarial gathering)
+4 - random + random
+5 - random + mimic
+6 - runner + chaser
+7 - gathering + static
+8 - multistep + static
+
+For example, to generate 100 collaborative gathering trials
+
+```bash
+python data_generation/generate_swm_data.py --scenario_num 2 --num_trials2gen 100
+```

@@ -1,6 +1,7 @@
 setup.py
 agents/__init__.py
 agents/agent.py
+agents/agent_funcs.py
 attention_agent.egg-info/PKG-INFO
 attention_agent.egg-info/SOURCES.txt
 attention_agent.egg-info/dependency_links.txt
