@@ -51,13 +51,13 @@ Example usage:
 python eval_world_model.py --eval_type goal_events --model_key rssm_disc
 ```
 
-1. Prediction error of forward rollouts on validation set (ADE and FDE): --eval_type displacement
-2. Simulating events in forward rollouts 
+1. **Prediction error of forward rollouts on validation set (ADE and FDE)**: --eval_type displacement
+2. **Simulating events in forward rollouts** 
     1. Evaluate single goal events: --eval_type goal_events
     2. Evaluate multi goal events: --eval_type multigoal_events
     2. Evaluate move events: --eval_type move_events
     3. Evaluate pick up events: --eval_type pickup_events
-3. Visualizing forward rollouts: visualize_model_rollouts.py
+3. **Visualizing forward rollouts**: visualize_model_rollouts.py
 
 In the constants.py file, specify the models you want to test in a dictionary of dicts, MODEL_DICT_VAL. Here's an example of what this might look like:
 
@@ -70,7 +70,7 @@ MODEL_DICT_VAL = {
 
 ## Generating More Data
 
-Data generating code is located in the swm_simulation_env folder
+Data generating code is located in the **swm_simulation_env** folder
 
 To install code and necessary dependencies:
 
@@ -87,19 +87,19 @@ cd swm_simulation_env
 python data_generation/generate_swm_data.py
 ```
 
-Data is stored in swm_simulation_env/img_out folder
+Data is stored in **swm_simulation_env/img_out folder**
 
 To generate data of particular behavior types, use the scenario_num flag with the corresponding numbers for each scenario. Each scenario includes two agents and behavior types.
 
-0 - gathering + random
-1 - multistep + random
-2 - leader + follower (collaborative gathering)
-3 - gathering + adversarial (adversarial gathering)
-4 - random + random
-5 - random + mimic
-6 - runner + chaser
-7 - gathering + static
-8 - multistep + static
+0 - gathering + random  
+1 - multistep + random  
+2 - leader + follower (collaborative gathering)  
+3 - gathering + adversarial (adversarial gathering)  
+4 - random + random  
+5 - random + mimic  
+6 - runner + chaser  
+7 - gathering + static  
+8 - multistep + static  
 
 For example, to generate 100 collaborative gathering trials
 
