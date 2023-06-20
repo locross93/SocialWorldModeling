@@ -126,9 +126,7 @@ class Analysis(object):
         real_trajs = []
         imag_trajs = []
 
-        for i,row in enumerate(single_goal_trajs):
-            if i%50 == 0:
-                print(i)
+        for i, row in tqdm(enumerate(single_goal_trajs), total=len(single_goal_trajs)):
             x = input_data[row,:,:].unsqueeze(0)
             # get the only pick up point in the trajectory
             steps2pickup = np.max(pickup_timepoints[row,:]).astype(int)
@@ -183,9 +181,7 @@ class Analysis(object):
         real_trajs = []
         imag_trajs = []
         
-        for i,row in enumerate(multi_goal_trajs):
-            if i%50 == 0:
-                print(i)
+        for i, row in tqdm(enumerate(multi_goal_trajs), total=len(multi_goal_trajs)):
             x = input_data[row,:,:].unsqueeze(0)
             # burn in to the pick up point of the 2nd object that is picked up, so its unambiguous that all objects will be delivered
             steps2pickup = np.sort(pickup_timepoints[row,:])[1].astype(int)
@@ -308,10 +304,8 @@ class Analysis(object):
         batch_inds = []
         burn_in_length = self.args.non_goal_burn_in
         rollout_length = self.num_timepoints - burn_in_length
-        for i in non_goal_trajs:
+        for i in tqdm(non_goal_trajs):
             counter += 1
-            if counter % 100 == 0:
-                print(i)
             x = input_data[i,:,:]#.unsqueeze(0)
             batch_inds.append(i)
             batch_trajs.append(x)
@@ -331,11 +325,8 @@ class Analysis(object):
         batch_inds = np.array(batch_inds)
         imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
         
-        #imagined_trajs = np.zeros(input_data.shape)
         for i in tqdm(goal_inds):
             counter += 1
-            if counter % 100 == 0:
-                print(i)
             x = input_data[i,:,:].unsqueeze(0)
             if i in single_goal_trajs:
                 # burn in to a few frames past the goal, so it is clear it is a single goal trial - TO DO THIS WILL BE DIFF FOR DS2
@@ -472,9 +463,7 @@ class Analysis(object):
         num_timepoints = input_data.size(1)
         real_trajs = []
         imag_trajs = []
-        for i,row in enumerate(single_goal_trajs):
-            if i%50 == 0:
-                print(i)
+        for i, row in tqdm(enumerate(single_goal_trajs), total=len(single_goal_trajs)):
             x = input_data[row,:,:].unsqueeze(0)
             # get the only pick up point in the trajectory
             steps2pickup = np.max(pickup_timepoints[row,:]).astype(int)
