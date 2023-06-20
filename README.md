@@ -101,7 +101,7 @@ To generate data of particular behavior types, use the scenario_num flag with th
 7 - gathering + static  
 8 - multistep + static  
 
-For example, to generate 100 collaborative gathering trials
+For example, to generate 100 collaborative gathering trials:
 
 ```bash
 python data_generation/generate_swm_data.py --scenario_num 2 --num_trials2gen 100
