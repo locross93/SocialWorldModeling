@@ -10,6 +10,7 @@ import pickle
 import torch
 import numpy as np
 import pandas as pd
+import random
 from functools import reduce
 from scipy.spatial import distance
 # to enforce type checking
@@ -37,8 +38,18 @@ class Analysis(object):
     """
     def __init__(self, args) -> None:        
         self.args = args        
-        torch.manual_seed(args.eval_seed)
-        print(f"Eval seed: {args.eval_seed}")           
+        self.set_random_seeds(args.eval_seed)
+        print(f"Eval seed: {args.eval_seed}")  
+
+    def set_random_seeds(seed):
+        """
+        Set random seeds for cpu and gpu
+        """
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        return None         
 
     def load_data(self) -> None:
         if self.args.dataset == 'train_test_splits_3D_dataset.pkl' or self.args.dataset == 'data_norm_velocity.pkl':

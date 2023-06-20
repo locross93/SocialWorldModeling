@@ -15,6 +15,7 @@ import pickle
 import argparse
 import numpy as np
 import pandas as pd
+import random
 from tqdm import tqdm
 
 import torch
@@ -23,8 +24,6 @@ from torch.utils.tensorboard import SummaryWriter
 from analysis_utils import init_model_class
 from constants import DEFAULT_VALUES, MODEL_DICT_TRAIN
 from models import ReplayBuffer
-# temp
-#from models import ReplayBufferEarly as ReplayBuffer
 
 
 """Global variables"""
@@ -85,7 +84,16 @@ def load_args():
     parser.add_argument('--rollout_length', type=int, default=30, help='Forward rollout length')    
 
     return parser.parse_args()
-    
+
+def set_random_seeds(seed):
+    """
+    Set random seeds for cpu and gpu
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    return None
 
 def load_config(file):
     with open(file) as f:
@@ -98,8 +106,10 @@ def save_config(config, filename):
 
 def main():
     args = load_args()
-    torch.manual_seed(args.train_seed)
+    # Set the seed
+    set_random_seeds(args.train_seed)
     print(f"Train seed: {args.train_seed}") 
+    
     config = load_config(os.path.join(args.model_config_dir, args.config))
     
     # Update config with args and keep track of overridden parameters
@@ -155,9 +165,8 @@ def main():
     # make validation data
     val_buffer = ReplayBuffer(sequence_length)
     val_buffer.upload_training_set(val_data)
-    seed = 100 # set seed so every model sees the same randomization
     val_batch_size = np.min([val_data.size(0), 1000])
-    val_trajs = val_buffer.sample(val_batch_size, random_seed=seed)
+    val_trajs = val_buffer.sample(val_batch_size, random_seed=args.train_seed)
     val_trajs = val_trajs.to(DEVICE)
     val_trajs = val_trajs.to(torch.float32)
         
