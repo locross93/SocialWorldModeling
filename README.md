@@ -107,7 +107,7 @@ For example, to generate 100 collaborative gathering trials
 python data_generation/generate_swm_data.py --scenario_num 2 --num_trials2gen 100
 ```
 
-After generating new data trials, use generate_dataset.py to generate a new dataset, with train and val splits in **full_dataset**, and info about behavior types and events in **exp_info_dict**
+After generating new data trials, use **generate_dataset.py** to generate a new dataset for the SWM Benchmark, with train and val splits in **full_dataset**, and info about behavior types and events in **exp_info_dict**
 
 Example usage:
 
