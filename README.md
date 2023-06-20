@@ -106,3 +106,11 @@ For example, to generate 100 collaborative gathering trials
 ```bash
 python data_generation/generate_swm_data.py --scenario_num 2 --num_trials2gen 100
 ```
+
+After generating new data trials, use generate_dataset.py to generate a new dataset, with train and val splits in **full_dataset**, and info about behavior types and events in **exp_info_dict**
+
+Example usage:
+
+```bash
+python generate_dataset.py --tdw_data_dir swm_path/swm_simulation_env/imgout --dataset_name new_dataset
+```
