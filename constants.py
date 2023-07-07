@@ -3,9 +3,9 @@ from models import DreamerV2, MultistepPredictor, MultistepDelta, \
      TransformerIrisWorldModel, TransformerWorldModel    
 #from agent_former.agentformer import AgentFormer
 #from sgnet_models.SGNet_CVAE import SGNet_CVAE
-from gnn_models.imma import IMMA
-from gnn_models.gat import GAT
-from gnn_models.rfm import RFM
+#from gnn_models.imma import IMMA
+#from gnn_models.gat import GAT
+#from gnn_models.rfm import RFM
 
 
 """Values for training"""
