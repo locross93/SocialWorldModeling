@@ -10,9 +10,9 @@ MODEL_DICT_TRAIN = {
     'dreamerv2': DreamerV2,
     'multistep_predictor': MultistepPredictor,    
     'transformer_wm': TransformerWorldModel,
-    'imma': IMMA,
-    'gat': GAT,
-    'rfm': RFM
+    #'imma': IMMA,
+    #'gat': GAT,
+    #'rfm': RFM
 }
 MODEL_DICT_VAL=  {
     # 'rssm_cont': {
@@ -36,33 +36,33 @@ MODEL_DICT_VAL=  {
     'transformer_wm': {
        'class': TransformerWorldModel, 'config': 'transformer_wm_default_config.json', 
        'model_dir': 'transformer_wm', 'model_label': 'Transformer'},
-    'gat': {
-       'class': GAT, 'config': 'gat_default_config.json', 
-       'model_dir': 'gat', 'model_label': 'GAT'},
-    'gat_rnn_enc': {
-       'class': GAT, 'config': 'gat_encoder_rnn_config.json', 
-       'model_dir': 'gat_rnn_enc', 'model_label': 'GAT RNN Encoder'},
-    'gat_rnn_norm_vel': {
-       'class': GAT, 'config': 'gat_encoder_rnn_config.json', 
-       'model_dir': 'gat_rnn_norm_vel', 'model_label': 'GAT RNN Encoder'},
-    'imma': {
-       'class': IMMA, 'config': 'imma_default_config.json', 
-       'model_dir': 'imma', 'model_label': 'IMMA'},
-    'imma_encoder': {
-       'class': IMMA, 'config': 'imma_encoder_rnn.json', 
-       'model_dir': 'imma_encoder', 'model_label': 'IMMA RNN Encoder'},
-    'imma_rnn_simple_ds': {
-       'class': IMMA, 'config': 'imma_rnn_simple_ds_hidden_dim_128.json', 
-       'model_dir': 'imma_rnn_simple_ds', 'model_label': 'IMMA RNN Encoder'},
-    'imma_rnn_norm_vel': {
-       'class': IMMA, 'config': 'imma_encoder_rnn.json', 
-       'model_dir': 'imma_rnn_norm_vel', 'model_label': 'IMMA RNN Encoder'},
-    'rfm': {
-       'class': RFM, 'config': 'rfm_default_config.json', 
-       'model_dir': 'rfm', 'model_label': 'RFM'},
-    'rfm_rnn': {
-       'class': RFM, 'config': 'rfm_rnn_config.json', 
-       'model_dir': 'rfm_rnn', 'model_label': 'RFM RNN'},
+    # 'gat': {
+    #    'class': GAT, 'config': 'gat_default_config.json', 
+    #    'model_dir': 'gat', 'model_label': 'GAT'},
+    # 'gat_rnn_enc': {
+    #    'class': GAT, 'config': 'gat_encoder_rnn_config.json', 
+    #    'model_dir': 'gat_rnn_enc', 'model_label': 'GAT RNN Encoder'},
+    # 'gat_rnn_norm_vel': {
+    #    'class': GAT, 'config': 'gat_encoder_rnn_config.json', 
+    #    'model_dir': 'gat_rnn_norm_vel', 'model_label': 'GAT RNN Encoder'},
+    # 'imma': {
+    #    'class': IMMA, 'config': 'imma_default_config.json', 
+    #    'model_dir': 'imma', 'model_label': 'IMMA'},
+    # 'imma_encoder': {
+    #    'class': IMMA, 'config': 'imma_encoder_rnn.json', 
+    #    'model_dir': 'imma_encoder', 'model_label': 'IMMA RNN Encoder'},
+    # 'imma_rnn_simple_ds': {
+    #    'class': IMMA, 'config': 'imma_rnn_simple_ds_hidden_dim_128.json', 
+    #    'model_dir': 'imma_rnn_simple_ds', 'model_label': 'IMMA RNN Encoder'},
+    # 'imma_rnn_norm_vel': {
+    #    'class': IMMA, 'config': 'imma_encoder_rnn.json', 
+    #    'model_dir': 'imma_rnn_norm_vel', 'model_label': 'IMMA RNN Encoder'},
+    # 'rfm': {
+    #    'class': RFM, 'config': 'rfm_default_config.json', 
+    #    'model_dir': 'rfm', 'model_label': 'RFM'},
+    # 'rfm_rnn': {
+    #    'class': RFM, 'config': 'rfm_rnn_config.json', 
+    #    'model_dir': 'rfm_rnn', 'model_label': 'RFM RNN'},
     'mp_ds2': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json', 
         'model_dir': 'multistep_predictor', 'model_label': 'Multistep Predictor'},

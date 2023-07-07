@@ -91,9 +91,9 @@ MODEL_DICT_VAL=  {
     # 'tf_emb2048_lr1e-4_s3': {
     #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
     #     'model_dir': 'tf_emb2048_lr1e-4_s3', 'model_label': 'TF Emb2048 S3'},
-    'sgnet_cvae_lr1e-4': {
-        'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
-        'model_dir': 'sgnet_cvae_default_lr1e-4', 'model_label': 'SGNet-H512'},
+    # 'sgnet_cvae_lr1e-4': {
+    #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
+    #     'model_dir': 'sgnet_cvae_default_lr1e-4', 'model_label': 'SGNet-H512'},
     # 'sgnet_cvae_hidden64_lr1e-4': {
     #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
     #     'model_dir': 'sgnet_cvae_hidden_size64_lr1e-4', 'model_label': 'SGNet-H64'},
