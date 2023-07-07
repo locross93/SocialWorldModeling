@@ -16,11 +16,11 @@ MODEL_DICT_TRAIN = {
     'multistep_delta':  MultistepDelta,
     'transformer_wm': TransformerWorldModel,
     'transformer_iris': TransformerIrisWorldModel,
-    'imma': IMMA,
-    'gat': GAT,
-    'rfm': RFM,
-    'sgnet_cvae': SGNet_CVAE,
-    'agent_former': AgentFormer
+    #'imma': IMMA,
+    #'gat': GAT,
+    #'rfm': RFM,
+    #'sgnet_cvae': SGNet_CVAE,
+    #'agent_former': AgentFormer
 }
 """Values for validation"""
 # Only using 5-31-23 for the paper
