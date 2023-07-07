@@ -98,6 +98,8 @@ MODEL_DICT_VAL=  {
         'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
 }
 DEFAULT_VALUES = {
+    'train_seed': 911320,
+    'eval_seed': 911320, #834869, #(good for SGNet & RSSM Discrete) 
     'analysis_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/',
     'data_path': '/Users/locro/Documents/Stanford/analysis/data/dataset_5_25_23.pkl' if platform.system() == 'Windows' else  '/mnt/fs2/locross/analysis/data/dataset_5_25_23.pkl',
     'data_dir': '/Users/locro/Documents/Stanford/analysis/data/' if platform.system() == 'Windows' else  '/mnt/fs2/locross/analysis/data/',
