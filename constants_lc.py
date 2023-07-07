@@ -1,8 +1,8 @@
 from models import DreamerV2, MultistepPredictor, \
     MultistepDelta, TransformerWorldModel, TransformerIrisWorldModel
-from gnn_models.imma import IMMA
-from gnn_models.gat import GAT
-from gnn_models.rfm import RFM
+# from gnn_models.imma import IMMA
+# from gnn_models.gat import GAT
+# from gnn_models.rfm import RFM
 import platform
 
 
