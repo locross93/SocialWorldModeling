@@ -1,0 +1,9 @@
+{
+    "obs_frames": 24,
+    "num_humans": 5,
+    "feat_dim": 7,
+    "hidden_dim": 512,
+    "encoder": "mlp",
+    "num_enc_layers": 1,
+    "model_type": "gat"
+}
