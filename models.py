@@ -675,3 +675,129 @@ class TransformerIrisWorldModel(nn.Module):
            #print(f"rollout step {i}, mse is {F.mse_loss(x[:, burn_in_length + i], output_observations[:, -1])}")
         x_rollout = torch.stack(x_rollout, dim=1)        
         return x_rollout
+
+
+class TransformerWorldModel(nn.Module):
+    def __init__(self, config):
+        super(TransformerWorldModel, self).__init__()
+        self.input_size = config['input_size']
+        self.embedding_size = config['embedding_size']
+        self.num_heads = config['num_heads']
+        self.encoder_hidden_size = config['encoder_hidden_size']
+        self.num_encoder_layers = config['num_encoder_layers']
+        self.num_decoder_layers = config['num_decoder_layers']
+        self.decoder_hidden_size = config['decoder_hidden_size']
+        self.dropout_p = 0.1
+        self.context_length = config['context_length']
+        self.rollout_length = config['rollout_length']
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        
+        # LAYERS
+        #self.embedding = nn.Embedding(self.input_size, self.embedding_size)
+        self.embedding = nn.Linear(self.input_size, self.embedding_size)
+        self.positional_encoder = PositionalEncoding(
+            dim_model=self.embedding_size, dropout_p=self.dropout_p, max_len=5000
+        )
+        encoder_layers = nn.TransformerEncoderLayer(self.embedding_size, self.num_heads, self.encoder_hidden_size, self.dropout_p)
+        self.transformer_encoder = nn.TransformerEncoder(encoder_layers, self.num_encoder_layers)
+        self.decoder = self.build_mlp(self.num_decoder_layers, self.embedding_size*self.context_length, self.decoder_hidden_size, self.input_size*self.rollout_length, nn.ReLU)
+    
+    def build_mlp(self, num_layers, input_size, node_size, output_size, activation):
+        model = [nn.Linear(input_size, node_size)]
+        model += [activation()]
+        for i in range(num_layers-1):
+            model += [nn.Linear(node_size, node_size)]
+            model += [activation()]
+        model += [nn.Linear(node_size, output_size)]
+        return nn.Sequential(*model)
+    
+    def forward(self, src):
+        # Src size must be (batch_size, src sequence length)
+        # Tgt size must be (batch_size, tgt sequence length)
+
+        # Embedding + positional encoding - Out size = (batch_size, sequence length, dim_model)
+        src = self.embedding(src) * math.sqrt(self.embedding_size)
+        src = self.positional_encoder(src)
+        
+        # We could use the parameter batch_first=True, but our KDL version doesn't support it yet, so we permute
+        # to obtain size (sequence length, batch_size, dim_model),
+        src = src.permute(1,0,2)
+
+        # Transformer blocks - Out size = (sequence length, batch_size, num_tokens)
+        transformer_out = self.transformer_encoder(src)
+        # Permute pred to have batch size first again
+        transformer_out = transformer_out.permute(1, 0, 2)
+        decoder_input = transformer_out.reshape(transformer_out.shape[0], -1)
+        out = self.decoder(decoder_input)
+        out = out.reshape(out.shape[0], self.rollout_length, self.input_size)
+        
+        return out
+    
+    def forward_rollout_train(self, x):
+        src = x[:,:self.context_length,:]
+        x_hat = self.forward(src)
+        
+        return x_hat
+    
+    def forward_rollout(self, x, context_length, rollout_length):
+        sequence_length = context_length + rollout_length
+        # only input obs from x up to context_length
+        src = x[:,:context_length,:]
+
+        # generate predictions until 
+        while src.size(1) < sequence_length:
+            if src.size(1) < self.context_length:
+                # if context is less than the model's context length, pad the beginning with zeros
+                zero_padding = torch.zeros(src.size(0), self.context_length - src.size(1), src.size(2)).to(x.device)
+                src_temp = torch.cat((zero_padding, src), dim=1)
+                out = self.forward(src_temp)
+            elif src.size(1) > self.context_length:
+                # use the last 50 steps
+                out = self.forward(src[:,-self.context_length:,:])
+            else:
+                out = self.forward(src)
+            # Append prediction to context for next prediction
+            src = torch.cat((src, out), dim=1)
+        x_hat = src[:,context_length:sequence_length,:]
+        
+        assert x_hat.size(1) == rollout_length
+        
+        return x_hat
+    
+    def loss(self, x):
+        x_hat = self.forward_rollout_train(x)  
+        t_end = self.context_length + self.rollout_length
+        x_supervise = x[:,self.context_length:t_end,:]
+        
+        loss = ((x_supervise - x_hat)**2).sum()
+        
+        return loss
+
+
+class PositionalEncoding(nn.Module):
+    def __init__(self, dim_model, dropout_p, max_len):
+        super().__init__()
+        # Modified version from: https://pytorch.org/tutorials/beginner/transformer_tutorial.html
+        # max_len determines how far the position can have an effect on a token (window)
+        
+        # Info
+        self.dropout = nn.Dropout(dropout_p)
+        
+        # Encoding - From formula
+        pos_encoding = torch.zeros(max_len, dim_model)
+        positions_list = torch.arange(0, max_len, dtype=torch.float).view(-1, 1) # 0, 1, 2, 3, 4, 5
+        division_term = torch.exp(torch.arange(0, dim_model, 2).float() * (-math.log(10000.0)) / dim_model) # 1000^(2i/dim_model)
+        
+        # PE(pos, 2i) = sin(pos/1000^(2i/dim_model))
+        pos_encoding[:, 0::2] = torch.sin(positions_list * division_term)
+        
+        # PE(pos, 2i + 1) = cos(pos/1000^(2i/dim_model))
+        pos_encoding[:, 1::2] = torch.cos(positions_list * division_term)
+        
+        # Saving buffer (same as parameter without gradients needed)
+        pos_encoding = pos_encoding.unsqueeze(0).transpose(0, 1)
+        self.register_buffer("pos_encoding",pos_encoding)
+        
+    def forward(self, token_embedding: torch.tensor) -> torch.tensor:
+        # Residual connection + pos encoding
+        return self.dropout(token_embedding + self.pos_encoding[:token_embedding.size(0), :])
