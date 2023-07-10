@@ -78,7 +78,6 @@ class GAT(nn.Module):
 
     def forward(self, human_states, batch_graph):
         # encoder
-        breakpoint()
         embeddings = self.embedding(human_states)
         # dynamical
         normalized_A, next_H = self.dynamical(embeddings)
