@@ -66,7 +66,6 @@ def load_args():
     parser.add_argument('--input_size', type=int, help='Input size')
     parser.add_argument('--env', type=str, default='tdw', help='Environment')
     parser.add_argument('--gt', default=False, action='store_true', help='use ground truth graph')    
-    parser.add_argument('--burn_in_length', type=int, default=50, help='Amount of frames to burn into RNN')
     parser.add_argument('--rollout_length', type=int, default=30, help='Forward rollout length') 
     # model parameters
     parser.add_argument('--obs_frames', type=int, help='Number of observation frames')
@@ -129,7 +128,7 @@ if __name__ == '__main__':
     val_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
     
     # initialize the replay buffer
-    burn_in_length = args.burn_in_length
+    burn_in_length = args.obs_frames
     rollout_length = args.rollout_length
     sequence_length = burn_in_length + rollout_length
     replay_buffer = ReplayBuffer(sequence_length)
