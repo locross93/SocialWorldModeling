@@ -4,7 +4,7 @@ Created on Wed Nov 16 15:09:25 2022
 
 @author: locro
 """
-# %%
+
 from collections import namedtuple
 from typing import Tuple, Dict
 import math
@@ -13,7 +13,7 @@ import torch
 import torch.nn.functional as F
 import torch.nn as nn
 import torch.distributions as td
-# %%
+
 
 class MlpAutoencoder(torch.nn.Module):
     def __init__(self, config):
@@ -1339,11 +1339,15 @@ class MultistepPredictor(nn.Module):
         return x_hat
     
     def loss(self, x, burn_in_length, rollout_length):
+        loss_fn = torch.nn.MSELoss()
+        
         x_hat = self.forward_rollout(x, burn_in_length, rollout_length)
         t_end = burn_in_length + rollout_length
         x_supervise = x[:,burn_in_length:t_end,:]
         
-        loss = ((x_supervise - x_hat)**2).sum()
+        #loss = ((x_supervise - x_hat)**2).sum()
+        
+        loss = loss_fn(x_supervise, x_hat)
         
         return loss
     
