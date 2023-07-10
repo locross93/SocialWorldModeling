@@ -100,9 +100,9 @@ MODEL_DICT_VAL=  {
 }
 DEFAULT_VALUES = {
     'analysis_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/',
-    'data_path': '/Users/locro/Documents/Stanford/analysis/data/swm_data.pkl' if platform.system() == 'Windows' else  '/data/locross/data/swm_data.pkl',
-    'data_dir': '/Users/locro/Documents/Stanford/analysis/data/' if platform.system() == 'Windows' else  '/data/locross/data/',
-    'checkpoint_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/data/locross/analysis/',
+    'data_path': '/Users/locro/Documents/Stanford/analysis/data/swm_data.pkl' if platform.system() == 'Windows' else  '/data2/locross/data/swm_data.pkl',
+    'data_dir': '/Users/locro/Documents/Stanford/analysis/data/' if platform.system() == 'Windows' else  '/data2/locross/data/',
+    'checkpoint_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/data2/locross/analysis/',
     'results_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/results/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/results',
     'model_config_dir': './model_configs',
     # general training parameters for all models
