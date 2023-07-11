@@ -1,0 +1,12 @@
+{
+    "obs_frames": 50,
+    "num_humans": 5,
+    "feat_dim": 14,
+    "skip_first": 0,
+    "edge_types": 2,
+    "hidden_dim": 1024,
+    "encoder": "rnn",
+    "plt": 0,
+    "burn_in": 0,
+    "model_type": "imma"
+}

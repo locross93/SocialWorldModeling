@@ -58,6 +58,9 @@ MODEL_DICT_VAL=  {
     'imma_rnn_norm_vel': {
        'class': IMMA, 'config': 'imma_encoder_rnn.json', 
        'model_dir': 'imma_rnn_norm_vel', 'model_label': 'IMMA RNN Encoder'},
+    'imma_rnn_norm_vel_lr_5e-5': {
+        'class': IMMA, 'config': 'imma_encoder_hidden_dim_1024.json',
+        'model_dir': 'imma_encoder', 'model_label': 'IMMA RNN Encoder'},
     'rfm': {
        'class': RFM, 'config': 'rfm_default_config.json', 
        'model_dir': 'rfm', 'model_label': 'RFM'},
