@@ -1,0 +1,10 @@
+{
+    "obs_frames": 24,
+    "num_humans": 5,
+    "feat_dim": 14,
+    "hidden_dim": 1024,
+    "edge_types": 2,
+    "skip_first": 0,
+    "encoder": "rnn",
+    "model_type": "rfm"
+}

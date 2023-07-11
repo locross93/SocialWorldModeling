@@ -1,0 +1,10 @@
+{
+    "obs_frames": 24,
+    "num_humans": 5,
+    "feat_dim": 14,
+    "hidden_dim": 1024,
+    "encoder": "rnn",
+    "edge_types": 2,
+    "num_enc_layers": 1,
+    "model_type": "gat"
+}
