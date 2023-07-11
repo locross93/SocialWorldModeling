@@ -149,7 +149,7 @@ class IMMA(nn.Module):
     def forward_rollout(self, x, burn_in_length, rollout_length):
         if len(x.size()) == 3:
             # unroll num_entities, num_feats dims
-            batch_x = x.reshape(-1, x.size(1), self.num_humans, self.human_state_dim)
+            batch_x = x.reshape(x.size(0), x.size(1), self.num_humans, self.human_state_dim)
         else:
             batch_x = x
         batch_context = batch_x[:,:burn_in_length,:,:]
@@ -172,7 +172,7 @@ class IMMA(nn.Module):
         
         if len(batch_x.size()) == 3:
             # unroll num_entities, num_feats dims
-            batch_x = batch_x.reshape(-1, batch_x.size(1), self.num_humans, self.human_state_dim)
+            batch_x = batch_x.reshape(batch_x.size(0), batch_x.size(1), self.num_humans, self.human_state_dim)
         
         batch_context = batch_x[:,:burn_in_length,:,:]
         true_rollout_x = batch_x[:,-rollout_length:,:,:]
