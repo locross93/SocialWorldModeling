@@ -143,8 +143,6 @@ if __name__ == '__main__':
     val_batch_size = np.min([val_data.size(0), 1000])
     val_trajs = val_buffer.sample(val_batch_size, random_seed=seed)
     val_trajs = val_trajs.to(DEVICE)
-    val_trajs = val_trajs.to(torch.float32)
-    val_trajs = val_trajs.reshape(-1, sequence_length, 5, 7)
         
     print('Starting', model_filename, 'On DS', args.dataset)
     
@@ -175,9 +173,7 @@ if __name__ == '__main__':
         nsamples = 0
         for i in tqdm(range(batches_per_epoch)):
             batch_x = replay_buffer.sample(args.batch_size)
-            batch_x = batch_x.to(torch.float32)
             batch_x = batch_x.to(DEVICE)
-            batch_x = batch_x.reshape(-1, sequence_length, 5, 7)
             nsamples += batch_x.shape[0]
             opt.zero_grad()
             loss = model.loss(batch_x, burn_in_length, rollout_length)
