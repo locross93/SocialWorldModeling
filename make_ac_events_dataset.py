@@ -123,5 +123,6 @@ if __name__ == '__main__':
         peak_list.append(last_timestep)
         peaks_indices.append(peak_list)
         
-    save_file = os.path.join(args.analysis_dir,'results','event_inds','event_inds_'+args.model_key+'.npy')
-    np.save(save_file, peaks_indices)
+    save_file = os.path.join(args.analysis_dir,'results','event_inds','event_inds_'+args.model_key+'.pkl')
+    with open(save_file, 'wb') as f:
+        pickle.dump(peaks_indices, f)
