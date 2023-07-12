@@ -31,6 +31,9 @@ def normalize(arr):
 
 def load_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--model_config_dir', type=str, action='store',
+                        default=DEFAULT_VALUES['model_config_dir'],
+                        help='Model config directory')
     parser.add_argument('--analysis_dir', type=str, action='store',
                         default=DEFAULT_VALUES['analysis_dir'], 
                         help='Analysis directory')
