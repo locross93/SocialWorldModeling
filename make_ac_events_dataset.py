@@ -61,6 +61,7 @@ if __name__ == '__main__':
     model_info = MODEL_DICT_VAL[args.model_key]
     model_name = model_info['model_label']
     model = load_trained_model(model_info, args)
+    model.eval()
     
     rollout_length = 30
     min_burnin = 5
