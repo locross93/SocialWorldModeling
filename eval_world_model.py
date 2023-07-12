@@ -595,7 +595,7 @@ class Analysis(object):
             df_results = pd.DataFrame(self.results)
             df_results.to_csv(save_path)
 
-        if self.args.plot:
+        if self.args.plot and self.args.eval_type != 'displacement':
             figure_save_dir = os.path.join(self.args.analysis_dir, 'results', 'figures')
             if not os.path.exists(figure_save_dir):
                 os.makedirs(figure_save_dir)                
@@ -653,7 +653,7 @@ def load_args():
                         choices=DEFAULT_VALUES['eval_types'], 
                         default='goal_events', 
                         help='Type of evaluation to perform')
-    parser.add_argument('--plot', type=bool, default=True, help='Plot Results')
+    parser.add_argument('--plot', type=int, default=1, help='Plot Results')
     parser.add_argument('--move_threshold', action='store',
                         default=DEFAULT_VALUES['move_threshold'],
                         help='Threshold for move event evaluation')
