@@ -40,6 +40,9 @@ MODEL_DICT_VAL=  {
     'gat': {
        'class': GAT, 'config': 'gat_default_config.json', 
        'model_dir': 'gat', 'model_label': 'GAT'},
+    'gat_128': {
+       'class': GAT, 'config': 'gat_hidden_dim_128.json', 
+       'model_dir': 'gat_128', 'model_label': 'GAT'},
     'gat_rnn_enc': {
        'class': GAT, 'config': 'gat_encoder_rnn_config.json', 
        'model_dir': 'gat_rnn_enc', 'model_label': 'GAT RNN Encoder'},
