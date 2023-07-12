@@ -57,6 +57,8 @@ def load_args():
     parser.add_argument('--lr', type=float, action='store',
                         default=DEFAULT_VALUES['lr'], 
                         help='Learning Rate')
+    parser.add_argument('--lr_scheduler', type=int, action='store',
+                        default=1, help='Learning Rate Scheduling')
     parser.add_argument('--epochs', type=int, action='store',
                         default=DEFAULT_VALUES['epochs'], 
                         help='Epochs')
@@ -152,6 +154,8 @@ if __name__ == '__main__':
     
     # optimizer
     opt = torch.optim.Adam(model.parameters(), lr=args.lr)
+    if args.lr_scheduler:
+        scheduler = torch.optim.lr_scheduler.StepLR(opt, step_size=10, gamma=0.9)
     
     # store losses in dictionary (will vary by model type)
     loss_dict = {}
@@ -207,5 +211,7 @@ if __name__ == '__main__':
                 training_info[key] = loss_dict[key]
             df_training = pd.DataFrame.from_dict(training_info)
             df_training.to_csv(os.path.join(save_dir, f'training_info_{model_filename}.csv'))
+        if args.lr_scheduler:
+            scheduler.step()
         print(f'Epoch {epoch}, Train Loss {epoch_loss}, Validation Loss {val_loss}')
 

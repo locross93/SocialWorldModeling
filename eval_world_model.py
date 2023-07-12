@@ -550,10 +550,10 @@ class Analysis(object):
         elif self.args.eval_type == 'pickup_events':
             result = self.eval_pickup_events_in_rollouts(model, self.input_data)
         elif self.args.eval_type == 'displacement':    # mean/final displacement error
-            if  'sgnet' in model_key:
+            if 'sgnet' in model_key:
                 batch_size = 32
             else:
-                batch_size = 2048          
+                batch_size = args.batch_size          
             result = self.compute_displacement_error(model, batch_size=batch_size)
         else:
             raise NotImplementedError(f'Evaluation type {self.args.eval_type} not implemented')    
@@ -602,7 +602,7 @@ class Analysis(object):
             plot_save_file = os.path.join(self.args.analysis_dir, 'results', 'figures', save_file)
             plot_eval_wm_results(df_results, self.args, plot_save_file)
             
-        if self.args.append_results and self.args.partial == 1.0:
+        if self.args.append_results and self.args.partial == 1.0 and self.args.eval_type != 'displacement':
             all_results_file = os.path.join(result_save_dir, 'all_results_'+self.args.eval_type+'.csv')
             if os.path.exists(all_results_file):
                 df_all_results = pd.read_csv(all_results_file, index_col=0)
@@ -661,7 +661,7 @@ def load_args():
                         default=DEFAULT_VALUES['non_goal_burn_in'],
                         help='Number of frames to burn in for non-goal events')
     parser.add_argument('--partial', type=float, default=1.0,         
-                        help='Partial evaluation')    
+                        help='Partial evaluation')
     return parser.parse_args()
 
 

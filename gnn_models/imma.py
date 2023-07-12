@@ -163,7 +163,11 @@ class IMMA(nn.Module):
         x_hat = torch.zeros(x.shape[0], rollout_length, x.shape[2])
         for idx in range(rollout_length):
             pred = preds[idx][-1]
-            x_hat[:,idx,:] = pred.reshape(x.shape[0], 1, x.shape[2])
+            if len(pred.size()) == 4:
+                pred = pred.reshape(x.shape[0], 1, x.shape[2])
+            elif len(pred.size()) == 3:
+                pred = pred.reshape(x.shape[0], x.shape[2])
+            x_hat[:,idx,:] = pred
             
         return x_hat
     
