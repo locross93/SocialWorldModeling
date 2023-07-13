@@ -71,58 +71,64 @@ if __name__ == '__main__':
     dataset_file = os.path.join(args.data_dir, args.dataset)
     loaded_dataset = pickle.load(open(dataset_file, 'rb'))
     train_dataset, test_dataset = loaded_dataset
-    if args.train_or_val == 'train':
-        input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
-    else:
-        input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
-    num_timesteps = input_data.size(1)
-    loader = DataLoader(input_data, batch_size=batch_size, shuffle=False, pin_memory=True)
-    data_indices = list(range(len(input_data)))
-    
-    # load dataset info
-    exp_info_file = dataset_file[:-4]+'_exp_info.pkl'
-    if os.path.isfile(exp_info_file):
-        with open(exp_info_file, 'rb') as f:
-            exp_info_dict = pickle.load(f)
-    else:
-        print('DS info dict not found')
-    
-    wm_loss_by_time = np.zeros([input_data.size(0), input_data.size(1)])
-    
-    for batch_idx, batch_x in enumerate(loader):
-        print('Batch',batch_idx)
-        batch_x = batch_x.to(args.device)
-        # Get the indices of the current batch
-        current_indices = data_indices[batch_idx * batch_size:(batch_idx + 1) * batch_size]
-        for t in range(min_burnin, (num_timesteps-rollout_length)):
-            if t%50 == 0:
-                print(t)
-            burn_in_length = t
-            x_hat = model.forward_rollout(batch_x, burn_in_length, rollout_length)
-            x_supervise = batch_x[:,t:(t+rollout_length),:]
-            wm_loss_temp = ((x_supervise - x_hat)**2).sum(dim=2)
-            wm_loss = wm_loss_temp.mean(dim=1)
-            wm_loss = wm_loss.detach().cpu().numpy()
-            wm_loss_by_time[current_indices,t] = wm_loss
-            
-    # find peaks for each trial
-    # Initialize a list to store the indices of the peaks for each trial
-    peaks_indices = []
 
-    for trial_num in range(input_data.size(0)):
-        # Normalize the world model loss for the current trial
-        normalized_loss = normalize(wm_loss_by_time[trial_num, :])
+    event_inds = {}
+    for train_or_val in ['train', 'val']:
+        print("Processing {} set".format(train_or_val))
+        if args.train_or_val == 'train':
+            input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
+        else:
+            input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
+        num_timesteps = input_data.size(1)
+        loader = DataLoader(input_data, batch_size=batch_size, shuffle=False, pin_memory=True)
+        data_indices = list(range(len(input_data)))
         
-        # Find the peaks
-        peaks, _ = find_peaks(normalized_loss, height=0.2, distance=10, prominence=0.2)
+        # load dataset info
+        exp_info_file = dataset_file[:-4]+'_exp_info.pkl'
+        if os.path.isfile(exp_info_file):
+            with open(exp_info_file, 'rb') as f:
+                exp_info_dict = pickle.load(f)
+        else:
+            print('DS info dict not found')
         
-        # Append the indices of the peaks to our list
-        peak_list = peaks.tolist()
-        # always include last timestep as an event such that it is predicted if nothing else (or nothing sooner)
-        last_timestep = input_data.size(1) - 1
-        peak_list.append(last_timestep)
-        peaks_indices.append(peak_list)
+        wm_loss_by_time = np.zeros([input_data.size(0), input_data.size(1)])
         
+        for batch_idx, batch_x in enumerate(loader):
+            print('Batch',batch_idx)
+            batch_x = batch_x.to(args.device)
+            # Get the indices of the current batch
+            current_indices = data_indices[batch_idx * batch_size:(batch_idx + 1) * batch_size]
+            for t in range(min_burnin, (num_timesteps-rollout_length)):
+                if t%50 == 0:
+                    print(t)
+                burn_in_length = t
+                x_hat = model.forward_rollout(batch_x, burn_in_length, rollout_length)
+                x_supervise = batch_x[:,t:(t+rollout_length),:]
+                wm_loss_temp = ((x_supervise - x_hat)**2).sum(dim=2)
+                wm_loss = wm_loss_temp.mean(dim=1)
+                wm_loss = wm_loss.detach().cpu().numpy()
+                wm_loss_by_time[current_indices,t] = wm_loss
+                
+        # find peaks for each trial
+        # Initialize a list to store the indices of the peaks for each trial
+        peaks_indices = []
+
+        for trial_num in range(input_data.size(0)):
+            # Normalize the world model loss for the current trial
+            normalized_loss = normalize(wm_loss_by_time[trial_num, :])
+            
+            # Find the peaks
+            peaks, _ = find_peaks(normalized_loss, height=0.2, distance=10, prominence=0.2)
+            
+            # Append the indices of the peaks to our list
+            peak_list = peaks.tolist()
+            # always include last timestep as an event such that it is predicted if nothing else (or nothing sooner)
+            last_timestep = input_data.size(1) - 1
+            peak_list.append(last_timestep)
+            peaks_indices.append(peak_list)
+
+        event_inds[train_or_val] = peaks_indices
+            
     save_file = os.path.join(args.analysis_dir,'results','event_inds','event_inds_'+args.model_key+'.pkl')
     with open(save_file, 'wb') as f:
-        pickle.dump(peaks_indices, f)
+        pickle.dump(event_inds, f)
