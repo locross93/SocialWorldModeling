@@ -1,5 +1,6 @@
 from models import DreamerV2, MultistepPredictor, \
-    TransformerMSPredictor, MultistepDelta, TransformerWorldModel, TransformerIrisWorldModel
+    TransformerMSPredictor, MultistepDelta, TransformerWorldModel, TransformerIrisWorldModel, \
+    EventPredictor, MSPredictorEventContext
 from gnn_models.imma import IMMA
 from gnn_models.gat import GAT
 from gnn_models.rfm import RFM
@@ -13,7 +14,10 @@ MODEL_DICT_TRAIN = {
     'transformer_wm': TransformerWorldModel,
     'imma': IMMA,
     'gat': GAT,
-    'rfm': RFM
+    'rfm': RFM,
+    'multistep_delta': MultistepDelta,
+    'event_predictor': EventPredictor,
+    'mp_event_context': MSPredictorEventContext
 }
 MODEL_DICT_VAL=  {
     # 'rssm_cont': {
@@ -112,7 +116,7 @@ DEFAULT_VALUES = {
     'data_dir': '/Users/locro/Documents/Stanford/analysis/data/' if platform.system() == 'Windows' else  '/data2/locross/data/',
     'checkpoint_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/data2/locross/analysis/',
     'results_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/results/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/results',
-    'model_config_dir': './model_configs',
+    'model_config_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/model_configs/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/model_configs/',
     # general training parameters for all models
     'batch_size': 8 if platform.system() == 'Windows' else 2048,
     'lr': 1e-5,

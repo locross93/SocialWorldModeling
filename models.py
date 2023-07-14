@@ -1332,8 +1332,7 @@ class MultistepPredictor(nn.Module):
             pred_outputs.append(xt_hat.squeeze(1))
             # output is next input x
             xt_hat, hidden = self.forward(xt_hat, hidden)
-        if len(pred_outputs) == 0:
-            breakpoint()
+        assert len(pred_outputs) != 0
         x_hat = torch.stack(pred_outputs, dim=1)
         
         return x_hat
@@ -2380,3 +2379,208 @@ class TransformerIrisWorldModel(nn.Module):
            #print(f"rollout step {i}, mse is {F.mse_loss(x[:, burn_in_length + i], output_observations[:, -1])}")
         x_rollout = torch.stack(x_rollout, dim=1)        
         return x_rollout
+    
+
+class ReplayBufferEvents:
+    def __init__(self, burn_in_length, rollout_length, training_set, event_inds):
+        self.burn_in_length = burn_in_length
+        self.rollout_length = rollout_length
+        self.sequence_length = sequence_length
+        self.event_inds = event_inds
+        self.buffer_size = training_set.size(0)
+        self.episode_length = training_set.size(1)
+        self.buffer = training_set
+        
+    def sample(self, batch_size, random_seed=None):
+        if random_seed is not None:
+            np.random.seed(random_seed)
+        episode_inds = np.random.choice(self.buffer_size, batch_size, replace=False)
+        episode_starts = np.random.randint(0, (self.episode_length - self.sequence_length)+1, size=batch_size)
+        batch_trajs = []
+        batch_event_states = []
+        batch_event_horizons = []
+        for i,ep_ind in enumerate(episode_inds):
+            start = episode_starts[i]
+            end = start + self.sequence_length
+            traj_sample = self.buffer[ep_ind,start:end,:]
+            assert traj_sample.size(0) == self.sequence_length
+            batch_trajs.append(traj_sample)
+            # get closest future event state in that trajectory from burn in state
+            traj_event_inds = np.array(self.event_inds[ep_ind])
+            burn_in_ind = start + (self.burn_in_length - 1)
+            closest_event_ind = np.min(traj_event_inds[np.where(traj_event_inds > burn_in_ind)[0]])
+            # get event horizon from end state
+            event_horizon = closest_event_ind - burn_in_ind
+            # min-max normalize event horizon, with 0 equaling now, 1 the entire episode length
+            event_horizon = (event_horizon - 1) / ((self.episode_length - self.burn_in_length) - 1)
+            event_state = self.buffer[ep_ind,closest_event_ind,:]
+            batch_event_states.append(event_state)
+            batch_event_horizons.append(event_horizon)
+        trajectories = torch.stack(batch_trajs, dim=0)
+        event_states = torch.stack(batch_event_states, dim=0)
+        event_horizons = torch.tensor(batch_event_horizons)
+        
+        return trajectories, event_states, event_horizons
+    
+
+class EventPredictor(nn.Module):
+    def __init__(self, config):
+        super(EventPredictor, self).__init__()
+        self.input_size = config['input_size']
+        self.rnn_type = config['rnn_type']
+        self.rnn_hidden_size = config['rnn_hidden_size']
+        self.num_rnn_layers = config['num_rnn_layers']
+        self.mlp_hidden_size = config['mlp_hidden_size']
+        if 'mlp_num_layers' in config:
+            self.num_mlp_layers = config['num_mlp_layers']
+        else:
+            self.num_mlp_layers = 2
+        if 'dropout' in config:
+            self.dropout = config['dropout']
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        
+        if self.rnn_type == 'GRU':
+            self.rnn = nn.GRU(self.input_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, batch_first=True)
+        elif self.rnn_type == 'LSTM':
+            self.rnn = nn.LSTM(self.input_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, batch_first=True)
+        self.event_decoder = self.build_mlp(self.num_mlp_layers, self.rnn_hidden_size, self.mlp_hidden_size, self.input_size, nn.ReLU, out_sigmoid=False)
+        if config['predict_horizon']:
+            self.predict_horizon = True
+            self.horizon_loss_weight = config['horizon_loss_weight']
+            self.event_horizon_decoder = self.build_mlp(self.num_mlp_layers, self.rnn_hidden_size, self.mlp_hidden_size, 1, nn.ReLU, out_sigmoid=True) 
+    
+    def build_mlp(self, num_layers, input_size, node_size, output_size, activation, out_sigmoid):
+        model = [nn.Linear(input_size, node_size)]
+        model += [activation()]
+        for i in range(num_layers-1):
+            model += [nn.Linear(node_size, node_size)]
+            model += [activation()]
+        model += [nn.Linear(node_size, output_size)]
+        if out_sigmoid:
+            # normalize output between 0 and 1
+            model += [nn.Sigmoid()]
+        return nn.Sequential(*model)
+
+    def forward(self, x, hidden):
+        rnn_out, hidden = self.rnn(x, hidden)
+        out_event_state = self.event_decoder(rnn_out)
+        if self.predict_horizon:
+            out_event_horizon = self.event_horizon_decoder(rnn_out)
+            return out_event_state, out_event_horizon, hidden
+        else:
+            return out_event_state, hidden
+
+    def init_hidden(self, batch_size):
+        if self.rnn_type == 'GRU':
+            hidden_cell = torch.zeros(self.num_rnn_layers, batch_size, self.rnn_hidden_size).to(self.device)
+            return hidden_cell
+        elif self.rnn_type == 'LSTM':
+            hidden_cell = torch.zeros(self.num_rnn_layers, batch_size, self.rnn_hidden_size).to(self.device)
+            state_cell = torch.zeros(self.num_rnn_layers, batch_size, self.rnn_hidden_size).to(self.device)
+            return (hidden_cell, state_cell)
+    
+    def supervised_loss(self, x, event_state, event_horizon=None):
+        batch_size = x.size(0)
+        hidden = self.init_hidden(batch_size)
+        if self.predict_horizon:
+            out_event_state, out_event_horizon, hidden = self.forward(x, hidden)
+        else:
+            out_event_state, hidden = self.forward(x, hidden)
+
+        # last output is prediction with entire burn in sequence
+        event_hat = out_event_state[:,-1,:]
+        assert event_state.size() == event_hat.size()
+        event_loss = ((event_state - event_hat)**2).mean()
+
+        if self.predict_horizon:
+            event_horizon_hat = out_event_horizon[:,-1,:].squeeze(1)
+            assert event_horizon.size() == event_horizon_hat.size()
+            horizon_loss = self.horizon_loss_weight * ((event_horizon - event_horizon_hat)**2).mean()
+            loss = event_loss + horizon_loss
+            return loss, event_loss, horizon_loss, event_hat, event_horizon_hat
+        else:
+            loss = event_loss
+            return loss, None, None, event_hat, None
+        
+
+class MSPredictorEventContext(nn.Module):
+    def __init__(self, config):
+        super(MSPredictorEventContext, self).__init__()
+        self.input_size = config['input_size']
+        self.rnn_type = config['rnn_type']
+        self.rnn_hidden_size = config['rnn_hidden_size']
+        self.num_rnn_layers = config['num_rnn_layers']
+        self.mlp_hidden_size = config['mlp_hidden_size']
+        if 'mlp_num_layers' in config:
+            self.num_mlp_layers = config['num_mlp_layers']
+        else:
+            self.num_mlp_layers = 2
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        
+        # create two linear embeddings, one for time varying input, one for predicted next event state by separate model
+        self.input_embed = nn.Linear(in_features=self.input_size, out_features=self.mlp_hidden_size//2)
+        if config['input_pred_horizon']:
+            # add one to input if inputting predicted horizon
+            self.event_embed = nn.Linear(in_features=self.input_size+1, out_features=self.mlp_hidden_size//2)
+        else:
+            self.event_embed = nn.Linear(in_features=self.input_size, out_features=self.mlp_hidden_size//2)
+        
+        if self.rnn_type == 'GRU':
+            self.rnn = nn.GRU(self.mlp_hidden_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, batch_first=True)
+        elif self.rnn_type == 'LSTM':
+            self.rnn = nn.LSTM(self.mlp_hidden_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, batch_first=True)
+        self.mlp = self.build_mlp(self.num_mlp_layers, self.rnn_hidden_size, self.mlp_hidden_size, self.input_size, nn.ReLU)
+    
+    def build_mlp(self, num_layers, input_size, node_size, output_size, activation):
+        model = [nn.Linear(input_size, node_size)]
+        model += [activation()]
+        for i in range(num_layers-1):
+            model += [nn.Linear(node_size, node_size)]
+            model += [activation()]
+        model += [nn.Linear(node_size, output_size)]
+        return nn.Sequential(*model)
+
+    def forward(self, x, event_hat, hidden):
+        input_embed = self.input_embed(x)
+        # copy predicted end state for each time step
+        if len(event_hat.size()) == 2:
+            event_hat = event_hat.unsqueeze(1)
+            event_hat = event_hat.repeat_interleave(x.size(1), dim=1)
+        event_embed = self.event_embed(event_hat)
+        rnn_input = torch.cat((input_embed, event_embed), dim=2)
+        out, hidden = self.rnn(rnn_input, hidden)
+        out = self.mlp(out)
+        return out, hidden
+
+    def init_hidden(self, batch_size):
+        if self.rnn_type == 'GRU':
+            hidden_cell = torch.zeros(self.num_rnn_layers, batch_size, self.rnn_hidden_size).to(self.device)
+            return hidden_cell
+        elif self.rnn_type == 'LSTM':
+            hidden_cell = torch.zeros(self.num_rnn_layers, batch_size, self.rnn_hidden_size).to(self.device)
+            state_cell = torch.zeros(self.num_rnn_layers, batch_size, self.rnn_hidden_size).to(self.device)
+            return (hidden_cell, state_cell)
+    
+    def forward_rollout(self, x, event_hat, burn_in_length, rollout_length):
+        batch_size = x.size(0)
+        hidden = self.init_hidden(batch_size)
+        output, hidden = self.forward(x[:,:burn_in_length,:], event_hat, hidden)
+        # last output is next input x
+        xt_hat = output[:,-1,:].unsqueeze(1)
+        pred_outputs = []
+        for t in range(rollout_length):
+            pred_outputs.append(xt_hat.squeeze(1))
+            # output is next input x
+            xt_hat, hidden = self.forward(xt_hat, event_hat, hidden)
+        x_hat = torch.stack(pred_outputs, dim=1)
+        
+        return x_hat
+    
+    def supervised_loss(self, x, event_hat, burn_in_length, rollout_length):
+        x_hat = self.forward_rollout(x, event_hat, burn_in_length, rollout_length)
+        t_end = burn_in_length + rollout_length
+        x_supervise = x[:,burn_in_length:t_end,:]
+        
+        loss = ((x_supervise - x_hat)**2).mean()
+        
+        return loss
