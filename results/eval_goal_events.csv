@@ -1,2 +1,2 @@
 ,model,score,MSE,epoch,dataset
-0,SGNet-H512,0.0,3.018923044204712,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default_lr1e-4/sgnet_cvae_default_lr1e-4_epoch1200,data_5_31_23.pkl
+0,Multistep Predictor,0.21311475409836064,2.0151233673095703,7000,swm_data.pkl

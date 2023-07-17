@@ -76,7 +76,7 @@ MODEL_DICT_VAL=  {
        'model_dir': 'rfm_rnn', 'model_label': 'RFM RNN'},
     'mp_ds2': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json', 
-        'model_dir': 'multistep_predictor', 'model_label': 'Multistep Predictor'},
+        'model_dir': 'multistep_predictor', 'epoch': '7000', 'model_label': 'Multistep Predictor'},
     'mp_ds3': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35.json',
         'model_dir': 'mp_ds3', 'model_label': 'Multistep Predictor DS3'},

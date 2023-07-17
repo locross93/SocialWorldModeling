@@ -183,21 +183,22 @@ def main():
         for i in tqdm(range(batches_per_epoch)):
             batch_x, event_states, event_horizons = replay_buffer.sample(batch_size)
             batch_x = batch_x.to(DEVICE)
+            event_states = event_states.to(DEVICE)
+            event_horizons = event_horizons.to(DEVICE)
             nsamples += batch_x.shape[0]
             opt.zero_grad()
-            ep_loss, event_loss, horizon_loss, event_hat, event_horizon_hat = ep_model.supervised_loss(batch_x[:,:burn_in_length,:], event_states)
+            ep_loss, event_loss, horizon_loss, event_hat, event_horizon_hat = ep_model.supervised_loss(batch_x[:,:burn_in_length,:], event_states, event_horizons)
             # condition ms predictor on predicted end states, detach from computational graph so gradients don't flow through esp_model
             if mp_config['input_pred_horizon']:
                 # concatenate event_hat and event_horizon_hat
-                event_hat = torch.cat([event_hat, event_horizon_hat], dim=-1)
-                breakpoint()
+                event_hat = torch.cat([event_hat, event_horizon_hat.unsqueeze(1)], dim=-1)
             mp_loss = mp_model.supervised_loss(batch_x, event_hat.detach(), burn_in_length, rollout_length)
             loss = ep_loss + mp_loss
             loss.backward()
             opt.step()
             batch_loss.append([ep_loss.item(), mp_loss.item(), loss.item()])
         loss_dict['train'].append(np.mean([b_loss[-1] for b_loss in batch_loss]))
-        loss_dict['ep_loss'].append(np.mean([b_loss[0] for b_loss in batch_loss])
+        loss_dict['ep_loss'].append(np.mean([b_loss[0] for b_loss in batch_loss]))
         loss_dict['mp_loss'].append(np.mean([b_loss[1] for b_loss in batch_loss]))
         loss_dict['epoch_times'].append(time.time()-start_time)
             
@@ -205,7 +206,10 @@ def main():
         with torch.no_grad():
             mp_model.eval()
             ep_model.eval()
-            val_ep_loss, val_event_loss, val_horizon_loss, val_event_hat, val_event_horizon_hat = esp_model.supervised_loss(val_trajs[:,:burn_in_length,:], val_event_states, val_event_horizons)
+            val_ep_loss, val_event_loss, val_horizon_loss, val_event_hat, val_event_horizon_hat = ep_model.supervised_loss(val_trajs[:,:burn_in_length,:], val_event_states, val_event_horizons)
+            if mp_config['input_pred_horizon']:
+                # concatenate event_hat and event_horizon_hat
+                val_event_hat = torch.cat([val_event_hat, val_event_horizon_hat.unsqueeze(1)], dim=-1)
             val_mp_loss = mp_model.supervised_loss(val_trajs, val_event_hat, burn_in_length, rollout_length)
             val_loss = val_ep_loss + val_mp_loss
             val_loss = val_loss.item()
@@ -213,7 +217,7 @@ def main():
         # log to tensorboard
         writer.add_scalar('Train Loss/loss', loss_dict['train'][-1], epoch)
         writer.add_scalar('Train Loss/ep_loss', loss_dict['ep_loss'][-1], epoch)
-        writer.add_scalar('Train Loss/mp_loss', loss_dict['mp_loss'][-1], epoch')
+        writer.add_scalar('Train Loss/mp_loss', loss_dict['mp_loss'][-1], epoch)
         writer.add_scalar('Val Loss/val', val_loss, epoch)
         
         if epoch % args.save_every == 0 or epoch == (args.epochs-1):

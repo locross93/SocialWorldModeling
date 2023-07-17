@@ -2385,7 +2385,7 @@ class ReplayBufferEvents:
     def __init__(self, burn_in_length, rollout_length, training_set, event_inds):
         self.burn_in_length = burn_in_length
         self.rollout_length = rollout_length
-        self.sequence_length = sequence_length
+        self.sequence_length = burn_in_length + rollout_length
         self.event_inds = event_inds
         self.buffer_size = training_set.size(0)
         self.episode_length = training_set.size(1)

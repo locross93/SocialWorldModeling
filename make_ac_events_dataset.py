@@ -47,7 +47,6 @@ def load_args():
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
     parser.add_argument('--model_key', type=str, required=True, help='Model to use for visualization')
-    parser.add_argument('--train_or_val', type=str, default='val', help='Training or Validation Set')
     parser.add_argument('--device', type=str, default='cuda', help='Device')
     parser.add_argument('--batch_size', type=int, action='store',
                         default=DEFAULT_VALUES['batch_size'],
@@ -75,7 +74,7 @@ if __name__ == '__main__':
     event_inds = {}
     for train_or_val in ['train', 'val']:
         print("Processing {} set".format(train_or_val))
-        if args.train_or_val == 'train':
+        if train_or_val == 'train':
             input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
         else:
             input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]

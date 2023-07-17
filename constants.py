@@ -1,6 +1,7 @@
 import os
 from models import DreamerV2, MultistepPredictor, MultistepDelta, \
-    TransformerMSPredictor, TransformerIrisWorldModel, TransformerWorldModel    
+    TransformerMSPredictor, TransformerIrisWorldModel, TransformerWorldModel, \
+    EventPredictor, MSPredictorEventContext 
 from agent_former.agentformer import AgentFormer
 from sgnet_models.SGNet_CVAE import SGNet_CVAE
 from gnn_models.imma import IMMA
@@ -21,7 +22,9 @@ MODEL_DICT_TRAIN = {
     'gat': GAT,
     'rfm': RFM,
     'sgnet_cvae': SGNet_CVAE,
-    'agent_former': AgentFormer
+    'agent_former': AgentFormer,
+    'event_predictor': EventPredictor,
+    'mp_event_context': MSPredictorEventContext
 }
 """Values for validation"""
 # Only using 5-31-23 for the paper
