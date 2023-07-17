@@ -50,6 +50,7 @@ def get_highest_numbered_file(model_filename, directory):
 
 def init_model_class(config, args=None):
     gnn_models = ['imma', 'gat', 'rfm']
+    event_models = ['event_model']
     model_type = config['model_type']
     model_class = model_dict[model_type]
     if model_type in gnn_models:
@@ -57,6 +58,20 @@ def init_model_class(config, args=None):
         for key in config.keys():
             setattr(args, key, config[key])
         model = model_class(args)
+    elif model_type in event_models:
+        # make new config with keys that start with mp_ and ep_
+        mp_config = {}
+        ep_config = {}
+        for key in config.keys():
+            if key.startswith('mp_'):
+                # make new key without mp_
+                new_key = key[3:]
+                mp_config[new_key] = config[key]
+            elif key.startswith('ep_'):
+                # make new key without ep_
+                new_key = key[3:]
+                ep_config[new_key] = config[key]
+        model = model_class(ep_config, mp_config)
     else:
         # init class with config
         model = model_class(config)
@@ -64,34 +79,46 @@ def init_model_class(config, args=None):
 
 def load_trained_model(model_info, args):
     gnn_models = ['imma', 'gat', 'rfm']
+    event_models = ['event_model']
     # load config and initialize model class
     config_file = os.path.join(args.model_config_dir, model_info['config'])
     config = load_config(config_file)
     model_type = config['model_type']
-    model_class = model_dict[model_type]
-    if model_type in gnn_models:
-        # set config params in args
-        for key in config.keys():
-            setattr(args, key, config[key])
-        model = model_class(args)
-    else:
-        # init class with config
-        model = model_class(config)
-    # load checkpoint weights
-    # checkpoints are in folder named after model
-    model_dir = os.path.join(args.checkpoint_dir, 'models', model_info['model_dir'])
-    if 'epoch' in model_info:
-        model_file_name = os.path.join(model_dir, model_info['model_dir']+'_epoch'+model_info['epoch'])
-        model.load_state_dict(torch.load(model_file_name))
-        print('Loading model', model_file_name)
-    else:
-        latest_checkpoint, _ =  get_highest_numbered_file(model_info['model_dir'], model_dir)
-        print('Loading from last checkpoint', latest_checkpoint)
-        model.load_state_dict(torch.load(latest_checkpoint))
+    model = init_model_class(config, args)
 
-    model.eval()
-    model.device = args.device
-    model.to(args.device)
+    if model_type in event_models:
+        # load weights
+        if 'epoch' in model_info:
+            ep_weights_path = os.path.join(args.checkpoint_dir, 'models', model_info['model_dir'], 'ep_model_epoch'+model_info['epoch'])
+            mp_weights_path = os.path.join(args.checkpoint_dir, 'models', model_info['model_dir'], 'mp_model_epoch'+model_info['epoch'])
+            model.load_weights(ep_weights_path, mp_weights_path)
+        else:
+            ep_weights_path, _ = get_highest_numbered_file('ep_model', os.path.join(args.checkpoint_dir, 'models', model_info['model_dir']))
+            mp_weights_path, _ = get_highest_numbered_file('mp_model', os.path.join(args.checkpoint_dir, 'models', model_info['model_dir']))
+            model.load_weights(ep_weights_path, mp_weights_path)
+        model.mp_model.device = args.device
+        model.ep_model.device = args.device
+        model.device = args.device
+        model.mp_model.to(args.device)
+        model.ep_model.to(args.device)
+        model.mp_model.eval()
+        model.ep_model.eval()
+    else:
+        # load checkpoint weights
+        # checkpoints are in folder named after model
+        model_dir = os.path.join(args.checkpoint_dir, 'models', model_info['model_dir'])
+        if 'epoch' in model_info:
+            model_file_name = os.path.join(model_dir, model_info['model_dir']+'_epoch'+model_info['epoch'])
+            model.load_state_dict(torch.load(model_file_name))
+            print('Loading model', model_file_name)
+        else:
+            latest_checkpoint, _ =  get_highest_numbered_file(model_info['model_dir'], model_dir)
+            print('Loading from last checkpoint', latest_checkpoint)
+            model.load_state_dict(torch.load(latest_checkpoint))
+        model.eval()
+        model.device = args.device
+        model.to(args.device)
+
     return model
 
     

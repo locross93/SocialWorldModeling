@@ -2448,7 +2448,9 @@ class EventPredictor(nn.Module):
             self.predict_horizon = True
             self.horizon_loss_weight = config['horizon_loss_weight']
             self.event_horizon_decoder = self.build_mlp(self.num_mlp_layers, self.rnn_hidden_size, self.mlp_hidden_size, 1, nn.ReLU, out_sigmoid=True) 
-    
+        else:
+            self.predict_horizon = False
+
     def build_mlp(self, num_layers, input_size, node_size, output_size, activation, out_sigmoid):
         model = [nn.Linear(input_size, node_size)]
         model += [activation()]
@@ -2520,9 +2522,11 @@ class MSPredictorEventContext(nn.Module):
         # create two linear embeddings, one for time varying input, one for predicted next event state by separate model
         self.input_embed = nn.Linear(in_features=self.input_size, out_features=self.mlp_hidden_size//2)
         if config['input_pred_horizon']:
+            self.input_pred_horizon = True
             # add one to input if inputting predicted horizon
             self.event_embed = nn.Linear(in_features=self.input_size+1, out_features=self.mlp_hidden_size//2)
         else:
+            self.input_pred_horizon = False
             self.event_embed = nn.Linear(in_features=self.input_size, out_features=self.mlp_hidden_size//2)
         
         if self.rnn_type == 'GRU':
@@ -2582,5 +2586,58 @@ class MSPredictorEventContext(nn.Module):
         x_supervise = x[:,burn_in_length:t_end,:]
         
         loss = ((x_supervise - x_hat)**2).mean()
+        
+        return loss
+
+
+class EventModel:
+    def __init__(self, ep_config, mp_config):
+        self.ep_model = EventPredictor(ep_config)
+        self.mp_model = MSPredictorEventContext(mp_config)
+        
+    def load_weights(self, ep_weights_path, mp_weights_path):
+        # Load the weights of the two models
+        self.ep_model.load_state_dict(torch.load(ep_weights_path))
+        self.mp_model.load_state_dict(torch.load(mp_weights_path))
+
+    def predict_next_event(self, x):
+        # Call EventPredictor's forward function with burn_in steps - x should be burn_in length
+        batch_size = x.size(0)
+        hidden = self.ep_model.init_hidden(batch_size)
+        if self.ep_model.predict_horizon:
+            out_event_state, out_event_horizon, hidden = self.ep_model.forward(x, hidden)
+            # last output is prediction with entire burn in sequence
+            event_hat = out_event_state[:,-1,:]
+            event_horizon_hat = out_event_horizon[:,-1,:].squeeze(1)
+            return event_hat, event_horizon_hat
+        else:
+            out_event_state, hidden = self.ep_model.forward(x, hidden)
+            # last output is prediction with entire burn in sequence
+            event_hat = out_event_state[:,-1,:]
+            return event_hat
+    
+    def forward_rollout(self, x, burn_in_length, rollout_length):
+        if self.ep_model.predict_horizon:
+            event_hat, event_horizon_hat = self.predict_next_event(x[:,:burn_in_length,:])
+        else:
+            event_hat = self.predict_next_event(x[:,:burn_in_length,:])
+
+        # condition ms predictor on predicted next event
+        if self.mp_model.input_pred_horizon:
+            # concatenate event_hat and event_horizon_hat
+            event_hat = torch.cat([event_hat, event_horizon_hat.unsqueeze(1)], dim=-1)
+        # Call MSPredictorEventContext's forward_rollout with event_hat
+        x_hat = self.mp_model.forward_rollout(x, event_hat, burn_in_length, rollout_length)
+
+        return x_hat
+
+    def loss(self, x, burn_in_length, rollout_length):
+        loss_fn = torch.nn.MSELoss()
+        
+        x_hat = self.forward_rollout(x, burn_in_length, rollout_length)
+        t_end = burn_in_length + rollout_length
+        x_supervise = x[:,burn_in_length:t_end,:]
+        
+        loss = loss_fn(x_supervise, x_hat)
         
         return loss

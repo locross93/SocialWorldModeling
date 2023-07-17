@@ -188,7 +188,7 @@ def main():
             nsamples += batch_x.shape[0]
             opt.zero_grad()
             ep_loss, event_loss, horizon_loss, event_hat, event_horizon_hat = ep_model.supervised_loss(batch_x[:,:burn_in_length,:], event_states, event_horizons)
-            # condition ms predictor on predicted end states, detach from computational graph so gradients don't flow through esp_model
+            # condition ms predictor on predicted end states, detach from computational graph so gradients don't flow through ep_model
             if mp_config['input_pred_horizon']:
                 # concatenate event_hat and event_horizon_hat
                 event_hat = torch.cat([event_hat, event_horizon_hat.unsqueeze(1)], dim=-1)

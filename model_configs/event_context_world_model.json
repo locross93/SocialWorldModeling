@@ -17,5 +17,6 @@
     "ep_predict_horizon": 1,
     "ep_horizon_loss_weight": 1.0,
     "ep_rnn_type": "LSTM",
-    "ep_model_type": "event_predictor"
+    "ep_model_type": "event_predictor",
+    "model_type": "event_model"
 }

@@ -1,6 +1,6 @@
 from models import DreamerV2, MultistepPredictor, \
     TransformerMSPredictor, MultistepDelta, TransformerWorldModel, TransformerIrisWorldModel, \
-    EventPredictor, MSPredictorEventContext
+    EventPredictor, MSPredictorEventContext, EventModel
 from gnn_models.imma import IMMA
 from gnn_models.gat import GAT
 from gnn_models.rfm import RFM
@@ -17,7 +17,8 @@ MODEL_DICT_TRAIN = {
     'rfm': RFM,
     'multistep_delta': MultistepDelta,
     'event_predictor': EventPredictor,
-    'mp_event_context': MSPredictorEventContext
+    'mp_event_context': MSPredictorEventContext,
+    'event_model': EventModel
 }
 MODEL_DICT_VAL=  {
     # 'rssm_cont': {
@@ -107,6 +108,9 @@ MODEL_DICT_VAL=  {
     'transformer_iris': {
         'class': TransformerIrisWorldModel, 'config': 'transformer_iris_concat_pos_embd_default_config.json',
         'model_dir': 'transformer_iris_concat_pos_embd_lr1e-4', 'model_label': 'Transformer Iris Concat Pos Embd lr1e-4'},
+    'event_context_mp': {
+        'class': EventModel, 'config': 'event_context_world_model.json',
+        'model_dir': 'event_context_world', 'model_label': 'Event Context World Model'},
 }
 DEFAULT_VALUES = {
 	'train_seed': 911320,
