@@ -1,3 +1,2 @@
 ,model,g2_acc,g2_goal_num,g2_mse,g3_acc,g3_goal_num,g3_mse,epoch,dataset
-0,SGNet-H512,0.1315240083507307,2nd Goal,3.382585048675537,0.025052192066805846,3rd Goal,3.382585048675537,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default_lr1e-4/sgnet_cvae_default_lr1e-4_epoch1000,data_5_31_23.pkl
-1,SGNet-H256,0.18162839248434237,2nd Goal,3.1806960105895996,0.08768267223382047,3rd Goal,3.1806960105895996,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size256_lr1e-4/sgnet_cvae_hidden_size256_lr1e-4_epoch1000,data_5_31_23.pkl
+0,Event Context World Model,0.20250521920668058,2nd Goal,2.8299753665924072,0.1524008350730689,3rd Goal,2.8299753665924072,/data2/locross/analysis/models/event_context_world/mp_model_epoch4200,swm_data.pkl

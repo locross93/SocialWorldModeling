@@ -15,7 +15,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 from analysis_utils import init_model_class
 from constants_lc import DEFAULT_VALUES, MODEL_DICT_TRAIN
-from models import ReplayBufferEvents
+from models import ReplayBufferEvents, ReplayBufferEndState
 
 
 """Global variables"""
@@ -60,6 +60,7 @@ def load_args():
                         default=DEFAULT_VALUES['save_every'], 
                         help='Epoch Save Interval')
     parser.add_argument('--input_size', type=int, help='Input size')
+    parser.add_argument('--pred_end_state', type=bool, default=False, help='Predict end state')
     # model parameters
     parser.add_argument('--mp_rnn_hidden_size', type=int, help='MP RNN hidden size')
     parser.add_argument('--mp_mlp_hidden_size', type=int, help='MP MLP hidden size')
@@ -140,13 +141,19 @@ def main():
     burn_in_length = args.burn_in_length
     rollout_length = args.rollout_length
     sequence_length = burn_in_length + rollout_length
-    replay_buffer = ReplayBufferEvents(burn_in_length, rollout_length, train_data, events_dataset['train'])
+    if args.pred_end_state:
+        replay_buffer = ReplayBufferEndState(burn_in_length, rollout_length, train_data)
+    else:
+        replay_buffer = ReplayBufferEvents(burn_in_length, rollout_length, train_data, events_dataset['train'])
     batch_size = args.batch_size
     print(f'Batch size: {batch_size}')
     batches_per_epoch = np.min([replay_buffer.buffer_size // batch_size, 50])
     
     # make validation data
-    val_buffer = ReplayBufferEvents(burn_in_length, rollout_length, val_data, events_dataset['val'])
+    if args.pred_end_state:
+        val_buffer = ReplayBufferEndState(burn_in_length, rollout_length, val_data)
+    else:
+        val_buffer = ReplayBufferEvents(burn_in_length, rollout_length, val_data, events_dataset['val'])
     seed = 100 # set seed so every model sees the same randomization
     val_batch_size = np.min([val_data.size(0), 1000])
     val_trajs, val_event_states, val_event_horizons = val_buffer.sample(val_batch_size, random_seed=seed)

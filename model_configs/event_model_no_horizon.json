@@ -1,0 +1,22 @@
+{
+    "mp_input_size": 35,
+    "mp_input_embed_size": 1024,
+    "mp_mlp_hidden_size": 1024,
+    "mp_num_mlp_layers": 2,
+    "mp_rnn_hidden_size": 1024,
+    "mp_num_rnn_layers": 2,
+    "mp_input_pred_horizon": 0,
+    "mp_rnn_type": "LSTM",
+    "mp_model_type": "mp_event_context",
+    "ep_input_size": 35,
+    "ep_input_embed_size": 1024,
+    "ep_mlp_hidden_size": 1024,
+    "ep_num_mlp_layers": 2,
+    "ep_rnn_hidden_size": 1024,
+    "ep_num_rnn_layers": 2,
+    "ep_predict_horizon": 0,
+    "ep_horizon_loss_weight": 0.0,
+    "ep_rnn_type": "LSTM",
+    "ep_model_type": "event_predictor",
+    "model_type": "event_model"
+}

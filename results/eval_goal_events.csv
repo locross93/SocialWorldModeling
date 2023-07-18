@@ -1,2 +1,2 @@
 ,model,score,MSE,epoch,dataset
-0,Multistep Predictor,0.21311475409836064,2.0151233673095703,7000,swm_data.pkl
+0,Multistep Predictor,0.23770491803278687,1.9375108480453491,6000,swm_data.pkl

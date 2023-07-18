@@ -78,7 +78,6 @@ def init_model_class(config, args=None):
     return model
 
 def load_trained_model(model_info, args):
-    gnn_models = ['imma', 'gat', 'rfm']
     event_models = ['event_model']
     # load config and initialize model class
     config_file = os.path.join(args.model_config_dir, model_info['config'])
@@ -95,6 +94,7 @@ def load_trained_model(model_info, args):
         else:
             ep_weights_path, _ = get_highest_numbered_file('ep_model', os.path.join(args.checkpoint_dir, 'models', model_info['model_dir']))
             mp_weights_path, _ = get_highest_numbered_file('mp_model', os.path.join(args.checkpoint_dir, 'models', model_info['model_dir']))
+            print('Loading from last checkpoint', mp_weights_path)
             model.load_weights(ep_weights_path, mp_weights_path)
         model.mp_model.device = args.device
         model.ep_model.device = args.device

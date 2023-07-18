@@ -77,25 +77,49 @@ class Analysis(object):
         DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
         setattr(args, 'device', DEVICE)
         config_file = os.path.join(self.args.model_config_dir, model_info['config'])
-        config = load_config(config_file)        
+        config = load_config(config_file)
+        model_type = config['model_type']        
         model = init_model_class(config, args)
-            
-        # load checkpoint weights
-        # checkpoints are in folder named after model
-        model_dir = os.path.join(self.args.checkpoint_dir, 'models', model_info['model_dir'])
-        if 'epoch' in model_info:
-            self.epoch = model_info['epoch']
-            model_file_name = os.path.join(model_dir, model_info['model_dir']+'_epoch'+model_info['epoch'])
-            model.load_state_dict(torch.load(model_file_name))
-            print('Loading model',model_file_name)
-        else:
-            latest_checkpoint, _ =  get_highest_numbered_file(model_info['model_dir'], model_dir)
-            print('Loading from last checkpoint',latest_checkpoint)
-            self.epoch = latest_checkpoint
-            model.load_state_dict(torch.load(latest_checkpoint))
 
-        model.eval()
-        model.to(DEVICE)
+        event_models = ['event_model']
+        if model_type in event_models:
+            # load weights
+            if 'epoch' in model_info:
+                self.epoch = model_info['epoch']
+                ep_weights_path = os.path.join(self.args.checkpoint_dir, 'models', model_info['model_dir'], 'ep_model_epoch'+model_info['epoch'])
+                mp_weights_path = os.path.join(self.args.checkpoint_dir, 'models', model_info['model_dir'], 'mp_model_epoch'+model_info['epoch'])
+                model.load_weights(ep_weights_path, mp_weights_path)
+            else:
+                ep_weights_path, _ = get_highest_numbered_file('ep_model', os.path.join(self.args.checkpoint_dir, 'models', model_info['model_dir']))
+                mp_weights_path, _ = get_highest_numbered_file('mp_model', os.path.join(self.args.checkpoint_dir, 'models', model_info['model_dir']))
+                print('Loading from last checkpoint', mp_weights_path)
+                self.epoch = mp_weights_path
+                model.load_weights(ep_weights_path, mp_weights_path)
+            model.mp_model.device = args.device
+            model.ep_model.device = args.device
+            model.device = args.device
+            model.mp_model.to(args.device)
+            model.ep_model.to(args.device)
+            model.mp_model.eval()
+            model.ep_model.eval()
+        else:
+            # load checkpoint weights
+            # checkpoints are in folder named after model
+            model_dir = os.path.join(self.args.checkpoint_dir, 'models', model_info['model_dir'])
+            if 'epoch' in model_info:
+                self.epoch = model_info['epoch']
+                model_file_name = os.path.join(model_dir, model_info['model_dir']+'_epoch'+model_info['epoch'])
+                model.load_state_dict(torch.load(model_file_name))
+                print('Loading model',model_file_name)
+            else:
+                latest_checkpoint, _ =  get_highest_numbered_file(model_info['model_dir'], model_dir)
+                print('Loading from last checkpoint', latest_checkpoint)
+                self.epoch = latest_checkpoint
+                model.load_state_dict(torch.load(latest_checkpoint))
+            model.eval()
+            model.device = args.device
+            model.to(args.device)
+
         return model
 
 
@@ -209,10 +233,7 @@ class Analysis(object):
             goals_obj3.append(y_recon[i,pickup_seq[2]])
 
         acc_g2 = np.mean(goals_obj2)
-        print('Goal 2 successes:',np.where(goals_obj2)[0])
         acc_g3 = np.mean(goals_obj3)
-        print('Goal 3 successes:',np.where(goals_obj3)[0])
-
         
         result = {
             'model': self.model_name,

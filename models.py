@@ -2421,6 +2421,42 @@ class ReplayBufferEvents:
         event_horizons = torch.tensor(batch_event_horizons)
         
         return trajectories, event_states, event_horizons
+
+
+class ReplayBufferEndState:
+    def __init__(self, burn_in_length, rollout_length, training_set):
+        self.burn_in_length = burn_in_length
+        self.rollout_length = rollout_length
+        self.sequence_length = burn_in_length + rollout_length
+        self.buffer_size = training_set.size(0)
+        self.episode_length = training_set.size(1)
+        self.buffer = training_set
+        
+    def sample(self, batch_size, random_seed=None):
+        if random_seed is not None:
+            np.random.seed(random_seed)
+        episode_inds = np.random.choice(self.buffer_size, batch_size, replace=False)
+        episode_starts = np.random.randint(0, (self.episode_length - self.sequence_length)+1, size=batch_size)
+        batch_trajs = []
+        batch_end_states = []
+        batch_end_horizons = []
+        for i,ep_ind in enumerate(episode_inds):
+            start = episode_starts[i]
+            end = start + self.sequence_length
+            traj_sample = self.buffer[ep_ind,start:end,:]
+            assert traj_sample.size(0) == self.sequence_length
+            batch_trajs.append(traj_sample)
+            # get last state in that trajectory
+            end_state = self.buffer[ep_ind,-1,:]
+            batch_end_states.append(end_state)
+            # how far away is the end state, with 0 equaling now, 1 the entire episode length
+            end_horizon = (self.episode_length - (start + self.burn_in_length)) / (self.episode_length - self.burn_in_length)
+            batch_end_horizons.append(end_horizon)
+        trajectories = torch.stack(batch_trajs, dim=0)
+        end_states = torch.stack(batch_end_states, dim=0)
+        end_horizons = torch.tensor(batch_end_horizons)
+        
+        return trajectories, end_states, end_horizons
     
 
 class EventPredictor(nn.Module):
