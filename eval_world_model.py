@@ -539,19 +539,25 @@ class Analysis(object):
                         torch.cuda.empty_cache()
                     rollout_x = torch.cat(rollout_x, dim=0)
 
+                    # compute average displacement error by computing euclidean distance between predicted and real trajectories
+                    ade = torch.mean(torch.norm(rollout_x - real_trajs, p=2, dim=-1))
+                    # compute final displacement error
+                    fde = torch.mean(torch.norm(rollout_x[:, -1] - real_trajs[:, -1], p=2, dim=-1))
+                    result['all_trials'] = {'ade': ade, 'fde': fde}
+
                     #rollout_x = rollout_x.reshape(rollout_x.size(0), -1)
                     #real_trajs = real_trajs.reshape(real_trajs.size(0), -1)
-                    behavior_result = {}
+                    #behavior_result = {}
                     for behavior_key in behavior_keys:
                         behavior_idxs = self.exp_info_dict['val'][behavior_key]
                         behavior_rollout_x = rollout_x[behavior_idxs]
                         behavior_real_trajs = real_trajs[behavior_idxs]                        
-                        # compute mean displacement error by computing euclidean distance between predicted and real trajectories
-                        mde = torch.mean(torch.norm(behavior_rollout_x - behavior_real_trajs, p=2, dim=-1))
+                        # compute average displacement error by computing euclidean distance between predicted and real trajectories
+                        ade = torch.mean(torch.norm(behavior_rollout_x - behavior_real_trajs, p=2, dim=-1))
                         # compute final displacement error
                         fde = torch.mean(torch.norm(behavior_rollout_x[:, -1] - behavior_real_trajs[:, -1], p=2, dim=-1))
-                        behavior_result[behavior_key] = {'mde': mde, 'fde': fde}
-                    result[burn_in_length] = behavior_result        
+                        result[behavior_key] = {'ade': ade, 'fde': fde}
+                    #result[burn_in_length] = behavior_result        
         result['model'] = self.model_name              
         return result
 
