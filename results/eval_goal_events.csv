@@ -1,2 +1,2 @@
 ,model,score,MSE,epoch,dataset
-0,Multistep Predictor,0.23770491803278687,1.9375108480453491,6000,swm_data.pkl
+0,Event Context World Model,0.0,2.4385924339294434,/data2/locross/analysis/models/event_context_world/mp_model_epoch5400,swm_data.pkl

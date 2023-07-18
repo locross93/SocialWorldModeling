@@ -2473,12 +2473,14 @@ class EventPredictor(nn.Module):
             self.num_mlp_layers = 2
         if 'dropout' in config:
             self.dropout = config['dropout']
+        else:
+            self.dropout = 0
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         
         if self.rnn_type == 'GRU':
-            self.rnn = nn.GRU(self.input_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, batch_first=True)
+            self.rnn = nn.GRU(self.input_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, dropout=self.dropout, batch_first=True)
         elif self.rnn_type == 'LSTM':
-            self.rnn = nn.LSTM(self.input_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, batch_first=True)
+            self.rnn = nn.LSTM(self.input_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, dropout=self.dropout, batch_first=True)
         self.event_decoder = self.build_mlp(self.num_mlp_layers, self.rnn_hidden_size, self.mlp_hidden_size, self.input_size, nn.ReLU, out_sigmoid=False)
         if config['predict_horizon']:
             self.predict_horizon = True
@@ -2553,6 +2555,10 @@ class MSPredictorEventContext(nn.Module):
             self.num_mlp_layers = config['num_mlp_layers']
         else:
             self.num_mlp_layers = 2
+        if 'dropout' in config:
+            self.dropout = config['dropout']
+        else:
+            self.dropout = 0
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         
         # create two linear embeddings, one for time varying input, one for predicted next event state by separate model
@@ -2566,9 +2572,9 @@ class MSPredictorEventContext(nn.Module):
             self.event_embed = nn.Linear(in_features=self.input_size, out_features=self.mlp_hidden_size//2)
         
         if self.rnn_type == 'GRU':
-            self.rnn = nn.GRU(self.mlp_hidden_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, batch_first=True)
+            self.rnn = nn.GRU(self.mlp_hidden_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, dropout=self.dropout, batch_first=True)
         elif self.rnn_type == 'LSTM':
-            self.rnn = nn.LSTM(self.mlp_hidden_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, batch_first=True)
+            self.rnn = nn.LSTM(self.mlp_hidden_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, dropout=self.dropout, batch_first=True)
         self.mlp = self.build_mlp(self.num_mlp_layers, self.rnn_hidden_size, self.mlp_hidden_size, self.input_size, nn.ReLU)
     
     def build_mlp(self, num_layers, input_size, node_size, output_size, activation):
