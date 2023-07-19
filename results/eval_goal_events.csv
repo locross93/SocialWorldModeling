@@ -1,2 +1,4 @@
 ,model,score,MSE,epoch,dataset
-0,Event Context World Model,0.0,2.4385924339294434,/data2/locross/analysis/models/event_context_world/mp_model_epoch5400,swm_data.pkl
+0,RSSM Discrete DS3,0.3248772504091653,2.292362928390503,/data2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch29999,swm_data.pkl
+1,Multistep Predictor,0.18739770867430441,2.0192625522613525,6000,swm_data.pkl
+2,Event Context World Model,0.010638297872340425,2.420804738998413,/data2/locross/analysis/models/event_context_world/mp_model_epoch5600,swm_data.pkl

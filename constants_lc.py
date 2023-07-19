@@ -130,7 +130,7 @@ DEFAULT_VALUES = {
     #'model_keys': ['multistep_pred'],
     #'model_keys': ['imma','gat','rfm','rfm_rnn'],
     #'model_keys': ['rssm_disc_ds2', 'rssm_disc_ds3', 'rssm_cont_ds3', 'mp_ds3', 'md_ds3', 'transformer_iris'],
-    'model_keys': ['rssm_disc_ds3', 'mp_ds2', 'transformer_iris', 'event_context_mp'],
+    'model_keys': ['rssm_disc_ds3', 'mp_ds2', 'event_context_mp'],
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
