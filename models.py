@@ -2641,6 +2641,10 @@ class EventModel:
         # Load the weights of the two models
         self.ep_model.load_state_dict(torch.load(ep_weights_path))
         self.mp_model.load_state_dict(torch.load(mp_weights_path))
+        
+    def eval(self):
+        self.mp_model.eval()
+        self.ep_model.eval()
 
     def predict_next_event(self, x):
         # Call EventPredictor's forward function with burn_in steps - x should be burn_in length
@@ -2660,16 +2664,16 @@ class EventModel:
     
     def forward_rollout(self, x, burn_in_length, rollout_length):
         if self.ep_model.predict_horizon:
-            event_hat, event_horizon_hat = self.predict_next_event(x[:,:burn_in_length,:])
+            self.event_hat, self.event_horizon_hat = self.predict_next_event(x[:,:burn_in_length,:])
         else:
-            event_hat = self.predict_next_event(x[:,:burn_in_length,:])
+           self.event_hat = self.predict_next_event(x[:,:burn_in_length,:])
 
         # condition ms predictor on predicted next event
         if self.mp_model.input_pred_horizon:
             # concatenate event_hat and event_horizon_hat
-            event_hat = torch.cat([event_hat, event_horizon_hat.unsqueeze(1)], dim=-1)
+            self.event_hat = torch.cat([self.event_hat, self.event_horizon_hat.unsqueeze(1)], dim=-1)
         # Call MSPredictorEventContext's forward_rollout with event_hat
-        x_hat = self.mp_model.forward_rollout(x, event_hat, burn_in_length, rollout_length)
+        x_hat = self.mp_model.forward_rollout(x, self.event_hat, burn_in_length, rollout_length)
 
         return x_hat
 

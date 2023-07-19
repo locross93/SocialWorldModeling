@@ -52,12 +52,17 @@ def load_args():
     # which visualizations
     parser.add_argument('--plot_traj_subplots', type=bool, default=True, help='Make subplot of true vs predicted trajectory')
     parser.add_argument('--make_video', type=int, default=1, help='Make video - compare real and reconstructed traj side by side')
+    parser.add_argument('--eval_event_model', type=bool, default=False, help='Visualize Predicted Next Event')
     return parser.parse_args()
 
 def load_config(file):
     with open(file) as f:
         config = json.load(f)
     return config
+
+def inverse_transform_horizon(event_horizon_normalized, episode_length=300, train_burn_in_length=50):
+    event_horizon = (event_horizon_normalized * ((episode_length - train_burn_in_length) - 1)) + 1
+    return event_horizon
 
 def make_traj_subplots(x_true, x_pred, subplot_dims, steps, save_file, data_columns, burn_in_length):
     # ie subplot_dims = (3,3)
@@ -178,6 +183,60 @@ def make_frame_compare(t):
     # returning numpy image
     return mplfig_to_npimage(fig)
 
+def plot_one_frame_compare(x_burnin, x_true, x_pred, data_columns, event_horizon=None, pred_horizon=None):
+    fig, ax = plt.subplots(1, 3, figsize=(15, 5))
+    # clear
+    ax[0].clear()
+    ax[1].clear()
+    ax[2].clear()
+    
+    ax[0].set_xlim(-7, 7)
+    ax[0].set_ylim(-7, 7)
+    for obj_num in range(3):
+        x_ind = data_columns.index('obj'+str(obj_num)+'_x')
+        z_ind = data_columns.index('obj'+str(obj_num)+'_z')
+        ax[0].plot(x_burnin[0,x_ind], x_burnin[0,z_ind], marker='o')
+    for agent_num in range(2):
+        x_ind = data_columns.index('agent'+str(agent_num)+'_x')
+        z_ind = data_columns.index('agent'+str(agent_num)+'_z')
+        ax[0].plot(x_burnin[0,x_ind], x_burnin[0,z_ind], marker='^', markersize=16)
+    # observer
+    ax[0].plot(0.0, -6.0, marker='s', markersize=12)
+    ax[0].set_title('Last Burn-in State')
+
+    ax[1].set_xlim(-7, 7)
+    ax[1].set_ylim(-7, 7)
+    for obj_num in range(3):
+        x_ind = data_columns.index('obj'+str(obj_num)+'_x')
+        z_ind = data_columns.index('obj'+str(obj_num)+'_z')
+        ax[1].plot(x_true[0,x_ind], x_true[0,z_ind], marker='o')
+    for agent_num in range(2):
+        x_ind = data_columns.index('agent'+str(agent_num)+'_x')
+        z_ind = data_columns.index('agent'+str(agent_num)+'_z')
+        ax[1].plot(x_true[0,x_ind], x_true[0,z_ind], marker='^', markersize=16)
+    # observer
+    ax[1].plot(0.0, -6.0, marker='s', markersize=12)
+    ax[1].set_title('Next AC Signal Event State')
+    if event_horizon is not None:
+        ax[1].text(3.6, 6, f'Horizon {event_horizon}', color='red')
+
+    ax[2].set_xlim(-7, 7)
+    ax[2].set_ylim(-7, 7)
+    for obj_num in range(3):
+        x_ind = data_columns.index('obj'+str(obj_num)+'_x')
+        z_ind = data_columns.index('obj'+str(obj_num)+'_z')
+        ax[2].plot(x_pred[0,x_ind], x_pred[0,z_ind], marker='o')
+    for agent_num in range(2):
+        x_ind = data_columns.index('agent'+str(agent_num)+'_x')
+        z_ind = data_columns.index('agent'+str(agent_num)+'_z')
+        ax[2].plot(x_pred[0,x_ind], x_pred[0,z_ind], marker='^', markersize=16)
+    ax[2].plot(0.0, -6.0, marker='s', markersize=12)
+    ax[2].set_title('Predicted Next Event State')
+    if pred_horizon is not None:
+        ax[2].text(3.6, 6, f'Horizon {pred_horizon}', color='red')
+    
+    return fig, ax
+
 if __name__ == '__main__':
     args = load_args()
     torch.manual_seed(DEFAULT_VALUES['eval_seed'])
@@ -185,6 +244,7 @@ if __name__ == '__main__':
     model_info = MODEL_DICT_VAL[args.model_key]
     model_name = model_info['model_label']
     model = load_trained_model(model_info, args)
+    model.eval()
     
     # load data
     dataset_file = os.path.join(args.data_dir, args.dataset)
@@ -234,6 +294,7 @@ if __name__ == '__main__':
         # all trial types
         traj_ind = args.trial_num
         burn_in_length = args.burn_in_length
+    print('Burn in length: {}'.format(burn_in_length))
     
     rollout_length = input_data.size(1) - burn_in_length
     x = input_data[traj_ind,:,:].unsqueeze(0)
@@ -244,8 +305,38 @@ if __name__ == '__main__':
     # if args.model_key == 'transformer_wm':
     #     rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
     # else:
-    rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().detach().numpy()
+    with torch.no_grad():
+        rollout_x = model.forward_rollout(x, burn_in_length, rollout_length).cpu().numpy()
     x_pred[burn_in_length:,:] = rollout_x 
+    
+    if args.eval_event_model:
+        pred_event_state = model.event_hat.numpy()
+        if pred_event_state.shape[1] == 36:
+            horizon_output = True
+            pred_horizon = pred_event_state[:,-1]
+            pred_horizon = int(inverse_transform_horizon(pred_horizon))
+            pred_event_state = pred_event_state[:,:-1]
+        else:
+            horizon_output = False
+        # load events data
+        events_ds_file = os.path.join(args.analysis_dir,'results/event_inds/event_inds_mp_ds2.pkl')
+        events_dataset = pickle.load(open(events_ds_file, 'rb'))
+        event_inds = events_dataset[args.train_or_val]
+        # get closest future event state in that trajectory from burn in state
+        traj_event_inds = np.array(event_inds[traj_ind])
+        burn_in_ind = burn_in_length - 1
+        last_burnin_state = input_data[traj_ind,burn_in_ind,:].unsqueeze(0)
+        closest_event_ind = np.min(traj_event_inds[np.where(traj_event_inds > burn_in_ind)[0]])
+        # get event horizon from end state
+        event_horizon = closest_event_ind - burn_in_ind
+        event_state = input_data[traj_ind,closest_event_ind,:].unsqueeze(0)
+        assert torch.equal(event_state, x[:,closest_event_ind,:])
+        event_state = event_state.numpy()
+        if horizon_output:
+            fig, ax = plot_one_frame_compare(last_burnin_state, event_state, pred_event_state, data_columns, event_horizon, pred_horizon)
+        else:
+            fig, ax = plot_one_frame_compare(last_burnin_state, event_state, pred_event_state, data_columns)
+        
     
     viz_dir = os.path.join(args.analysis_dir, 'results/viz_trajs',args.model_key)
     if not os.path.exists(viz_dir):        

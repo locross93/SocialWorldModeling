@@ -100,8 +100,6 @@ class Analysis(object):
             model.device = args.device
             model.mp_model.to(args.device)
             model.ep_model.to(args.device)
-            model.mp_model.eval()
-            model.ep_model.eval()
         else:
             # load checkpoint weights
             # checkpoints are in folder named after model
@@ -116,9 +114,9 @@ class Analysis(object):
                 print('Loading from last checkpoint', latest_checkpoint)
                 self.epoch = latest_checkpoint
                 model.load_state_dict(torch.load(latest_checkpoint))
-            model.eval()
             model.device = args.device
             model.to(args.device)
+        model.eval()
 
         return model
 
