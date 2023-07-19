@@ -24,4 +24,7 @@
 22,Transformer Iris Concat Pos Embd lr1e-4,0.2978723404255319,4.334659099578857,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/transformer_iris_concat_pos_embd_lr1e-4/transformer_iris_concat_pos_embd_lr1e-4_epoch25600,data_5_31_23.pkl
 23,MP 4096 DS3,0.0392798690671031,2.356709241867065,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/mp_4096_ds3/mp_4096_ds3_epoch600,data_5_31_23.pkl
 24,MD 4096 DS3,0.0,2.034997701644897,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/multistep_delta_ds3/multistep_delta_ds3_epoch800,data_5_31_23.pkl
-25,Event Context World Model,0.0024549918166939444,2.417630434036255,/data2/locross/analysis/models/event_context_world/mp_model_epoch4200,swm_data.pkl
+25,Event Context World Model,0.0024549918166939,2.417630434036255,/data2/locross/analysis/models/event_context_world/mp_model_epoch4200,swm_data.pkl
+26,RSSM Discrete DS3,0.3248772504091653,2.292362928390503,/data2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch29999,swm_data.pkl
+27,Multistep Predictor,0.18739770867430441,2.0192625522613525,6000,swm_data.pkl
+28,Event Context World Model,0.010638297872340425,2.420804738998413,/data2/locross/analysis/models/event_context_world/mp_model_epoch5600,swm_data.pkl
