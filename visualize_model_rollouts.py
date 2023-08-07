@@ -331,12 +331,22 @@ if __name__ == '__main__':
         event_horizon = closest_event_ind - burn_in_ind
         event_state = input_data[traj_ind,closest_event_ind,:].unsqueeze(0)
         assert torch.equal(event_state, x[:,closest_event_ind,:])
-        event_state = event_state.numpy()
+        #event_state = event_state.numpy()
         if horizon_output:
             fig, ax = plot_one_frame_compare(last_burnin_state, event_state, pred_event_state, data_columns, event_horizon, pred_horizon)
         else:
             fig, ax = plot_one_frame_compare(last_burnin_state, event_state, pred_event_state, data_columns)
-        
+       
+    # TEMP ADD TRUE NEXT EVENT
+    # condition ms predictor on predicted next event
+    # concatenate event_hat and event_horizon_hat
+    # first normalize event_horizon
+    event_horizon = float((event_horizon - 1) / ((300 - 50) - 1))
+    event_state = torch.cat([event_state, torch.tensor(event_horizon).unsqueeze(0).unsqueeze(0)], dim=-1)
+    # Call MSPredictorEventContext's forward_rollout with event_hat
+    with torch.no_grad():
+        rollout_x  = model.mp_model.forward_rollout(x, event_state, burn_in_length, rollout_length)
+    x_pred[burn_in_length:,:] = rollout_x 
     
     viz_dir = os.path.join(args.analysis_dir, 'results/viz_trajs',args.model_key)
     if not os.path.exists(viz_dir):        
@@ -351,6 +361,9 @@ if __name__ == '__main__':
     # if a training set trial, add suffix
     if args.train_or_val == 'train':
         save_file = save_file+'_train'
+        
+    # TEMP
+    save_file = save_file+'_true_event_context'
         
     # make subplot of true vs predicted trajectory
     if args.plot_traj_subplots:
