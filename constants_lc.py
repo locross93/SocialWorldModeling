@@ -1,6 +1,6 @@
 from models import DreamerV2, MultistepPredictor, \
     TransformerMSPredictor, MultistepDelta, TransformerWorldModel, TransformerIrisWorldModel, \
-    EventPredictor, MSPredictorEventContext, EventModel
+    EventPredictor, MSPredictorEventContext, EventModel, MultistepPredictor4D
 from gnn_models.imma import IMMA
 from gnn_models.gat import GAT
 from gnn_models.rfm import RFM
@@ -18,7 +18,8 @@ MODEL_DICT_TRAIN = {
     'multistep_delta': MultistepDelta,
     'event_predictor': EventPredictor,
     'mp_event_context': MSPredictorEventContext,
-    'event_model': EventModel
+    'event_model': EventModel,
+    'multistep_predictor4d': MultistepPredictor4D,
 }
 MODEL_DICT_VAL=  {
     # 'rssm_cont': {
