@@ -1406,6 +1406,84 @@ class MultistepDelta(nn.Module):
         loss = ((x_supervise - x_hat)**2).sum()
         
         return loss
+
+
+class MultistepPredictor4D(nn.Module):
+    def __init__(self, config):
+        super(MultistepPredictor4D, self).__init__()
+        self.input_size = config['input_size']
+        self.rnn_type = config['rnn_type']
+        self.rnn_hidden_size = config['rnn_hidden_size']
+        self.num_rnn_layers = config['num_rnn_layers']
+        self.mlp_hidden_size = config['mlp_hidden_size']
+        self.num_stack = config['num_stack']
+        if 'mlp_num_layers' in config:
+            self.num_mlp_layers = config['num_mlp_layers']
+        else:
+            self.num_mlp_layers = 2
+        self.input_embed_size = config['input_embed_size']
+        self.input_embed_layers = config['input_embed_layers']
+        self.rnn_input_size = self.input_embed_size
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        
+        self.input_embed = self.build_mlp(self.input_embed_layers, self.input_size*self.num_stack, self.input_embed_size, self.input_embed_size, nn.ReLU)
+        
+        if self.rnn_type == 'GRU':
+            self.rnn = nn.GRU(self.rnn_input_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, batch_first=True)
+        elif self.rnn_type == 'LSTM':
+            self.rnn = nn.LSTM(self.rnn_input_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, batch_first=True)
+        self.mlp = self.build_mlp(self.num_mlp_layers, self.rnn_hidden_size, self.mlp_hidden_size, self.input_size, nn.ReLU)
+    
+    def build_mlp(self, num_layers, input_size, node_size, output_size, activation):
+        model = [nn.Linear(input_size, node_size)]
+        model += [activation()]
+        for i in range(num_layers-1):
+            model += [nn.Linear(node_size, node_size)]
+            model += [activation()]
+        model += [nn.Linear(node_size, output_size)]
+        return nn.Sequential(*model)
+
+    def forward(self, x, hidden):    
+        x = self.input_embed(x)
+        out, hidden = self.rnn(x, hidden)
+        out = self.mlp(out)
+        return out, hidden
+
+    def init_hidden(self, batch_size):
+        if self.rnn_type == 'GRU':
+            hidden_cell = torch.zeros(self.num_rnn_layers, batch_size, self.rnn_hidden_size).to(self.device)
+            return hidden_cell
+        elif self.rnn_type == 'LSTM':
+            hidden_cell = torch.zeros(self.num_rnn_layers, batch_size, self.rnn_hidden_size).to(self.device)
+            state_cell = torch.zeros(self.num_rnn_layers, batch_size, self.rnn_hidden_size).to(self.device)
+            return (hidden_cell, state_cell)
+    
+    def forward_rollout(self, x, burn_in_length, rollout_length):
+        batch_size = x.size(0)
+        hidden = self.init_hidden(batch_size)
+        output, hidden = self.forward(x[:,:burn_in_length,:], hidden)
+        # last output is next input x
+        xt_hat = output[:,-1,:].unsqueeze(1)
+        pred_outputs = []
+        for t in range(rollout_length):
+            pred_outputs.append(xt_hat.squeeze(1))
+            # output is next input x
+            xt_hat, hidden = self.forward(xt_hat, hidden)
+        assert len(pred_outputs) != 0
+        x_hat = torch.stack(pred_outputs, dim=1)
+        
+        return x_hat
+    
+    def loss(self, x, burn_in_length, rollout_length):
+        loss_fn = torch.nn.MSELoss()
+        
+        x_hat = self.forward_rollout(x, burn_in_length, rollout_length)
+        t_end = burn_in_length + rollout_length
+        x_supervise = x[:,burn_in_length:t_end,:]
+        
+        loss = loss_fn(x_supervise, x_hat)
+        
+        return loss
     
     
 class ReplayBuffer:
@@ -1429,6 +1507,40 @@ class ReplayBuffer:
             traj_sample = self.buffer[ep_ind,start:end,:]
             assert traj_sample.size(0) == self.sequence_length
             batch_trajs.append(traj_sample)
+        trajectories = torch.stack(batch_trajs, dim=0)
+        
+        return trajectories
+
+
+class ReplayBufferFrameStack:
+    def __init__(self, sequence_length, num_stack):
+        self.sequence_length = sequence_length
+        self.num_stack = num_stack
+
+    def upload_training_set(self, training_set):
+        self.buffer_size = training_set.size(0)
+        self.episode_length = training_set.size(1)
+        self.buffer = training_set
+
+    def sample(self, batch_size, random_seed=None):
+        if random_seed is not None:
+            np.random.seed(random_seed)
+            
+        episode_inds = np.random.choice(self.buffer_size, batch_size, replace=False)
+        episode_starts = np.random.randint(self.num_stack, (self.episode_length - self.sequence_length)+1, size=batch_size)
+        
+        batch_trajs = []
+        for i, ep_ind in enumerate(episode_inds):
+            stacked_trajs = []
+            for j in range(self.num_stack):
+                start = episode_starts[i] - j
+                end = start + self.sequence_length
+                traj_sample = self.buffer[ep_ind, start:end, :]
+                assert traj_sample.size(0) == self.sequence_length
+                stacked_trajs.append(traj_sample)
+            stacked_traj = torch.cat(stacked_trajs, dim=1)
+            batch_trajs.append(stacked_traj)
+            
         trajectories = torch.stack(batch_trajs, dim=0)
         
         return trajectories

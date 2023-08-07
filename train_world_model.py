@@ -22,7 +22,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 from analysis_utils import init_model_class
 from constants_lc import DEFAULT_VALUES, MODEL_DICT_TRAIN
-from models import ReplayBuffer
+from models import ReplayBuffer, ReplayBufferFrameStack
 # temp
 #from models import ReplayBufferEarly as ReplayBuffer
 
@@ -153,7 +153,8 @@ def main():
     batches_per_epoch = np.min([replay_buffer.buffer_size // batch_size, 50])
     
     # make validation data
-    val_buffer = ReplayBuffer(sequence_length)
+    #val_buffer = ReplayBuffer(sequence_length)
+    val_buffer = ReplayBufferFrameStack(sequence_length, num_stack=4)
     val_buffer.upload_training_set(val_data)
     seed = 100 # set seed so every model sees the same randomization
     val_batch_size = np.min([val_data.size(0), 1000])
