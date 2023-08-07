@@ -15,7 +15,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 from analysis_utils import init_model_class
 from constants_lc import DEFAULT_VALUES, MODEL_DICT_TRAIN
-from models import ReplayBufferEvents, ReplayBufferEndState
+from models import ReplayBufferGTEvents, ReplayBufferEndState
 
 
 """Global variables"""
@@ -132,10 +132,28 @@ def main():
     train_dataset, test_dataset = loaded_dataset
     train_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     val_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
+    # load dataset info
+    exp_info_file = dataset_file[:-4]+'_exp_info.pkl'
+    if os.path.isfile(exp_info_file):
+        with open(exp_info_file, 'rb') as f:
+            exp_info_dict = pickle.load(f)
+    else:
+        print('DS info dict not found')
 
-    # load events data
-    events_ds_file = os.path.join(args.analysis_dir,'results/event_inds/event_inds_mp_ds2.pkl')
-    events_dataset = pickle.load(open(events_ds_file, 'rb'))
+    # make ground truth events dataset
+    events_dataset = {}
+    for split in ['train', 'val']:
+        events_dataset[split] = []
+        for i in range(exp_info_dict[split]['pickup_timepoints'].shape[0]):
+            all_event_inds = np.concatenate([exp_info_dict[split]['pickup_timepoints'][i,:],exp_info_dict[split]['goal_timepoints'][i,:]])
+            # only include all_events_inds if > 0
+            all_event_inds = all_event_inds[all_event_inds > 0]
+            if len(all_event_inds) > 0:
+                # sort
+                all_event_inds = list(np.sort(all_event_inds).astype(int))
+            else:
+                all_event_inds = []
+            events_dataset[split].append(all_event_inds)
 
     # initialize the replay buffer
     burn_in_length = args.burn_in_length
@@ -144,7 +162,7 @@ def main():
     if args.pred_end_state:
         replay_buffer = ReplayBufferEndState(burn_in_length, rollout_length, train_data)
     else:
-        replay_buffer = ReplayBufferEvents(burn_in_length, rollout_length, train_data, events_dataset['train'])
+        replay_buffer = ReplayBufferGTEvents(burn_in_length, rollout_length, train_data, events_dataset['train'])
     batch_size = args.batch_size
     print(f'Batch size: {batch_size}')
     batches_per_epoch = np.min([replay_buffer.buffer_size // batch_size, 50])
@@ -153,13 +171,16 @@ def main():
     if args.pred_end_state:
         val_buffer = ReplayBufferEndState(burn_in_length, rollout_length, val_data)
     else:
-        val_buffer = ReplayBufferEvents(burn_in_length, rollout_length, val_data, events_dataset['val'])
+        val_buffer = ReplayBufferGTEvents(burn_in_length, rollout_length, val_data, events_dataset['val'])
     seed = 100 # set seed so every model sees the same randomization
     val_batch_size = np.min([val_data.size(0), 1000])
     val_trajs, val_event_states, val_event_horizons = val_buffer.sample(val_batch_size, random_seed=seed)
     val_trajs = val_trajs.to(DEVICE)
     val_event_states = val_event_states.to(DEVICE)
     val_event_horizons = val_event_horizons.to(DEVICE)
+    if mp_config['input_pred_horizon']:
+        # concatenate true event_states and event_horizon
+        val_mp_input = torch.cat([val_event_states, val_event_horizons.unsqueeze(1)], dim=-1)
         
     print('Starting', model_filename, 'On DS', args.dataset)
     
@@ -196,12 +217,14 @@ def main():
             event_horizons = event_horizons.to(DEVICE)
             nsamples += batch_x.shape[0]
             opt.zero_grad()
+            # optional, train event predictor on true event states
             ep_loss, event_loss, horizon_loss, event_hat, event_horizon_hat = ep_model.supervised_loss(batch_x[:,:burn_in_length,:], event_states, event_horizons)
             # condition ms predictor on predicted end states, detach from computational graph so gradients don't flow through ep_model
             if mp_config['input_pred_horizon']:
-                # concatenate event_hat and event_horizon_hat
-                event_hat = torch.cat([event_hat, event_horizon_hat.unsqueeze(1)], dim=-1)
-            mp_loss = mp_model.supervised_loss(batch_x, event_hat.detach(), burn_in_length, rollout_length)
+                # concatenate true event_states and event_horizon
+                event_states = torch.cat([event_states, event_horizons.unsqueeze(1)], dim=-1)
+            # input ground truth event states to forward rollout
+            mp_loss = mp_model.supervised_loss(batch_x, event_states, burn_in_length, rollout_length)
             loss = ep_loss + mp_loss
             loss.backward()
             opt.step()
@@ -216,10 +239,7 @@ def main():
             mp_model.eval()
             ep_model.eval()
             val_ep_loss, val_event_loss, val_horizon_loss, val_event_hat, val_event_horizon_hat = ep_model.supervised_loss(val_trajs[:,:burn_in_length,:], val_event_states, val_event_horizons)
-            if mp_config['input_pred_horizon']:
-                # concatenate event_hat and event_horizon_hat
-                val_event_hat = torch.cat([val_event_hat, val_event_horizon_hat.unsqueeze(1)], dim=-1)
-            val_mp_loss = mp_model.supervised_loss(val_trajs, val_event_hat, burn_in_length, rollout_length)
+            val_mp_loss = mp_model.supervised_loss(val_trajs, val_mp_input, burn_in_length, rollout_length)
             val_loss = val_ep_loss + val_mp_loss
             val_loss = val_loss.item()
             loss_dict['val'].append(val_loss)
