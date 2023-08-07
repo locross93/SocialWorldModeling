@@ -111,6 +111,45 @@ MODEL_DICT_VAL=  {
     'event_context_mp': {
         'class': EventModel, 'config': 'event_context_world_model.json',
         'model_dir': 'event_context_world', 'model_label': 'Event Context World Model'},
+    'em_dropout': {
+        'class': EventModel, 'config': 'event_model_dropout.json',
+        'model_dir': 'em_dropout', 'model_label': 'Event Model Dropout: 0.1'},
+    'event_model2': {
+        'class': EventModel, 'config': 'event_context_world_model.json',
+        'model_dir': 'event_model2', 'model_label': 'Event Model 2'},
+    'emodel_no_horizon': {
+        'class': EventModel, 'config': 'event_model_no_horizon.json',
+        'model_dir': 'emodel_no_horizon', 'model_label': 'Event Model No Horizon'},
+    'pred_end_state': {
+        'class': EventModel, 'config': 'event_context_world_model.json',
+        'model_dir': 'pred_end_state', 'model_label': 'Pred End State'},
+    'em_2048': {
+        'class': EventModel, 'config': 'event_model_hidden_2048.json',
+        'model_dir': 'em_2048', 'model_label': 'Event Model 2048'},
+    'em_lr5e-5': {
+        'class': EventModel, 'config': 'event_context_world_model.json',
+        'model_dir': 'em_lr5e-5', 'model_label': 'Event Model lr5e-5'},
+    'em_min_horizon': {
+        'class': EventModel, 'config': 'event_context_world_model.json',
+        'model_dir': 'em_min_horizon', 'model_label': 'Event Model Min Horizon'},
+    'rssm_norm_vel': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_70.json',
+        'model_dir': 'rssm_norm_vel', 'model_label': 'Multistep Predictor Vel'},
+    'em_gt': {
+        'class': EventModel, 'config': 'event_context_world_model.json',
+        'model_dir': 'em_gt', 'model_label': 'Event Model GT'},
+    'rssm_1step': {
+        'class': DreamerV2, 'config': 'rssm_disc_default_config.json',
+        'model_dir': 'rssm_1step', 'model_label': 'RSSM 1 Step Rollout'},
+    'rssm_5step': {
+        'class': DreamerV2, 'config': 'rssm_disc_default_config.json',
+        'model_dir': 'rssm_5step', 'model_label': 'RSSM 5 Step Rollout'},
+    'rssm_10step': {
+        'class': DreamerV2, 'config': 'rssm_disc_default_config.json',
+        'model_dir': 'rssm_10step', 'model_label': 'RSSM 10 Step Rollout'},
+    'rssm_20step': {
+        'class': DreamerV2, 'config': 'rssm_disc_default_config.json',
+        'model_dir': 'rssm_20step', 'model_label': 'RSSM 20 Step Rollout'},
 }
 DEFAULT_VALUES = {
 	'train_seed': 911320,
@@ -139,5 +178,6 @@ DEFAULT_VALUES = {
 DATASET_NUMS = {
     'train_test_splits_3D_dataset.pkl': 1,
     'dataset_5_25_23.pkl': 2,
-    'swm_data': 3
+    'swm_data': 3,
+    'data_norm_velocity.pkl': 4,
 }
