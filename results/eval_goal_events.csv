@@ -1,2 +1,6 @@
 ,model,score,MSE,epoch,dataset
-0,RSSM 20 Step Rollout,0.05737704918032787,2.4456279277801514,/data2/locross/analysis/models/rssm_20step/rssm_20step_epoch5600,swm_data.pkl
+0,RSSM 1 Step Rollout,0.35842880523731585,2.411444902420044,/data2/locross/analysis/models/rssm_1step/rssm_1step_epoch10400,swm_data.pkl
+1,RSSM 5 Step Rollout,0.20130932896890344,2.3391599655151367,/data2/locross/analysis/models/rssm_5step/rssm_5step_epoch9800,swm_data.pkl
+2,RSSM 10 Step Rollout,0.23240589198036007,2.3981001377105713,/data2/locross/analysis/models/rssm_10step/rssm_10step_epoch9200,swm_data.pkl
+3,RSSM 20 Step Rollout,0.15630114566284778,2.473283290863037,/data2/locross/analysis/models/rssm_20step/rssm_20step_epoch8200,swm_data.pkl
+4,RSSM Discrete DS3,0.3150572831423895,2.273829460144043,/data2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch29999,swm_data.pkl

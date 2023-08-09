@@ -1464,12 +1464,12 @@ class MultistepPredictor4D(nn.Module):
         output, hidden = self.forward(x[:,:burn_in_length,:], hidden)
         # last output is next input x
         xt_hat = output[:,-1,:].unsqueeze(1)
-        pred_outputs = [xt_hat.squeeze(1)]
+        pred_outputs = []
         for t in range(rollout_length):
-            # Construct new frame-stacked data: discard the oldest frame and append the newest prediction
-            new_input = torch.cat([x[:, (burn_in_length-self.num_stack+t):burn_in_length+t, :], xt_hat], dim=1)
-            xt_hat, hidden = self.forward(new_input, hidden)
             pred_outputs.append(xt_hat.squeeze(1))
+            # Construct new frame-stacked data: discard the oldest frame and append the newest prediction [t, t-1, t-2, t-3]
+            new_input = torch.cat([xt_hat, x[:, (burn_in_length-1+t), :self.input_size*(self.num_stack-1)].unsqueeze(1)], dim=2)
+            xt_hat, hidden = self.forward(new_input, hidden)
         assert len(pred_outputs) != 0
         x_hat = torch.stack(pred_outputs, dim=1)
         
@@ -1480,7 +1480,7 @@ class MultistepPredictor4D(nn.Module):
         
         x_hat = self.forward_rollout(x, burn_in_length, rollout_length)
         t_end = burn_in_length + rollout_length
-        x_supervise = x[:,burn_in_length:t_end,:]
+        x_supervise = x[:,burn_in_length:t_end,:self.input_size]
         
         loss = loss_fn(x_supervise, x_hat)
         

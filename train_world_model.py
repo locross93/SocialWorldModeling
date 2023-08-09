@@ -214,7 +214,7 @@ def main():
                 batch_cvae_loss.append(sgnet_loss_dict['cvae_loss'])
                 batch_goal_loss.append(sgnet_loss_dict['goal_loss'])
                 batch_kld_loss.append(sgnet_loss_dict['kld_loss'])
-            elif config['model_type'] in ['multistep_predictor', 'multistep_delta']:
+            elif config['model_type'] in ['multistep_predictor', 'multistep_delta', 'multistep_predictor4d']:
                 loss = model.loss(batch_x, burn_in_length, rollout_length)
             elif config['model_type'] == 'transformer_mp':
                 loss = model.loss(batch_x, burn_in_length, rollout_length, mask_type='triangular')
@@ -247,7 +247,7 @@ def main():
                 val_loss = model.loss(val_trajs)
             elif config['model_type'] in ['sgnet_cvae']:
                 val_loss, _ = model.loss(val_trajs)
-            elif config['model_type'] in ['multistep_predictor', 'multistep_delta']:
+            elif config['model_type'] in ['multistep_predictor', 'multistep_delta', 'multistep_predictor4d']:
                 val_loss = model.loss(val_trajs, burn_in_length, rollout_length)
             elif config['model_type'] == 'transformer_mp':
                 val_loss = model.loss(val_trajs, burn_in_length, rollout_length, mask_type='triangular')
@@ -255,7 +255,9 @@ def main():
             val_loss = val_loss.item()
             loss_dict['val'].append(val_loss)
             # get MSE on validation data
-            if config['model_type'] == 'dreamerv2':
+            if config['model_type'] in ['multistep_predictor', 'multistep_predictor4d']:
+                val_mse = val_loss
+            elif config['model_type'] in ['dreamerv2']:
                 val_mse = model.recon_loss.item() / val_trajs[:,-rollout_length:,:].numel()
             else:
                 val_mse = val_loss / val_trajs[:,-rollout_length:,:].numel()

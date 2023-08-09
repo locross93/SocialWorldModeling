@@ -134,8 +134,8 @@ MODEL_DICT_VAL=  {
         'class': EventModel, 'config': 'event_context_world_model.json',
         'model_dir': 'em_min_horizon', 'model_label': 'Event Model Min Horizon'},
     'rssm_norm_vel': {
-        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_70.json',
-        'model_dir': 'rssm_norm_vel', 'model_label': 'Multistep Predictor Vel'},
+        'class': DreamerV2, 'config': 'rssm_disc_input_size_70.json',
+        'model_dir': 'rssm_norm_vel.pkl', 'model_label': 'RSSM Norm Vel'},
     'em_gt': {
         'class': EventModel, 'config': 'event_context_world_model.json',
         'model_dir': 'em_gt', 'model_label': 'Event Model GT'},
@@ -151,6 +151,9 @@ MODEL_DICT_VAL=  {
     'rssm_20step': {
         'class': DreamerV2, 'config': 'rssm_disc_default_config.json',
         'model_dir': 'rssm_20step', 'model_label': 'RSSM 20 Step Rollout'},
+    'mp_frame_stack': {
+        'class': MultistepPredictor4D, 'config': 'multistep_predictor_frame_stack.json',
+        'model_dir': 'mp_frame_stack', 'model_label': 'MP Frame Stack'},
 }
 DEFAULT_VALUES = {
 	'train_seed': 911320,
@@ -170,7 +173,8 @@ DEFAULT_VALUES = {
     #'model_keys': ['multistep_pred'],
     #'model_keys': ['imma','gat','rfm','rfm_rnn'],
     #'model_keys': ['rssm_disc_ds2', 'rssm_disc_ds3', 'rssm_cont_ds3', 'mp_ds3', 'md_ds3', 'transformer_iris'],
-    'model_keys': ['rssm_disc_ds3', 'mp_ds2', 'event_context_mp'],
+    #'model_keys': ['rssm_disc_ds3', 'mp_ds2', 'event_context_mp'],
+    'model_keys': ['rssm_1step', 'rssm_5step', 'rssm_10step', 'rssm_20step', 'rssm_disc_ds3'],
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
@@ -179,6 +183,6 @@ DEFAULT_VALUES = {
 DATASET_NUMS = {
     'train_test_splits_3D_dataset.pkl': 1,
     'dataset_5_25_23.pkl': 2,
-    'swm_data': 3,
+    'swm_data.pkl': 3,
     'data_norm_velocity.pkl': 4,
 }
