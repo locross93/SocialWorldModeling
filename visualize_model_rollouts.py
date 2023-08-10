@@ -249,11 +249,16 @@ if __name__ == '__main__':
     # load data
     dataset_file = os.path.join(args.data_dir, args.dataset)
     loaded_dataset = pickle.load(open(dataset_file, 'rb'))
-    train_dataset, test_dataset = loaded_dataset
-    if args.train_or_val == 'train':
-        input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
+    if dataset_file == os.path.join(args.data_dir, 'data_norm_velocity_val_only.pkl'):
+        input_data = loaded_dataset
+        # reset filename for exp_info_file
+        dataset_file = os.path.join(args.data_dir, 'data_norm_velocity.pkl')
     else:
-        input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
+        train_dataset, test_dataset = loaded_dataset
+        if args.train_or_val == 'train':
+            input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
+        else:
+            input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
         
     if args.dataset in DATASET_NUMS and DATASET_NUMS[args.dataset] == 1:
         # first dataset use states to define events
@@ -337,16 +342,17 @@ if __name__ == '__main__':
         else:
             fig, ax = plot_one_frame_compare(last_burnin_state, event_state, pred_event_state, data_columns)
        
-    # TEMP ADD TRUE NEXT EVENT
-    # condition ms predictor on predicted next event
-    # concatenate event_hat and event_horizon_hat
-    # first normalize event_horizon
-    event_horizon = float((event_horizon - 1) / ((300 - 50) - 1))
-    event_state = torch.cat([event_state, torch.tensor(event_horizon).unsqueeze(0).unsqueeze(0)], dim=-1)
-    # Call MSPredictorEventContext's forward_rollout with event_hat
-    with torch.no_grad():
-        rollout_x  = model.mp_model.forward_rollout(x, event_state, burn_in_length, rollout_length)
-    x_pred[burn_in_length:,:] = rollout_x 
+        # TEMP ADD TRUE NEXT EVENT
+        # condition ms predictor on predicted next event
+        # concatenate event_hat and event_horizon_hat
+        # first normalize event_horizon
+        #event_horizon = float((event_horizon - 1) / ((300 - 50) - 1))
+        #event_state = torch.cat([event_state, torch.tensor(event_horizon).unsqueeze(0).unsqueeze(0)], dim=-1)
+        #rollout_x  = model.mp_model.forward_rollout(x, event_state, burn_in_length, rollout_length)
+        # Call MSPredictorEventContext's forward_rollout with event_hat
+        with torch.no_grad():
+            rollout_x  = model.mp_model.forward_rollout(x, pred_event_state, burn_in_length, rollout_length)
+        x_pred[burn_in_length:,:] = rollout_x 
     
     viz_dir = os.path.join(args.analysis_dir, 'results/viz_trajs',args.model_key)
     if not os.path.exists(viz_dir):        
@@ -361,9 +367,6 @@ if __name__ == '__main__':
     # if a training set trial, add suffix
     if args.train_or_val == 'train':
         save_file = save_file+'_train'
-        
-    # TEMP
-    save_file = save_file+'_true_event_context'
         
     # make subplot of true vs predicted trajectory
     if args.plot_traj_subplots:

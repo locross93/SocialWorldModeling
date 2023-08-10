@@ -133,8 +133,8 @@ MODEL_DICT_VAL=  {
         'class': EventModel, 'config': 'event_context_world_model.json',
         'model_dir': 'em_min_horizon', 'model_label': 'Event Model Min Horizon'},
     'rssm_norm_vel': {
-        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_70.json',
-        'model_dir': 'rssm_norm_vel', 'model_label': 'Multistep Predictor Vel'},
+        'class': DreamerV2, 'config': 'rssm_disc_input_size_70.json',
+        'model_dir': 'rssm_norm_vel', 'model_label': 'RSSM Norm Vel'},
     'em_gt': {
         'class': EventModel, 'config': 'event_context_world_model.json',
         'model_dir': 'em_gt', 'model_label': 'Event Model GT'},
