@@ -1,2 +1,2 @@
 ,model,score,MSE,epoch,dataset
-0,RSSM 20 Step Rollout,0.05737704918032787,2.4456279277801514,/data2/locross/analysis/models/rssm_20step/rssm_20step_epoch5600,swm_data.pkl
+0,RSSM 1 Step Rollout,0.45081967213114754,2.370549440383911,/data2/locross/analysis/models/rssm_1step/rssm_1step_epoch14200,swm_data.pkl

@@ -20,7 +20,7 @@ from tqdm import tqdm
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
-from analysis_utils import load_config, get_highest_numbered_file, get_data_columns, init_model_class
+from analysis_utils import load_config, get_highest_numbered_file, get_data_columns, init_model_class, inverse_normalize
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
 from plot_eval_world_model import plot_eval_wm_results
@@ -41,10 +41,12 @@ class Analysis(object):
         print(f"Eval seed: {args.eval_seed}")           
 
     def load_data(self) -> None:
-        if self.args.dataset == 'train_test_splits_3D_dataset.pkl' or self.args.dataset == 'data_norm_velocity.pkl':
+        #if self.args.dataset == 'train_test_splits_3D_dataset.pkl' or self.args.dataset == 'data_norm_velocity.pkl':
+        if self.args.dataset == 'train_test_splits_3D_dataset.pkl':
             self.ds_num = 1
         else:
-            self.ds_num = 2
+            #self.ds_num = 2
+            self.ds_num = DATASET_NUMS[self.args.dataset]
         self.dataset_file = os.path.join(self.args.data_dir, self.args.dataset)
         self.loaded_dataset = pickle.load(open(self.dataset_file, 'rb'))
         train_dataset, test_dataset = self.loaded_dataset
@@ -164,11 +166,26 @@ class Analysis(object):
             imag_trajs.append(rollout_x)
             # store the steps after pick up with predicted frames in imagined_trajs
             imagined_trajs[i,steps2pickup:,:] = rollout_x
+        # LC 8/8/23 is this correct? Is this for MSE?
         x_true = torch.cat(real_trajs, dim=1)
         x_hat = torch.cat(imag_trajs, dim=1)
-        mse = ((x_true - x_hat)**2).mean().item()
-    
         full_trajs = input_data[single_goal_trajs,:,:].cpu()
+        #breakpoint()
+        if 'min_max_values' in self.exp_info_dict:
+            # data is normalize, project it back into regular input space
+            min_values, max_values = self.exp_info_dict['min_max_values']
+            velocity = any('vel' in s for s in self.data_columns)
+            x_true = inverse_normalize(x_true, max_values.astype(np.float32), min_values.astype(np.float32), velocity)
+            x_hat = inverse_normalize(x_hat, max_values.astype(np.float32), min_values.astype(np.float32), velocity)
+            full_trajs = inverse_normalize(full_trajs, max_values.astype(np.float32), min_values.astype(np.float32), velocity)
+        if any('vel' in item for item in self.data_columns):
+            #breakpoint()
+            # remove velocity columns
+            x_true = x_true[:,:,::2]
+            x_hat = x_hat[:,:,::2]
+            full_trajs = full_trajs[:,:,::2]
+        mse = ((x_true - x_hat)**2).mean().item()
+
         scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num)
         # evaluate whether only appropriate goals (after object picked up) are reconstructed
         pickup_subset = pickup_timepoints[single_goal_trajs,:]

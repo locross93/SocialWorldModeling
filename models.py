@@ -1467,8 +1467,9 @@ class MultistepPredictor4D(nn.Module):
         pred_outputs = []
         for t in range(rollout_length):
             pred_outputs.append(xt_hat.squeeze(1))
-            # output is next input x
-            xt_hat, hidden = self.forward(xt_hat, hidden)
+            # Construct new frame-stacked data: discard the oldest frame and append the newest prediction [t, t-1, t-2, t-3]
+            new_input = torch.cat([xt_hat, x[:, (burn_in_length-1+t), :self.input_size*(self.num_stack-1)].unsqueeze(1)], dim=2)
+            xt_hat, hidden = self.forward(new_input, hidden)
         assert len(pred_outputs) != 0
         x_hat = torch.stack(pred_outputs, dim=1)
         
@@ -1479,7 +1480,7 @@ class MultistepPredictor4D(nn.Module):
         
         x_hat = self.forward_rollout(x, burn_in_length, rollout_length)
         t_end = burn_in_length + rollout_length
-        x_supervise = x[:,burn_in_length:t_end,:]
+        x_supervise = x[:,burn_in_length:t_end,:self.input_size]
         
         loss = loss_fn(x_supervise, x_hat)
         
@@ -2562,7 +2563,7 @@ class ReplayBufferEndState:
             end_state = self.buffer[ep_ind,-1,:]
             batch_end_states.append(end_state)
             # how far away is the end state, with 0 equaling now, 1 the entire episode length
-            end_horizon = (self.episode_length - (start + self.burn_in_length)) / (self.episode_length - self.burn_in_length)
+            end_horizon = float((self.episode_length - (start + self.burn_in_length)) / (self.episode_length - self.burn_in_length))
             batch_end_horizons.append(end_horizon)
         trajectories = torch.stack(batch_trajs, dim=0)
         end_states = torch.stack(batch_end_states, dim=0)

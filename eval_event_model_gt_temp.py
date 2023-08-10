@@ -219,6 +219,12 @@ class Analysis(object):
         imagined_trajs = np.zeros([num_multi_goal_trajs, input_data.shape[1], input_data.shape[2]])
         real_trajs = []
         imag_trajs = []
+
+        # TEMP
+        # load events data
+        events_ds_file = os.path.join(args.analysis_dir,'results/event_inds/event_inds_mp_ds2.pkl')
+        events_dataset = pickle.load(open(events_ds_file, 'rb'))
+        event_inds = events_dataset[args.train_or_val]
         
         for i,row in enumerate(multi_goal_trajs):
             if i%50 == 0:
@@ -230,7 +236,25 @@ class Analysis(object):
             imagined_trajs[i,:steps2pickup,:] = x[:,:steps2pickup,:].cpu()
             # rollout model for the rest of the trajectory
             rollout_length = self.num_timepoints - steps2pickup
-            rollout_x = model.forward_rollout(x.cuda(), steps2pickup, rollout_length).cpu().detach()
+            # TEMP
+            # get closest future event state in that trajectory from burn in state
+            traj_event_inds = np.array(event_inds[row])
+            burn_in_ind = steps2pickup - 1
+            if args.use_end_state:
+                closest_event_ind = -1
+            else:
+                closest_event_ind = np.min(traj_event_inds[np.where(traj_event_inds > burn_in_ind)[0]])
+            # get event horizon from end state
+            event_horizon = closest_event_ind - burn_in_ind
+            event_state = input_data[row,closest_event_ind,:].unsqueeze(0)
+            assert torch.equal(event_state, x[:,closest_event_ind,:])
+            # first normalize event_horizon
+            event_horizon = float((event_horizon - 1) / ((300 - 50) - 1))
+            event_state = torch.cat([event_state, torch.tensor(event_horizon).unsqueeze(0).unsqueeze(0)], dim=-1)
+            # Call MSPredictorEventContext's forward_rollout with event_hat
+            with torch.no_grad():
+                rollout_x  = model.mp_model.forward_rollout(x.cuda(), event_state.cuda(), steps2pickup, rollout_length).cpu()
+            #rollout_x = model.forward_rollout(x.cuda(), steps2pickup, rollout_length).cpu().detach()
             # get end portion of true trajectory to compare to rollout
             real_traj = x[:,steps2pickup:,:].to("cpu")                
             assert rollout_x.size() == real_traj.size()
@@ -334,12 +358,19 @@ class Analysis(object):
         goal_inds = np.concatenate([single_goal_trajs, multi_goal_trajs])        
         non_goal_trajs = [i for i in range(len(input_data)) if i not in goal_inds]
         non_goal_trajs = non_goal_trajs[ :int(len(input_data)*partial)]
-        goal_inds =  np.random.choice(goal_inds, size=int(len(goal_inds)*partial), replace=False)                                    
+        goal_inds =  np.random.choice(goal_inds, size=int(len(goal_inds)*partial), replace=False)    
+        
+        # TEMP
+        # load events data
+        events_ds_file = os.path.join(args.analysis_dir,'results/event_inds/event_inds_mp_ds2.pkl')
+        events_dataset = pickle.load(open(events_ds_file, 'rb'))
+        event_inds = events_dataset[args.train_or_val]                                
 
         # compute non goal trajs first with batches
         counter = 0
         batch_trajs = []
         batch_inds = []
+        batch_events = []
         burn_in_length = self.args.non_goal_burn_in
         rollout_length = self.num_timepoints - burn_in_length
         for i in non_goal_trajs:
@@ -347,21 +378,46 @@ class Analysis(object):
             if counter % 100 == 0:
                 print(i)
             x = input_data[i,:,:]#.unsqueeze(0)
+            # get closest future event state in that trajectory from burn in state
+            traj_event_inds = np.array(event_inds[i])
+            burn_in_ind = burn_in_length - 1
+            if args.use_end_state:
+                closest_event_ind = -1
+            else:
+                closest_event_ind = np.min(traj_event_inds[np.where(traj_event_inds > burn_in_ind)[0]])
+            # get event horizon from end state
+            event_horizon = closest_event_ind - burn_in_ind
+            event_state = input_data[i,closest_event_ind,:]
+            assert torch.equal(event_state, x[closest_event_ind,:])
+            # first normalize event_horizon
+            event_horizon = float((event_horizon - 1) / ((300 - 50) - 1))
+            event_state = torch.cat([event_state, torch.tensor(event_horizon).unsqueeze(0)], dim=-1)
             batch_inds.append(i)
             batch_trajs.append(x)
+            batch_events.append(event_state)
             if counter > 0 and counter % self.args.batch_size == 0:
                 batch_x = torch.stack(batch_trajs, dim=0)
-                batch_x = torch.stack(batch_trajs, dim=0)
                 batch_x = batch_x.to(self.args.device)#model.DEVICE)
-                rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
+                batch_event_state = torch.stack(batch_events, dim=0)
+                batch_event_state = batch_event_state.to(self.args.device)#model.DEVICE)
+                # Call MSPredictorEventContext's forward_rollout with event_hat
+                with torch.no_grad():
+                    rollout_x  = model.mp_model.forward_rollout(batch_x, batch_event_state, burn_in_length, rollout_length).cpu()
+                #rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
                 batch_inds = np.array(batch_inds)
                 imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
                 batch_trajs = []
                 batch_inds = []
+                batch_events = []
         # compute last batch that is less than batch_size
         batch_x = torch.stack(batch_trajs, dim=0)
         batch_x = batch_x.to(self.args.device)#model.DEVICE)
-        rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
+        batch_event_state = torch.stack(batch_events, dim=0)
+        batch_event_state = batch_event_state.to(self.args.device)#model.DEVICE)
+        # Call MSPredictorEventContext's forward_rollout with event_hat
+        with torch.no_grad():
+            rollout_x  = model.mp_model.forward_rollout(batch_x, batch_event_state, burn_in_length, rollout_length).cpu()
+        #rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
         batch_inds = np.array(batch_inds)
         imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
         
@@ -370,7 +426,7 @@ class Analysis(object):
             counter += 1
             if counter % 100 == 0:
                 print(i)
-            x = input_data[i,:,:].unsqueeze(0)
+            x = input_data[i,:,:]#.unsqueeze(0)
             if i in single_goal_trajs:
                 # burn in to a few frames past the goal, so it is clear it is a single goal trial - TO DO THIS WILL BE DIFF FOR DS2
                 # get the only goal point in the trajectory
@@ -387,9 +443,25 @@ class Analysis(object):
             imagined_trajs[i,:burn_in_length,:] = x[:,:burn_in_length,:].cpu()
             # rollout model for the rest of the trajectory
             rollout_length = self.num_timepoints - burn_in_length
-            if x.dtype == torch.float64:
-                x = x.float()
-            rollout_x = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu().detach()
+            # TEMP
+            # get closest future event state in that trajectory from burn in state
+            traj_event_inds = np.array(event_inds[i])
+            burn_in_ind = burn_in_length - 1
+            if args.use_end_state:
+                closest_event_ind = -1
+            else:
+                closest_event_ind = np.min(traj_event_inds[np.where(traj_event_inds > burn_in_ind)[0]])
+            # get event horizon from end state
+            event_horizon = closest_event_ind - burn_in_ind
+            event_state = input_data[i,closest_event_ind,:]
+            assert torch.equal(event_state, x[closest_event_ind,:])
+            # first normalize event_horizon
+            event_horizon = float((event_horizon - 1) / ((300 - 50) - 1))
+            event_state = torch.cat([event_state, torch.tensor(event_horizon).unsqueeze(0)], dim=-1)
+            # Call MSPredictorEventContext's forward_rollout with event_hat
+            with torch.no_grad():
+                rollout_x  = model.mp_model.forward_rollout(x.cuda(), event_state.cuda(), burn_in_length, rollout_length).cpu()
+            #rollout_x = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu().detach()
             # store the steps after pick up with predicted frames in imagined_trajs
             imagined_trajs[i,burn_in_length:,:] = rollout_x
                             
@@ -500,6 +572,12 @@ class Analysis(object):
             multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
             
         # TO DO, ANALYZE EVERY PICKUP EVENT SEPARATELY, INCLUDING MULTI GOAL TRAJS
+
+        # TEMP
+        # load events data
+        events_ds_file = os.path.join(args.analysis_dir,'results/event_inds/event_inds_mp_ds2.pkl')
+        events_dataset = pickle.load(open(events_ds_file, 'rb'))
+        event_inds = events_dataset[args.train_or_val]
         
         num_single_goal_trajs = len(single_goal_trajs)
         imagined_trajs = np.zeros([num_single_goal_trajs, input_data.shape[1], input_data.shape[2]])
@@ -524,7 +602,25 @@ class Analysis(object):
             imagined_trajs[i,:burn_in_length,:] = x[:,:burn_in_length,:].cpu()
             # rollout model for the rest of the trajectory
             rollout_length = num_timepoints - burn_in_length
-            rollout_x = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu().detach()
+            # TEMP
+            # get closest future event state in that trajectory from burn in state
+            traj_event_inds = np.array(event_inds[row])
+            burn_in_ind = burn_in_length - 1
+            if args.use_end_state:
+                closest_event_ind = -1
+            else:
+                closest_event_ind = np.min(traj_event_inds[np.where(traj_event_inds > burn_in_ind)[0]])
+            # get event horizon from end state
+            event_horizon = closest_event_ind - burn_in_ind
+            event_state = input_data[row,closest_event_ind,:].unsqueeze(0)
+            assert torch.equal(event_state, x[:,closest_event_ind,:])
+            # first normalize event_horizon
+            event_horizon = float((event_horizon - 1) / ((300 - 50) - 1))
+            event_state = torch.cat([event_state, torch.tensor(event_horizon).unsqueeze(0).unsqueeze(0)], dim=-1)
+            # Call MSPredictorEventContext's forward_rollout with event_hat
+            with torch.no_grad():
+                rollout_x  = model.mp_model.forward_rollout(x.cuda(), event_state.cuda(), burn_in_length, rollout_length).cpu()
+            #rollout_x = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu().detach()
             # get end portion of true trajectory to compare to rollout
             real_traj = x[:,burn_in_length:,:].to("cpu")
             assert rollout_x.size() == real_traj.size()

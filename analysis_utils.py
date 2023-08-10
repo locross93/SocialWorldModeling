@@ -20,13 +20,27 @@ def get_data_columns(ds_num):
             'obj2_x', 'obj2_y', 'obj2_z', 'agent0_x', 'agent0_y', 'agent0_z', 'agent0_rot_x',
             'agent0_rot_y', 'agent0_rot_z', 'agent0_rot_w', 'agent1_x', 'agent1_y',
             'agent1_z', 'agent1_rot_x', 'agent1_rot_y', 'agent1_rot_z', 'agent1_rot_w'] 
-    elif ds_num == 2:
+    elif ds_num == 2 or ds_num == 3:
         data_columns = [
             'obj0_x', 'obj0_y', 'obj0_z', 'obj0_rot_x', 'obj0_rot_y', 'obj0_rot_z', 'obj0_rot_w', 
             'obj1_x', 'obj1_y', 'obj1_z', 'obj1_rot_x', 'obj1_rot_y', 'obj1_rot_z', 'obj1_rot_w', 
             'obj2_x', 'obj2_y', 'obj2_z', 'obj2_rot_x', 'obj2_rot_y', 'obj2_rot_z', 'obj2_rot_w', 
             'agent0_x', 'agent0_y', 'agent0_z', 'agent0_rot_x', 'agent0_rot_y', 'agent0_rot_z', 'agent0_rot_w', 
             'agent1_x', 'agent1_y', 'agent1_z', 'agent1_rot_x', 'agent1_rot_y', 'agent1_rot_z', 'agent1_rot_w']
+    elif ds_num == 4:
+        data_columns = [
+            'obj0_x', 'obj0_x_vel', 'obj0_y', 'obj0_y_vel', 'obj0_z', 'obj0_z_vel', 'obj0_rot_x', 
+            'obj0_rot_x_vel', 'obj0_rot_y', 'obj0_rot_y_vel', 'obj0_rot_z', 'obj0_rot_z_vel', 'obj0_rot_w', 
+            'obj0_rot_w_vel', 'obj1_x', 'obj1_x_vel', 'obj1_y', 'obj1_y_vel', 'obj1_z', 'obj1_z_vel', 
+            'obj1_rot_x', 'obj1_rot_x_vel', 'obj1_rot_y', 'obj1_rot_y_vel', 'obj1_rot_z', 'obj1_rot_z_vel', 
+            'obj1_rot_w', 'obj1_rot_w_vel', 'obj2_x', 'obj2_x_vel', 'obj2_y', 'obj2_y_vel', 'obj2_z', 
+            'obj2_z_vel', 'obj2_rot_x', 'obj2_rot_x_vel', 'obj2_rot_y', 'obj2_rot_y_vel', 'obj2_rot_z', 
+            'obj2_rot_z_vel', 'obj2_rot_w', 'obj2_rot_w_vel', 'agent0_x', 'agent0_x_vel', 'agent0_y', 
+            'agent0_y_vel', 'agent0_z', 'agent0_z_vel', 'agent0_rot_x', 'agent0_rot_x_vel', 'agent0_rot_y', 
+            'agent0_rot_y_vel', 'agent0_rot_z', 'agent0_rot_z_vel', 'agent0_rot_w', 'agent0_rot_w_vel', 
+            'agent1_x', 'agent1_x_vel', 'agent1_y', 'agent1_y_vel', 'agent1_z', 'agent1_z_vel', 
+            'agent1_rot_x', 'agent1_rot_x_vel', 'agent1_rot_y', 'agent1_rot_y_vel', 'agent1_rot_z', 
+            'agent1_rot_z_vel', 'agent1_rot_w', 'agent1_rot_w_vel']
         
     return data_columns
 
