@@ -12,11 +12,13 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 from analysis_utils import get_data_columns
 
 
-def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_location=True, plot=True, ds_num=2):
+def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_location=False, plot=True, ds_num=2, obj_dist_thr=2.0, agent_dist_thr=1.0):
     if hasattr(recon_matrices, 'requires_grad') and recon_matrices.requires_grad:
         recon_matrices = recon_matrices.detach().numpy()
         
     scores = {}
+    
+    import pdb
     
     # relabel y based on validation input tensor
     num_trials = input_matrices.shape[0]
@@ -46,13 +48,27 @@ def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_locati
                 # check if any location at any step is close to target
                 dist2target = np.array([distance.euclidean(fp1_pos, step_pos) for step_pos in trial_obj_pos])
                 target_dist = np.min(dist2target)
-            if target_dist < 2.0:
+                min_timepoint = np.argmin(dist2target)
+            if target_dist < obj_dist_thr:
                 event_conditions.append(True)
+                if agent_dist_thr is not None:
+                    # is either agent close to the object when it is delivered?
+                    agent_close = False
+                    for k in range(2):
+                        agent_pos_inds = [data_columns.index('agent'+str(k)+'_'+dim) for dim in dims]
+                        trial_agent_pos = trial_x[:,agent_pos_inds]
+                        agent_dist = distance.euclidean(trial_agent_pos[min_timepoint,:], trial_obj_pos[min_timepoint,:])
+                        if agent_dist < agent_dist_thr:
+                            agent_close = True
+                            break
+                    if agent_close:
+                        event_conditions.append(True)
+                    else:
+                        event_conditions.append(False)
             else:
                 event_conditions.append(False)
             if all(event_conditions):
                 y_labels[i,j] = 1
-                #print('goal '+str(j)+' is a success')
             else:
                 y_labels[i,j] = 0
                 
@@ -80,8 +96,23 @@ def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_locati
                 # check if any location at any step is close to target
                 dist2target = np.array([distance.euclidean(fp1_pos, step_pos) for step_pos in trial_obj_pos])
                 target_dist = np.min(dist2target)
-            if target_dist < 2.0:
+                min_timepoint = np.argmin(dist2target)
+            if target_dist < obj_dist_thr:
                 event_conditions.append(True)
+                if agent_dist_thr is not None:
+                    # is either agent close to the object when it is delivered?
+                    agent_close = False
+                    for k in range(2):
+                        agent_pos_inds = [data_columns.index('agent'+str(k)+'_'+dim) for dim in dims]
+                        trial_agent_pos = trial_x[:,agent_pos_inds]
+                        agent_dist = distance.euclidean(trial_agent_pos[min_timepoint,:], trial_obj_pos[min_timepoint,:])
+                        if agent_dist < agent_dist_thr:
+                            agent_close = True
+                            break
+                    if agent_close:
+                        event_conditions.append(True)
+                    else:
+                        event_conditions.append(False)
             else:
                 event_conditions.append(False)
             if all(event_conditions):

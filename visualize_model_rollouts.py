@@ -19,7 +19,7 @@ from moviepy.video.io.bindings import mplfig_to_npimage
 
 from analysis_utils import load_trained_model, get_data_columns, inverse_normalize
 from annotate_pickup_timepoints import annotate_pickup_timepoints
-from annotate_goal_timepoints import annotate_goal_timepoints
+from annotate_goal_timepoints import annotate_goal_timepoints, eval_recon_goals
 
 from constants_lc import MODEL_DICT_VAL, DEFAULT_VALUES, DATASET_NUMS
     

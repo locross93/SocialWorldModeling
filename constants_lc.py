@@ -159,9 +159,9 @@ DEFAULT_VALUES = {
 	'train_seed': 911320,
     'eval_seed': 911320, #834869, #(good for SGNet & RSSM Discrete) 
     'analysis_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/',
-    'data_path': '/Users/locro/Documents/Stanford/analysis/data/swm_data.pkl' if platform.system() == 'Windows' else  '/data2/locross/data/swm_data.pkl',
-    'data_dir': '/Users/locro/Documents/Stanford/analysis/data/' if platform.system() == 'Windows' else  '/data2/locross/data/',
-    'checkpoint_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/data2/locross/analysis/',
+    'data_path': '/Users/locro/Documents/Stanford/analysis/data/swm_data.pkl' if platform.system() == 'Windows' else  '/mnt/fs2/locross/data/swm_data.pkl',
+    'data_dir': '/Users/locro/Documents/Stanford/analysis/data/' if platform.system() == 'Windows' else  '/mnt/fs2/locross/data',
+    'checkpoint_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/mnt/fs2/locross/analysis/',
     'results_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/results/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/results',
     'model_config_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/model_configs/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/model_configs/',
     # general training parameters for all models
