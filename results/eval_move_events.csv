@@ -1,3 +1,2 @@
 ,accuracy,precision,recall,model,epoch,dataset
-0,0.7547328719469771,0.9560733384262796,0.43629074429144155,SGNet-H512,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default_lr1e-4/sgnet_cvae_default_lr1e-4_epoch1000,data_5_31_23.pkl
-1,0.7508879856457578,0.862937062937063,0.4839637441171344,SGNet-H256,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size256_lr1e-4/sgnet_cvae_hidden_size256_lr1e-4_epoch1200,data_5_31_23.pkl
+0,0.49141308726061006,0.4467897589565064,0.8836499912846435,Pred End State,/data2/locross/analysis/models/pred_end_state/mp_model_epoch19000,swm_data.pkl

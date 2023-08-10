@@ -146,16 +146,15 @@ def main():
     burn_in_length = args.burn_in_length
     rollout_length = args.rollout_length
     sequence_length = burn_in_length + rollout_length
-    #replay_buffer = ReplayBuffer(sequence_length)
-    replay_buffer = ReplayBufferFrameStack(sequence_length, num_stack=4)
+    replay_buffer = ReplayBuffer(sequence_length)
     replay_buffer.upload_training_set(train_data)    
     batch_size = args.batch_size
     print(f'Batch size: {batch_size}')
     batches_per_epoch = np.min([replay_buffer.buffer_size // batch_size, 50])
     
     # make validation data
-    #val_buffer = ReplayBuffer(sequence_length)
-    val_buffer = ReplayBufferFrameStack(sequence_length, num_stack=4)
+    val_buffer = ReplayBuffer(sequence_length)
+    breakpoint()
     val_buffer.upload_training_set(val_data)
     seed = 100 # set seed so every model sees the same randomization
     val_batch_size = np.min([val_data.size(0), 1000])

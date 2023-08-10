@@ -1,2 +1,2 @@
 ,model,g2_acc,g2_goal_num,g2_mse,g3_acc,g3_goal_num,g3_mse,epoch,dataset
-0,Event Context World Model,0.20250521920668058,2nd Goal,2.8299753665924072,0.1524008350730689,3rd Goal,2.8299753665924072,/data2/locross/analysis/models/event_context_world/mp_model_epoch4200,swm_data.pkl
+0,Pred End State,0.9574468085106383,2nd Goal,0.8119568824768066,0.9574468085106383,3rd Goal,0.8119568824768066,/data2/locross/analysis/models/pred_end_state/mp_model_epoch19000,swm_data.pkl

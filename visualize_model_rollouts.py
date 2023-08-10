@@ -254,13 +254,6 @@ if __name__ == '__main__':
         input_data = train_dataset.dataset.tensors[0][train_dataset.indices,:,:]
     else:
         input_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
-
-    dataset_file2 = os.path.join(args.data_dir, 'data_norm_velocity_val_only.pkl')
-    # save pickle file with input_data
-    with open(dataset_file2, 'wb') as f:
-        pickle.dump(input_data, f)
-
-    breakpoint()
         
     if args.dataset in DATASET_NUMS and DATASET_NUMS[args.dataset] == 1:
         # first dataset use states to define events

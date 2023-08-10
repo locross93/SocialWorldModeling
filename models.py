@@ -2563,7 +2563,7 @@ class ReplayBufferEndState:
             end_state = self.buffer[ep_ind,-1,:]
             batch_end_states.append(end_state)
             # how far away is the end state, with 0 equaling now, 1 the entire episode length
-            end_horizon = (self.episode_length - (start + self.burn_in_length)) / (self.episode_length - self.burn_in_length)
+            end_horizon = float((self.episode_length - (start + self.burn_in_length)) / (self.episode_length - self.burn_in_length))
             batch_end_horizons.append(end_horizon)
         trajectories = torch.stack(batch_trajs, dim=0)
         end_states = torch.stack(batch_end_states, dim=0)
