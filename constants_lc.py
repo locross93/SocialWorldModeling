@@ -169,6 +169,15 @@ MODEL_DICT_VAL=  {
     'tf_emb2048_lr1e-4_s1': {
         'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
         'model_dir': 'tf_emb2048_lr1e-4_s1', 'model_label': 'TF Emb2048 S1'},
+    'gt_end_state_s1': {
+        'class': EventModel, 'config': 'event_context_world_model.json',
+        'model_dir': 'gt_end_state_s1', 'model_label': 'GT End State S1'},
+    'gt_end_state_s2': {
+        'class': EventModel, 'config': 'event_context_world_model.json',
+        'model_dir': 'gt_end_state_s2', 'model_label': 'GT End State S2'},
+    'gt_end_state_s3': {
+        'class': EventModel, 'config': 'event_context_world_model.json',
+        'model_dir': 'gt_end_state_s3', 'model_label': 'GT End State S3'},
 }
 DEFAULT_VALUES = {
 	'train_seed': 911320,

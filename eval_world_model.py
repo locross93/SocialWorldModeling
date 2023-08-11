@@ -186,7 +186,9 @@ class Analysis(object):
             full_trajs = full_trajs[:,:,::2]
         mse = ((x_true - x_hat)**2).mean().item()
 
-        scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num)
+        scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num, obj_dist_thr=2.0, agent_dist_thr=1.0)
+        # Easier
+        #scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num, obj_dist_thr=2.0, agent_dist_thr=None)
         # evaluate whether only appropriate goals (after object picked up) are reconstructed
         pickup_subset = pickup_timepoints[single_goal_trajs,:]
         indices = np.argwhere(pickup_subset > -1)
