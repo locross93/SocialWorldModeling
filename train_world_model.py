@@ -154,7 +154,6 @@ def main():
     
     # make validation data
     val_buffer = ReplayBuffer(sequence_length)
-    breakpoint()
     val_buffer.upload_training_set(val_data)
     seed = 100 # set seed so every model sees the same randomization
     val_batch_size = np.min([val_data.size(0), 1000])
