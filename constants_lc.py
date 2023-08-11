@@ -154,14 +154,38 @@ MODEL_DICT_VAL=  {
     'mp_frame_stack': {
         'class': MultistepPredictor4D, 'config': 'multistep_predictor_frame_stack.json',
         'model_dir': 'mp_frame_stack', 'model_label': 'MP Frame Stack'},
+    'mp_mlp_2048_lr3e-4_s1': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
+        'model_dir': 'mp_mlp_2048_lr3e-4_s1', 'model_label': 'MP-S1'},
+    'rssm_disc_h_2048_lr3e-4_s1': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json', 
+        'model_dir': 'rssm_disc_h_2048_lr3e-4_s1', 'model_label': 'RSSM-S1'},
+    'rssm_cont_h_2048_lr1e-4_s1': {
+        'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_2048.json',
+        'model_dir': 'rssm_cont_h_2048_lr1e-4_s1', 'model_label': 'RSSM-Cont-S1'},
+    'md_mlp_2048_lr3e-4_s1' : {
+        'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
+        'model_dir': 'md_mlp_2048_lr3e-4_s1', 'model_label': 'MP-S1'},
+    'tf_emb2048_lr1e-4_s1': {
+        'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
+        'model_dir': 'tf_emb2048_lr1e-4_s1', 'model_label': 'TF Emb2048 S1'},
+    'gt_end_state_s1': {
+        'class': EventModel, 'config': 'event_context_world_model.json',
+        'model_dir': 'gt_end_state_s1', 'model_label': 'GT End State S1'},
+    'gt_end_state_s2': {
+        'class': EventModel, 'config': 'event_context_world_model.json',
+        'model_dir': 'gt_end_state_s2', 'model_label': 'GT End State S2'},
+    'gt_end_state_s3': {
+        'class': EventModel, 'config': 'event_context_world_model.json',
+        'model_dir': 'gt_end_state_s3', 'model_label': 'GT End State S3'},
 }
 DEFAULT_VALUES = {
 	'train_seed': 911320,
     'eval_seed': 911320, #834869, #(good for SGNet & RSSM Discrete) 
     'analysis_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/',
-    'data_path': '/Users/locro/Documents/Stanford/analysis/data/swm_data.pkl' if platform.system() == 'Windows' else  '/mnt/fs2/locross/data/swm_data.pkl',
-    'data_dir': '/Users/locro/Documents/Stanford/analysis/data/' if platform.system() == 'Windows' else  '/mnt/fs2/locross/data',
-    'checkpoint_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/mnt/fs2/locross/analysis/',
+    'data_path': '/Users/locro/Documents/Stanford/analysis/data/swm_data.pkl' if platform.system() == 'Windows' else  '/data2/locross/data/swm_data.pkl',
+    'data_dir': '/Users/locro/Documents/Stanford/analysis/data/' if platform.system() == 'Windows' else  '/data2/locross/data',
+    'checkpoint_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/data2/locross/analysis/',
     'results_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/results/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/results',
     'model_config_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/model_configs/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/model_configs/',
     # general training parameters for all models
@@ -170,12 +194,12 @@ DEFAULT_VALUES = {
     'epochs': int(3e4),
     'save_every': 200,
     #'model_keys': list(MODEL_DICT_VAL.keys()),
-    #'model_keys': ['multistep_pred'],
+    'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','rssm_cont_h_2048_lr1e-4_s1','md_mlp_2048_lr3e-4_s1'],
     #'model_keys': ['imma','gat','rfm','rfm_rnn'],
     #'model_keys': ['rssm_disc_ds2', 'rssm_disc_ds3', 'rssm_cont_ds3', 'mp_ds3', 'md_ds3', 'transformer_iris'],
     #'model_keys': ['rssm_disc_ds3', 'mp_ds2', 'event_context_mp'],
     #'model_keys': ['rssm_1step', 'rssm_5step', 'rssm_10step', 'rssm_20step', 'rssm_disc_ds3'],
-    'model_keys': ['event_context_mp', 'em_dropout', 'event_model2', 'emodel_no_horizon', 'pred_end_state', 'em_2048', 'em_lr5e-5', 'em_min_horizon', 'em_gt'],    
+    #'model_keys': ['event_context_mp', 'em_dropout', 'event_model2', 'emodel_no_horizon', 'pred_end_state', 'em_2048', 'em_lr5e-5', 'em_min_horizon', 'em_gt'],    
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
