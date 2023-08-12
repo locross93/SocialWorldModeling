@@ -5,6 +5,7 @@ from gnn_models.imma import IMMA
 from gnn_models.gat import GAT
 from gnn_models.rfm import RFM
 import platform
+import socket
 
 
 MODEL_DICT_TRAIN = {
@@ -179,15 +180,46 @@ MODEL_DICT_VAL=  {
         'class': EventModel, 'config': 'event_context_world_model.json',
         'model_dir': 'gt_end_state_s3', 'model_label': 'GT End State S3'},
 }
+# Get the hostname of the machine
+hostname = socket.gethostname()
+if 'node05-ccncluster' in hostname:
+    analysis_dir = '/home/locross/SocialWorldModeling/'
+    data_path = '/data2/locross/data/swm_data.pkl'
+    data_dir = '/data2/locross/data/'
+    checkpoint_dir = '/data2/locross/analysis/'
+    results_dir = '/home/locross/SocialWorldModeling/results'
+    model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
+elif 'DESKTOP-LU5SR6R' in hostname:
+    analysis_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/'
+    data_path = '/Users/locro/Documents/Stanford/analysis/data/swm_data.pkl'
+    data_dir = '/Users/locro/Documents/Stanford/analysis/data/'
+    checkpoint_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/'
+    results_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/results/'
+    model_config_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/model_configs/'
+elif 'node4-ccn2cluster.stanford.edu' in hostname or 'node5-ccn2cluster.stanford.edu' in hostname:
+    analysis_dir = '/home/locross/SocialWorldModeling/'
+    data_path = '/ccn2/u/ziyxiang/swm_data_and_results/data/swm_data.pkl'
+    data_dir = '/ccn2/u/ziyxiang/swm_data_and_results/data/'
+    checkpoint_dir = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
+    results_dir = '/home/locross/SocialWorldModeling/results'
+    model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
+elif 'node02-ccncluster' in hostname or 'node07-ccncluster' in hostname:
+    analysis_dir = '/home/locross/SocialWorldModeling/'
+    data_path = '/mnt/fs2/locross/data/swm_data.pkl'
+    data_dir = '/mnt/fs2/locross/data/'
+    checkpoint_dir = '/mnt/fs2/locross/analysis/'
+    results_dir = '/home/locross/SocialWorldModeling/results'
+    model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
+
 DEFAULT_VALUES = {
 	'train_seed': 911320,
     'eval_seed': 911320, #834869, #(good for SGNet & RSSM Discrete) 
-    'analysis_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/',
-    'data_path': '/Users/locro/Documents/Stanford/analysis/data/swm_data.pkl' if platform.system() == 'Windows' else  '/data2/locross/data/swm_data.pkl',
-    'data_dir': '/Users/locro/Documents/Stanford/analysis/data/' if platform.system() == 'Windows' else  '/data2/locross/data',
-    'checkpoint_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/data2/locross/analysis/',
-    'results_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/results/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/results',
-    'model_config_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/model_configs/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/model_configs/',
+    'analysis_dir': analysis_dir,
+    'data_path': data_path,
+    'data_dir': data_dir,
+    'checkpoint_dir': checkpoint_dir,
+    'results_dir': results_dir,
+    'model_config_dir': model_config_dir,
     # general training parameters for all models
     'batch_size': 8 if platform.system() == 'Windows' else 2048,
     'lr': 1e-5,
