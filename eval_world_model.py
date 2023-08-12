@@ -340,6 +340,8 @@ class Analysis(object):
             if counter % 100 == 0:
                 print(i)
             x = input_data[i,:,:]#.unsqueeze(0)
+            # store the steps of burn in with real frames in imagined_trajs
+            imagined_trajs[i,:burn_in_length,:] = x[:burn_in_length,:].cpu()
             batch_inds.append(i)
             batch_trajs.append(x)
             if counter > 0 and counter % self.args.batch_size == 0:
@@ -348,7 +350,7 @@ class Analysis(object):
                 batch_x = batch_x.to(self.args.device)#model.DEVICE)
                 rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
                 batch_inds = np.array(batch_inds)
-                imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
+                imagined_trajs[batch_inds,burn_in_length:,:] = rollout_x
                 batch_trajs = []
                 batch_inds = []
         # compute last batch that is less than batch_size
@@ -358,7 +360,6 @@ class Analysis(object):
         batch_inds = np.array(batch_inds)
         imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
         
-        #imagined_trajs = np.zeros(input_data.shape)
         for i in tqdm(goal_inds):
             counter += 1
             if counter % 100 == 0:

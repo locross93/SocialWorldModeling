@@ -1,2 +1,2 @@
 ,model,score,MSE,epoch,dataset
-0,Event Model GT,0.13114754098360656,1.8571265935897827,/data2/locross/analysis/models/em_gt/mp_model_epoch6600,swm_data.pkl
+0,Pred End State,0.9098360655737705,0.6429778933525085,/data2/locross/analysis/models/pred_end_state/mp_model_epoch19000,swm_data.pkl

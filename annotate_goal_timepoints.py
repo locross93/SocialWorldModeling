@@ -18,8 +18,6 @@ def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_locati
         
     scores = {}
     
-    import pdb
-    
     # relabel y based on validation input tensor
     num_trials = input_matrices.shape[0]
     num_goals = 3

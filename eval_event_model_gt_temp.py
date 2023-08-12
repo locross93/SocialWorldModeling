@@ -195,7 +195,8 @@ class Analysis(object):
         mse = ((x_true - x_hat)**2).mean().item()
     
         full_trajs = input_data[single_goal_trajs,:,:].cpu()
-        scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num)
+        #scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num)
+        scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num, obj_dist_thr=2.0, agent_dist_thr=None)
         # evaluate whether only appropriate goals (after object picked up) are reconstructed
         pickup_subset = pickup_timepoints[single_goal_trajs,:]
         indices = np.argwhere(pickup_subset > -1)
@@ -557,7 +558,7 @@ class Analysis(object):
         return accuracy, obj_pick_up_flag, recon_pick_up_flag    
     
     
-    def eval_pickup_events_in_rollouts(self, model, input_data) -> Dict[str, Any]:
+    def eval_pickup_events_in_rollouts(self, model, input_data, partial=1.0) -> Dict[str, Any]:
         if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
@@ -569,7 +570,9 @@ class Analysis(object):
             pickup_timepoints = self.exp_info_dict[self.args.train_or_val]['pickup_timepoints']
             goal_timepoints = self.exp_info_dict[self.args.train_or_val]['goal_timepoints']
             single_goal_trajs = self.exp_info_dict[self.args.train_or_val]['single_goal_trajs']
+            single_goal_trajs = single_goal_trajs[:int(partial*len(single_goal_trajs))]
             multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
+            multi_goal_trajs = multi_goal_trajs[:int(partial*len(multi_goal_trajs))]
             
         # TO DO, ANALYZE EVERY PICKUP EVENT SEPARATELY, INCLUDING MULTI GOAL TRAJS
 

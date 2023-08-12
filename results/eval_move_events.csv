@@ -1,2 +1,5 @@
 ,accuracy,precision,recall,model,epoch,dataset
-0,0.49141308726061006,0.4467897589565064,0.8836499912846435,Pred End State,/data2/locross/analysis/models/pred_end_state/mp_model_epoch19000,swm_data.pkl
+0,0.6953385330843311,0.5943520402058154,0.8657835105455813,MP-S1,/data2/locross/analysis/models/mp_mlp_2048_lr3e-4_s1/mp_mlp_2048_lr3e-4_s1_epoch29999,swm_data.pkl
+1,0.8121132227470798,0.9342735861974532,0.5946487711347395,RSSM-S1,/data2/locross/analysis/models/rssm_disc_h_2048_lr3e-4_s1/rssm_disc_h_2048_lr3e-4_s1_epoch24200,swm_data.pkl
+2,0.5364165659672635,0.47492176266599,0.978734530242287,RSSM-Cont-S1,/data2/locross/analysis/models/rssm_cont_h_2048_lr1e-4_s1/rssm_cont_h_2048_lr1e-4_s1_epoch9000,swm_data.pkl
+3,0.7644366326119594,0.8924178732679433,0.49956423217709606,MP-S1,/data2/locross/analysis/models/md_mlp_2048_lr3e-4_s1/md_mlp_2048_lr3e-4_s1_epoch13800,swm_data.pkl
