@@ -2699,7 +2699,7 @@ class EventPredictor(nn.Module):
         hidden = self.init_hidden(batch_size)
         if self.pred_delta:
             # predict delta between current and next event state
-            event_state = event_state - x[:,:-1,:]
+            event_state = event_state - x[:,-1,:]
         if self.predict_horizon:
             out_event_state, out_event_horizon, hidden = self.forward(x, hidden)
         else:
