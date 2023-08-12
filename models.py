@@ -2563,7 +2563,7 @@ class ReplayBufferEndState:
             batch_trajs.append(traj_sample)
             # get last state in that trajectory/trial
             if self.end_traj:
-                end_state = self.buffer[ep_ind,end,:]
+                end_state = self.buffer[ep_ind,end-1,:]
                 # end horizon will be fixed at rollout_length
                 end_horizon = 1.0
             else:

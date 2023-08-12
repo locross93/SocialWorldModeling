@@ -16,6 +16,7 @@
     "ep_num_rnn_layers": 2,
     "ep_predict_horizon": 0,
     "ep_horizon_loss_weight": 0.0,
+    "ep_pred_delta": 0,
     "ep_rnn_type": "LSTM",
     "ep_model_type": "event_predictor",
     "model_type": "event_model"
