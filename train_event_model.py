@@ -156,10 +156,10 @@ def main():
     if args.pred_end_state:
         val_buffer = ReplayBufferEndState(burn_in_length, rollout_length, val_data)
     elif args.pred_end_traj:
-        replay_buffer = ReplayBufferEndState(burn_in_length, rollout_length, train_data, end_traj=True)
+        val_buffer = ReplayBufferEndState(burn_in_length, rollout_length, train_data, end_traj=True)
     else:
         val_buffer = ReplayBufferEvents(burn_in_length, rollout_length, val_data, events_dataset['val'])
-    seed = 100 # set seed so every model sees the same randomization
+    seed = 100 # set seed so every model sees the same randomization of validation data
     val_batch_size = np.min([val_data.size(0), 1000])
     val_trajs, val_event_states, val_event_horizons = val_buffer.sample(val_batch_size, random_seed=seed)
     val_trajs = val_trajs.to(DEVICE)
