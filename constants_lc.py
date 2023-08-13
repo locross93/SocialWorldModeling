@@ -187,7 +187,7 @@ if 'node05-ccncluster' in hostname:
     data_path = '/data2/locross/data/swm_data.pkl'
     data_dir = '/data2/locross/data/'
     checkpoint_dir = '/data2/locross/analysis/'
-    results_dir = '/home/locross/SocialWorldModeling/results'
+    results_dir = '/home/locross/SocialWorldModeling/results/'
     model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
 elif 'DESKTOP-LU5SR6R' in hostname:
     analysis_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/'
@@ -201,15 +201,22 @@ elif 'node4-ccn2cluster.stanford.edu' in hostname or 'node5-ccn2cluster.stanford
     data_path = '/ccn2/u/ziyxiang/swm_data_and_results/data/swm_data.pkl'
     data_dir = '/ccn2/u/ziyxiang/swm_data_and_results/data/'
     checkpoint_dir = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
-    results_dir = '/home/locross/SocialWorldModeling/results'
+    results_dir = '/home/locross/SocialWorldModeling/results/'
     model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
 elif 'node02-ccncluster' in hostname or 'node07-ccncluster' in hostname:
     analysis_dir = '/home/locross/SocialWorldModeling/'
     data_path = '/mnt/fs2/locross/data/swm_data.pkl'
     data_dir = '/mnt/fs2/locross/data/'
     checkpoint_dir = '/mnt/fs2/locross/analysis/'
-    results_dir = '/home/locross/SocialWorldModeling/results'
+    results_dir = '/home/locross/SocialWorldModeling/results/'
     model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
+elif 'node1-ccn2cluster.stanford.edu' in hostname:
+    analysis_dir = '/data3/locross/SocialWorldModeling/'
+    data_path = '/ccn2/u/ziyxiang/swm_data_and_results/data/swm_data.pkl'
+    data_dir = '/ccn2/u/ziyxiang/swm_data_and_results/data/'
+    checkpoint_dir = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
+    results_dir = '/data3/locross/SocialWorldModeling/results/'
+    model_config_dir = '/data3/locross/SocialWorldModeling/model_configs/'
 
 DEFAULT_VALUES = {
 	'train_seed': 911320,
