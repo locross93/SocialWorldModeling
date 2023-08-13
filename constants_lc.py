@@ -184,9 +184,31 @@ MODEL_DICT_VAL=  {
     'sgnet_10': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
         'model_dir': 'sgnet_cvae_default', 'model_label': 'SGNet 10'},
-    'feudal_10step': {
+    'feudal_5steps': {
         'class': EventModel, 'config': 'hierarchical_event_model.json',
-        'model_dir': 'feudal_10step', 'model_label': 'Feudal 10 Step'},
+        'model_dir': 'feudal_5steps', 'model_label': 'Feudal 5 Step'},
+    'feudal_10steps': {
+        'class': EventModel, 'config': 'hierarchical_event_model.json',
+        'model_dir': 'feudal_10steps', 'model_label': 'Feudal 10 Step'},
+    'feudal_20steps': {
+        'class': EventModel, 'config': 'hierarchical_event_model.json',
+        'model_dir': 'feudal_20steps', 'model_label': 'Feudal 20 Step'},
+    'feudal_30steps': {
+        'class': EventModel, 'config': 'hierarchical_event_model.json',
+        'model_dir': 'feudal_30steps', 'model_label': 'Feudal 30 Step'},
+    'hdelta_5steps': {
+        'class': EventModel, 'config': 'hierarchical_delta_emodel.json',
+        'model_dir': 'hdelta_5steps', 'model_label': 'HDelta 5 Step'},
+    'hdelta_10steps': {
+        'class': EventModel, 'config': 'hierarchical_delta_emodel.json',
+        'model_dir': 'hdelta_10steps', 'model_label': 'HDelta 10 Step'},
+    'hdelta_20steps': {
+        'class': EventModel, 'config': 'hierarchical_delta_emodel.json',
+        'model_dir': 'hdelta_20steps', 'model_label': 'HDelta 20 Step'},
+    'hdelta_30steps': {
+        'class': EventModel, 'config': 'hierarchical_delta_emodel.json',
+        'model_dir': 'hdelta_30steps', 'model_label': 'HDelta 30 Step'},
+
 }
 # Get the hostname of the machine
 hostname = socket.gethostname()
