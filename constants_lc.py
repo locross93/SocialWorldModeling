@@ -229,7 +229,7 @@ DEFAULT_VALUES = {
     'model_config_dir': model_config_dir,
     # general training parameters for all models
     'batch_size': 8 if platform.system() == 'Windows' else 2048,
-    'lr': 1e-5,
+    'lr': 1e-4,
     'epochs': int(3e4),
     'save_every': 200,
     #'model_keys': list(MODEL_DICT_VAL.keys()),
