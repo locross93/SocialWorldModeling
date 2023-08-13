@@ -4,6 +4,7 @@ from models import DreamerV2, MultistepPredictor, \
 from gnn_models.imma import IMMA
 from gnn_models.gat import GAT
 from gnn_models.rfm import RFM
+from sgnet_models.SGNet_CVAE import SGNet_CVAE
 import platform
 import socket
 
@@ -16,6 +17,7 @@ MODEL_DICT_TRAIN = {
     'imma': IMMA,
     'gat': GAT,
     'rfm': RFM,
+    'sgnet_cvae': SGNet_CVAE,
     'multistep_delta': MultistepDelta,
     'event_predictor': EventPredictor,
     'mp_event_context': MSPredictorEventContext,
@@ -179,6 +181,12 @@ MODEL_DICT_VAL=  {
     'gt_end_state_s3': {
         'class': EventModel, 'config': 'event_context_world_model.json',
         'model_dir': 'gt_end_state_s3', 'model_label': 'GT End State S3'},
+    'sgnet_10': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
+        'model_dir': 'sgnet_cvae_default', 'model_label': 'SGNet 10'},
+    'feudal_10step': {
+        'class': EventModel, 'config': 'hierarchical_event_model.json',
+        'model_dir': 'feudal_10step', 'model_label': 'Feudal 10 Step'},
 }
 # Get the hostname of the machine
 hostname = socket.gethostname()

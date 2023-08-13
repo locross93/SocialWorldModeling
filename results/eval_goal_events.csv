@@ -1,2 +1,2 @@
 ,model,score,MSE,epoch,dataset
-0,Pred End State,0.9098360655737705,0.6429778933525085,/data2/locross/analysis/models/pred_end_state/mp_model_epoch19000,swm_data.pkl
+0,SGNet 10,0.0,2.4660634994506836,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default/sgnet_cvae_default_epoch200,swm_data.pkl
