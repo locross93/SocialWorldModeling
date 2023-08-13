@@ -10,5 +10,7 @@
 
     "hidden_size": 256,
     "dropout": 0.2,
-    "K": 20
+    "K": 20,
+    "dec_steps": 20,
+    "goal_horizon": 10
 }
