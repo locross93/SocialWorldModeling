@@ -110,7 +110,6 @@ def main():
             overridden_parameters.append(f"{k}_{v}")
             print(f"{k}_{v}")
 
-    print(config['dec_steps'])
     if config['model_type'] == "sgnet_cvae":
         # if encoder is not specified, use default
         if 'enc_steps' not in config:
