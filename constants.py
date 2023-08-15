@@ -1,7 +1,7 @@
 import os
-from models import DreamerV2, MultistepPredictor, MultistepDelta, \
+from models import DreamerV2, MultistepPredictor, MultistepDelta,  \
     TransformerMSPredictor, TransformerIrisWorldModel, TransformerWorldModel, \
-    EventPredictor, MSPredictorEventContext, EventModel, MultistepPredictor4D
+    EventPredictor, MSPredictorEventContext, EventModel, MultistepPredictor4D, RSSM_Delta
 from agent_former.agentformer import AgentFormer
 from sgnet_models.SGNet_CVAE import SGNet_CVAE
 from gnn_models.imma import IMMA
@@ -15,6 +15,7 @@ MODEL_DICT_TRAIN = {
     'dreamerv2': DreamerV2,
     'multistep_predictor': MultistepPredictor,
     'multistep_delta':  MultistepDelta,
+    'rssm_delta': RSSM_Delta,
     'transformer_wm': TransformerWorldModel,   
     'transformer_mp': TransformerMSPredictor,
     'transformer_iris': TransformerIrisWorldModel,
