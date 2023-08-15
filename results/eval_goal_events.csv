@@ -1,2 +1,4 @@
 ,model,score,MSE,epoch,dataset
-0,Feudal 10 Step,0.0,3.3284881114959717,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/feudal_10steps/mp_model_epoch2800,swm_data.pkl
+0,GT End State S1,0.9950900163666121,0.4531250596046448,/mnt/fs2/locross/analysis/models/gt_end_state_s1/mp_model_epoch4400,swm_data.pkl
+1,GT End State S2,0.9950900163666121,0.44203710556030273,/mnt/fs2/locross/analysis/models/gt_end_state_s2/mp_model_epoch6200,swm_data.pkl
+2,GT End State S3,0.9934533551554828,0.4422409236431122,/mnt/fs2/locross/analysis/models/gt_end_state_s3/mp_model_epoch5800,swm_data.pkl
