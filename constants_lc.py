@@ -263,11 +263,18 @@ elif 'node4-ccn2cluster.stanford.edu' in hostname or 'node5-ccn2cluster.stanford
     checkpoint_dir = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
     results_dir = '/home/locross/SocialWorldModeling/results/'
     model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
-elif 'node02-ccncluster' in hostname or 'node07-ccncluster' in hostname:
+elif 'node07-ccncluster' in hostname:
     analysis_dir = '/home/locross/SocialWorldModeling/'
     data_path = '/mnt/fs2/locross/data/swm_data.pkl'
     data_dir = '/mnt/fs2/locross/data/'
     checkpoint_dir = '/mnt/fs2/locross/analysis/'
+    results_dir = '/home/locross/SocialWorldModeling/results/'
+    model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
+elif 'node02-ccncluster' in hostname:
+    analysis_dir = '/home/locross/SocialWorldModeling/'
+    data_path = '/home/locross/SocialWorldModeling/data/swm_data.pkl'
+    data_dir = '/home/locross/SocialWorldModeling/data/'
+    checkpoint_dir = '/home/locross/SocialWorldModeling/'
     results_dir = '/home/locross/SocialWorldModeling/results/'
     model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
 elif 'node1-ccn2cluster.stanford.edu' in hostname:
