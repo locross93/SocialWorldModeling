@@ -453,8 +453,8 @@ class Analysis(object):
                 closest_event_ind = np.min(traj_event_inds[np.where(traj_event_inds > burn_in_ind)[0]])
             # get event horizon from end state
             event_horizon = closest_event_ind - burn_in_ind
-            event_state = input_data[i,closest_event_ind,:]
-            assert torch.equal(event_state, x[0,closest_event_ind,:])
+            event_state = input_data[i,closest_event_ind,:].unsqueeze(0)
+            assert torch.equal(event_state, x[:,closest_event_ind,:])
             # first normalize event_horizon
             event_horizon = float((event_horizon - 1) / ((300 - 50) - 1))
             event_state = torch.cat([event_state, torch.tensor(event_horizon).unsqueeze(0)], dim=-1)

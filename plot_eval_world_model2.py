@@ -165,9 +165,9 @@ event_type = goal_path.split('_')[-2]
 df = process_plot_data(goal_path)
 
 model_keys = {
-    'GT End State S1' : 'Hierarcical Oracle Model',
-    'GT End State S2' : 'Hierarcical Oracle Model',
-    'GT End State S3' : 'Hierarcical Oracle Model',
+    'GT End State S1' : 'Hierarchical Oracle Model',
+    'GT End State S2' : 'Hierarchical Oracle Model',
+    'GT End State S3' : 'Hierarchical Oracle Model',
     'Multistep Predictor DS3' : 'Multistep Predictor',
     'RSSM Discrete DS3' : 'RSSM Discrete',
     'RSSM Continuous Replay Early' : 'RSSM Continuous',
