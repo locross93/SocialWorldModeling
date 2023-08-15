@@ -209,7 +209,36 @@ MODEL_DICT_VAL=  {
     'hdelta_30steps': {
         'class': EventModel, 'config': 'hierarchical_delta_emodel.json',
         'model_dir': 'hdelta_30steps', 'model_label': 'HDelta 30 Step'},
-
+    'rssm_ds1000': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
+        'model_dir': 'rssm_ds1000', 'model_label': 'RSSM DS1000'},
+    'rssm_ds20000': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
+        'model_dir': 'rssm_ds20000', 'model_label': 'RSSM DS20000'},
+    'mp_ds1000': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
+        'model_dir': 'mp_ds1000', 'model_label': 'MP DS1000'},
+    'mp_ds20000': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
+        'model_dir': 'mp_ds20000', 'model_label': 'MP DS20000'},
+    'rssm_cont_ds1000': {
+        'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_2048.json',
+        'model_dir': 'rssm_cont_ds1000', 'model_label': 'RSSM Cont DS1000'},
+    'rssm_cont_ds20000': {
+        'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_2048.json',
+        'model_dir': 'rssm_cont_ds20000', 'model_label': 'RSSM Cont DS20000'},
+    'md_ds1000': {
+        'class': MultistepDelta, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
+        'model_dir': 'md_ds1000', 'model_label': 'MD DS1000'},
+    'md_ds20000': {
+        'class': MultistepDelta, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
+        'model_dir': 'md_ds20000', 'model_label': 'MD DS20000'},
+    'transformer_ds1000': {
+        'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
+        'model_dir': 'transformer_ds1000', 'model_label': 'Transformer DS1000'},
+    'transformer_ds20000': {
+        'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
+        'model_dir': 'transformer_ds20000', 'model_label': 'Transformer DS20000'},
 }
 # Get the hostname of the machine
 hostname = socket.gethostname()
@@ -234,11 +263,18 @@ elif 'node4-ccn2cluster.stanford.edu' in hostname or 'node5-ccn2cluster.stanford
     checkpoint_dir = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
     results_dir = '/home/locross/SocialWorldModeling/results/'
     model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
-elif 'node02-ccncluster' in hostname or 'node07-ccncluster' in hostname:
+elif 'node07-ccncluster' in hostname:
     analysis_dir = '/home/locross/SocialWorldModeling/'
     data_path = '/mnt/fs2/locross/data/swm_data.pkl'
     data_dir = '/mnt/fs2/locross/data/'
     checkpoint_dir = '/mnt/fs2/locross/analysis/'
+    results_dir = '/home/locross/SocialWorldModeling/results/'
+    model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
+elif 'node02-ccncluster' in hostname:
+    analysis_dir = '/home/locross/SocialWorldModeling/'
+    data_path = '/home/locross/SocialWorldModeling/data/swm_data.pkl'
+    data_dir = '/home/locross/SocialWorldModeling/data/'
+    checkpoint_dir = '/home/locross/SocialWorldModeling/'
     results_dir = '/home/locross/SocialWorldModeling/results/'
     model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
 elif 'node1-ccn2cluster.stanford.edu' in hostname:
@@ -264,12 +300,13 @@ DEFAULT_VALUES = {
     'epochs': int(3e4),
     'save_every': 200,
     #'model_keys': list(MODEL_DICT_VAL.keys()),
-    'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','rssm_cont_h_2048_lr1e-4_s1','md_mlp_2048_lr3e-4_s1','transformer_iris'],
+    #'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','rssm_cont_h_2048_lr1e-4_s1','md_mlp_2048_lr3e-4_s1','transformer_iris'],
     #'model_keys': ['imma','gat','rfm','rfm_rnn'],
     #'model_keys': ['rssm_disc_ds2', 'rssm_disc_ds3', 'rssm_cont_ds3', 'mp_ds3', 'md_ds3', 'transformer_iris'],
     #'model_keys': ['rssm_disc_ds3', 'mp_ds2', 'event_context_mp'],
     #'model_keys': ['rssm_1step', 'rssm_5step', 'rssm_10step', 'rssm_20step', 'rssm_disc_ds3'],
-    #'model_keys': ['event_context_mp', 'em_dropout', 'event_model2', 'emodel_no_horizon', 'pred_end_state', 'em_2048', 'em_lr5e-5', 'em_min_horizon', 'em_gt'],    
+    #'model_keys': ['event_context_mp', 'em_dropout', 'event_model2', 'emodel_no_horizon', 'pred_end_state', 'em_2048', 'em_lr5e-5', 'em_min_horizon', 'em_gt'],   
+    'model_keys': ['gt_end_state_s1', 'gt_end_state_s2', 'gt_end_state_s3'], 
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
