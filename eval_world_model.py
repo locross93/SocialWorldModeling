@@ -426,7 +426,6 @@ class Analysis(object):
                     obj_delta_event = obj_pos_delta[pick_up_event,:]
                     amax_delta = np.argmax(obj_delta_event[:,1])
                     index_percentage = amax_delta / len(obj_delta_event)
-                    breakpoint()
                     if index_percentage < 0.1 or index_percentage > 0.9:
                         picked_up = True
                         dropped = True
