@@ -263,7 +263,7 @@ DEFAULT_VALUES = {
     'epochs': int(3e4),
     'save_every': 200,
     #'model_keys': list(MODEL_DICT_VAL.keys()),
-    'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','rssm_cont_h_2048_lr1e-4_s1','md_mlp_2048_lr3e-4_s1'],
+    'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','rssm_cont_h_2048_lr1e-4_s1','md_mlp_2048_lr3e-4_s1','transformer_iris'],
     #'model_keys': ['imma','gat','rfm','rfm_rnn'],
     #'model_keys': ['rssm_disc_ds2', 'rssm_disc_ds3', 'rssm_cont_ds3', 'mp_ds3', 'md_ds3', 'transformer_iris'],
     #'model_keys': ['rssm_disc_ds3', 'mp_ds2', 'event_context_mp'],

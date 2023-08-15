@@ -1,2 +1,2 @@
 ,model,score,MSE,epoch,dataset
-0,SGNet 10,0.0,2.4660634994506836,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default/sgnet_cvae_default_epoch200,swm_data.pkl
+0,Feudal 10 Step,0.0,3.3284881114959717,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/feudal_10steps/mp_model_epoch2800,swm_data.pkl
