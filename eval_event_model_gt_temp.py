@@ -422,12 +422,11 @@ class Analysis(object):
         batch_inds = np.array(batch_inds)
         imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
         
-        #imagined_trajs = np.zeros(input_data.shape)
         for i in tqdm(goal_inds):
             counter += 1
             if counter % 100 == 0:
                 print(i)
-            x = input_data[i,:,:]#.unsqueeze(0)
+            x = input_data[i,:,:].unsqueeze(0)
             if i in single_goal_trajs:
                 # burn in to a few frames past the goal, so it is clear it is a single goal trial - TO DO THIS WILL BE DIFF FOR DS2
                 # get the only goal point in the trajectory
