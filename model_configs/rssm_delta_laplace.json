@@ -1,0 +1,11 @@
+{
+  "input_size": 35,
+  "deter_size": 1024,
+  "dec_hidden_size": 2048,
+  "rssm_type": "discrete",
+  "rnn_type": "GRU",
+  "category_size": 32,
+  "class_size": 32,
+  "model_type": "rssm_delta",
+  "dec_dist": "laplace"
+}
