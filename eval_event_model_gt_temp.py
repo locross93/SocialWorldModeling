@@ -457,7 +457,7 @@ class Analysis(object):
             assert torch.equal(event_state, x[:,closest_event_ind,:])
             # first normalize event_horizon
             event_horizon = float((event_horizon - 1) / ((300 - 50) - 1))
-            event_state = torch.cat([event_state, torch.tensor(event_horizon).unsqueeze(0)], dim=-1)
+            event_state = torch.cat([event_state, torch.tensor(event_horizon).unsqueeze(0).unsqueeze(0)], dim=-1)
             # Call MSPredictorEventContext's forward_rollout with event_hat
             with torch.no_grad():
                 rollout_x  = model.mp_model.forward_rollout(x.cuda(), event_state.cuda(), burn_in_length, rollout_length).cpu()
