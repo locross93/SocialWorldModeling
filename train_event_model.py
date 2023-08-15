@@ -61,6 +61,7 @@ def load_args():
                         help='Epoch Save Interval')
     parser.add_argument('--input_size', type=int, help='Input size')
     parser.add_argument('--pred_end_state', type=bool, default=False, help='Predict end state')
+    parser.add_argument('--pred_end_traj', type=bool, default=False, help='Predict end of trajectory')
     # model parameters
     parser.add_argument('--mp_rnn_hidden_size', type=int, help='MP RNN hidden size')
     parser.add_argument('--mp_mlp_hidden_size', type=int, help='MP MLP hidden size')
@@ -143,6 +144,8 @@ def main():
     sequence_length = burn_in_length + rollout_length
     if args.pred_end_state:
         replay_buffer = ReplayBufferEndState(burn_in_length, rollout_length, train_data)
+    elif args.pred_end_traj:
+        replay_buffer = ReplayBufferEndState(burn_in_length, rollout_length, train_data, end_traj=True)
     else:
         replay_buffer = ReplayBufferEvents(burn_in_length, rollout_length, train_data, events_dataset['train'])
     batch_size = args.batch_size
@@ -152,9 +155,11 @@ def main():
     # make validation data
     if args.pred_end_state:
         val_buffer = ReplayBufferEndState(burn_in_length, rollout_length, val_data)
+    elif args.pred_end_traj:
+        val_buffer = ReplayBufferEndState(burn_in_length, rollout_length, train_data, end_traj=True)
     else:
         val_buffer = ReplayBufferEvents(burn_in_length, rollout_length, val_data, events_dataset['val'])
-    seed = 100 # set seed so every model sees the same randomization
+    seed = 100 # set seed so every model sees the same randomization of validation data
     val_batch_size = np.min([val_data.size(0), 1000])
     val_trajs, val_event_states, val_event_horizons = val_buffer.sample(val_batch_size, random_seed=seed)
     val_trajs = val_trajs.to(DEVICE)

@@ -340,6 +340,8 @@ class Analysis(object):
             if counter % 100 == 0:
                 print(i)
             x = input_data[i,:,:]#.unsqueeze(0)
+            # store the steps of burn in with real frames in imagined_trajs
+            imagined_trajs[i,:burn_in_length,:] = x[:burn_in_length,:].cpu()
             batch_inds.append(i)
             batch_trajs.append(x)
             if counter > 0 and counter % self.args.batch_size == 0:
@@ -348,7 +350,7 @@ class Analysis(object):
                 batch_x = batch_x.to(self.args.device)#model.DEVICE)
                 rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
                 batch_inds = np.array(batch_inds)
-                imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
+                imagined_trajs[batch_inds,burn_in_length:,:] = rollout_x
                 batch_trajs = []
                 batch_inds = []
         # compute last batch that is less than batch_size
@@ -358,7 +360,6 @@ class Analysis(object):
         batch_inds = np.array(batch_inds)
         imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
         
-        #imagined_trajs = np.zeros(input_data.shape)
         for i in tqdm(goal_inds):
             counter += 1
             if counter % 100 == 0:
@@ -424,7 +425,7 @@ class Analysis(object):
                     # largest y delta should be beginning or end of the sequence
                     obj_delta_event = obj_pos_delta[pick_up_event,:]
                     amax_delta = np.argmax(obj_delta_event[:,1])
-                    index_percentage = amax_delta / len(obj_delta_event) * 100
+                    index_percentage = amax_delta / len(obj_delta_event)
                     if index_percentage < 0.1 or index_percentage > 0.9:
                         picked_up = True
                         dropped = True
@@ -478,7 +479,7 @@ class Analysis(object):
         return accuracy, obj_pick_up_flag, recon_pick_up_flag    
     
     
-    def eval_pickup_events_in_rollouts(self, model, input_data) -> Dict[str, Any]:
+    def eval_pickup_events_in_rollouts(self, model, input_data, partial=1.0) -> Dict[str, Any]:
         if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
@@ -494,6 +495,7 @@ class Analysis(object):
             
         # TO DO, ANALYZE EVERY PICKUP EVENT SEPARATELY, INCLUDING MULTI GOAL TRAJS
         
+        single_goal_trajs = single_goal_trajs[:int(partial*len(single_goal_trajs))]
         num_single_goal_trajs = len(single_goal_trajs)
         imagined_trajs = np.zeros([num_single_goal_trajs, input_data.shape[1], input_data.shape[2]])
         num_timepoints = input_data.size(1)
@@ -590,15 +592,15 @@ class Analysis(object):
         elif self.args.eval_type == 'multigoal_events':
             result = self.eval_multigoal_events_in_rollouts(model, self.input_data, partial=self.args.partial)
         elif self.args.eval_type == 'move_events':
-            result = self.eval_move_events_in_rollouts(model, self.input_data)        
+            result = self.eval_move_events_in_rollouts(model, self.input_data, partial=self.args.partial)        
         elif self.args.eval_type == 'pickup_events':
-            result = self.eval_pickup_events_in_rollouts(model, self.input_data)
+            result = self.eval_pickup_events_in_rollouts(model, self.input_data, partial=self.args.partial)
         elif self.args.eval_type == 'displacement':    # mean/final displacement error
             if 'sgnet' in model_key:
                 batch_size = 32
             else:
                 batch_size = args.batch_size          
-            result = self.compute_displacement_error(model, batch_size=batch_size)
+            result = self.compute_displacement_error(model, batch_size=batch_size, partial=self.args.partial)
         else:
             raise NotImplementedError(f'Evaluation type {self.args.eval_type} not implemented')    
         

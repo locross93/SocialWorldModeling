@@ -2583,13 +2583,15 @@ class ReplayBufferEvents:
 
 
 class ReplayBufferEndState:
-    def __init__(self, burn_in_length, rollout_length, training_set):
+    def __init__(self, burn_in_length, rollout_length, training_set, end_traj=False):
         self.burn_in_length = burn_in_length
         self.rollout_length = rollout_length
         self.sequence_length = burn_in_length + rollout_length
         self.buffer_size = training_set.size(0)
         self.episode_length = training_set.size(1)
         self.buffer = training_set
+        # use end of trial or end of trajectory as end state
+        self.end_traj = end_traj
         
     def sample(self, batch_size, random_seed=None):
         if random_seed is not None:
@@ -2605,11 +2607,16 @@ class ReplayBufferEndState:
             traj_sample = self.buffer[ep_ind,start:end,:]
             assert traj_sample.size(0) == self.sequence_length
             batch_trajs.append(traj_sample)
-            # get last state in that trajectory
-            end_state = self.buffer[ep_ind,-1,:]
+            # get last state in that trajectory/trial
+            if self.end_traj:
+                end_state = self.buffer[ep_ind,end-1,:]
+                # end horizon will be fixed at rollout_length
+                end_horizon = 1.0
+            else:
+                end_state = self.buffer[ep_ind,-1,:]
+                # how far away is the end state, with 0 equaling now, 1 the entire episode length
+                end_horizon = float((self.episode_length - (start + self.burn_in_length)) / (self.episode_length - self.burn_in_length))
             batch_end_states.append(end_state)
-            # how far away is the end state, with 0 equaling now, 1 the entire episode length
-            end_horizon = float((self.episode_length - (start + self.burn_in_length)) / (self.episode_length - self.burn_in_length))
             batch_end_horizons.append(end_horizon)
         trajectories = torch.stack(batch_trajs, dim=0)
         end_states = torch.stack(batch_end_states, dim=0)
@@ -2685,6 +2692,10 @@ class EventPredictor(nn.Module):
             self.dropout = config['dropout']
         else:
             self.dropout = 0
+        if 'pred_delta' in config:
+            self.pred_delta = config['pred_delta']
+        else:
+            self.pred_delta = False
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         
         if self.rnn_type == 'GRU':
@@ -2732,6 +2743,9 @@ class EventPredictor(nn.Module):
     def supervised_loss(self, x, event_state, event_horizon=None):
         batch_size = x.size(0)
         hidden = self.init_hidden(batch_size)
+        if self.pred_delta:
+            # predict delta between current and next event state
+            event_state = event_state - x[:,-1,:]
         if self.predict_horizon:
             out_event_state, out_event_horizon, hidden = self.forward(x, hidden)
         else:

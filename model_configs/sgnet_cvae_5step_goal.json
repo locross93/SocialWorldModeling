@@ -8,9 +8,9 @@
     "latent_dim": 32,
     "dec_with_z": true,
 
-    "hidden_size": 256,
+    "hidden_size": 512,
     "dropout": 0.2,
     "K": 20,
     "dec_steps": 20,
-    "goal_horizon": 10
+    "goal_horizon": 5
 }

@@ -56,7 +56,8 @@ class SGNet_CVAE(nn.Module):
         self.dropout = config["dropout"]
         self.feature_extractor = nn.Sequential(nn.Linear(self.input_dim, self.hidden_size),
                                               nn.ReLU(inplace=True))
-        self.pred_dim = config["pred_dim"]        
+        self.pred_dim = config["pred_dim"]
+        self.goal_horizon = config["goal_horizon"]        
         self.K = config["K"] # number of trajectory        
         # loss
         self.goal_loss = rmse_loss()
@@ -174,7 +175,7 @@ class SGNet_CVAE(nn.Module):
         enc_targets = []
         for i in range(self.enc_steps):
             # @TODO gotta sweep how far in the future the goal should be
-            start_idx = i + 1
+            start_idx = i + self.goal_horizon
             end_idx = start_idx + self.dec_steps
             enc_targets.append(inputs[:, start_idx : end_idx, :])
         enc_targets = torch.stack(enc_targets, dim=1)

@@ -111,8 +111,12 @@ def main():
             print(f"{k}_{v}")
 
     if config['model_type'] == "sgnet_cvae":
-        config['enc_steps'] = args.burn_in_length
-        config['dec_steps'] = args.rollout_length
+        # if encoder is not specified, use default
+        if 'enc_steps' not in config:
+            config['enc_steps'] = args.burn_in_length
+        if 'dec_steps' not in config:
+            print("HERE")
+            config['dec_steps'] = args.rollout_length
     elif config['model_type'] == "agent_former":        
         config['past_frames'] = args.burn_in_length
         config['future_frames'] = args.rollout_length

@@ -4,7 +4,9 @@ from models import DreamerV2, MultistepPredictor, \
 from gnn_models.imma import IMMA
 from gnn_models.gat import GAT
 from gnn_models.rfm import RFM
+from sgnet_models.SGNet_CVAE import SGNet_CVAE
 import platform
+import socket
 
 
 MODEL_DICT_TRAIN = {
@@ -15,6 +17,7 @@ MODEL_DICT_TRAIN = {
     'imma': IMMA,
     'gat': GAT,
     'rfm': RFM,
+    'sgnet_cvae': SGNet_CVAE,
     'multistep_delta': MultistepDelta,
     'rssm_delta': RSSM_Delta,
     'event_predictor': EventPredictor,
@@ -179,23 +182,89 @@ MODEL_DICT_VAL=  {
     'gt_end_state_s3': {
         'class': EventModel, 'config': 'event_context_world_model.json',
         'model_dir': 'gt_end_state_s3', 'model_label': 'GT End State S3'},
+    'sgnet_10': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
+        'model_dir': 'sgnet_cvae_default', 'model_label': 'SGNet 10'},
+    'feudal_5steps': {
+        'class': EventModel, 'config': 'hierarchical_event_model.json',
+        'model_dir': 'feudal_5steps', 'model_label': 'Feudal 5 Step'},
+    'feudal_10steps': {
+        'class': EventModel, 'config': 'hierarchical_event_model.json',
+        'model_dir': 'feudal_10steps', 'model_label': 'Feudal 10 Step'},
+    'feudal_20steps': {
+        'class': EventModel, 'config': 'hierarchical_event_model.json',
+        'model_dir': 'feudal_20steps', 'model_label': 'Feudal 20 Step'},
+    'feudal_30steps': {
+        'class': EventModel, 'config': 'hierarchical_event_model.json',
+        'model_dir': 'feudal_30steps', 'model_label': 'Feudal 30 Step'},
+    'hdelta_5steps': {
+        'class': EventModel, 'config': 'hierarchical_delta_emodel.json',
+        'model_dir': 'hdelta_5steps', 'model_label': 'HDelta 5 Step'},
+    'hdelta_10steps': {
+        'class': EventModel, 'config': 'hierarchical_delta_emodel.json',
+        'model_dir': 'hdelta_10steps', 'model_label': 'HDelta 10 Step'},
+    'hdelta_20steps': {
+        'class': EventModel, 'config': 'hierarchical_delta_emodel.json',
+        'model_dir': 'hdelta_20steps', 'model_label': 'HDelta 20 Step'},
+    'hdelta_30steps': {
+        'class': EventModel, 'config': 'hierarchical_delta_emodel.json',
+        'model_dir': 'hdelta_30steps', 'model_label': 'HDelta 30 Step'},
+
 }
+# Get the hostname of the machine
+hostname = socket.gethostname()
+if 'node05-ccncluster' in hostname:
+    analysis_dir = '/home/locross/SocialWorldModeling/'
+    data_path = '/data2/locross/data/swm_data.pkl'
+    data_dir = '/data2/locross/data/'
+    checkpoint_dir = '/data2/locross/analysis/'
+    results_dir = '/home/locross/SocialWorldModeling/results/'
+    model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
+elif 'DESKTOP-LU5SR6R' in hostname:
+    analysis_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/'
+    data_path = '/Users/locro/Documents/Stanford/analysis/data/swm_data.pkl'
+    data_dir = '/Users/locro/Documents/Stanford/analysis/data/'
+    checkpoint_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/'
+    results_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/results/'
+    model_config_dir = '/Users/locro/Documents/Stanford/SocialWorldModeling/model_configs/'
+elif 'node4-ccn2cluster.stanford.edu' in hostname or 'node5-ccn2cluster.stanford.edu' in hostname:
+    analysis_dir = '/home/locross/SocialWorldModeling/'
+    data_path = '/ccn2/u/ziyxiang/swm_data_and_results/data/swm_data.pkl'
+    data_dir = '/ccn2/u/ziyxiang/swm_data_and_results/data/'
+    checkpoint_dir = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
+    results_dir = '/home/locross/SocialWorldModeling/results/'
+    model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
+elif 'node02-ccncluster' in hostname or 'node07-ccncluster' in hostname:
+    analysis_dir = '/home/locross/SocialWorldModeling/'
+    data_path = '/mnt/fs2/locross/data/swm_data.pkl'
+    data_dir = '/mnt/fs2/locross/data/'
+    checkpoint_dir = '/mnt/fs2/locross/analysis/'
+    results_dir = '/home/locross/SocialWorldModeling/results/'
+    model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
+elif 'node1-ccn2cluster.stanford.edu' in hostname:
+    analysis_dir = '/data3/locross/SocialWorldModeling/'
+    data_path = '/ccn2/u/ziyxiang/swm_data_and_results/data/swm_data.pkl'
+    data_dir = '/ccn2/u/ziyxiang/swm_data_and_results/data/'
+    checkpoint_dir = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
+    results_dir = '/data3/locross/SocialWorldModeling/results/'
+    model_config_dir = '/data3/locross/SocialWorldModeling/model_configs/'
+
 DEFAULT_VALUES = {
 	'train_seed': 911320,
     'eval_seed': 911320, #834869, #(good for SGNet & RSSM Discrete) 
-    'analysis_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/',
-    'data_path': '/Users/locro/Documents/Stanford/analysis/data/swm_data.pkl' if platform.system() == 'Windows' else  '/data2/locross/data/swm_data.pkl',
-    'data_dir': '/Users/locro/Documents/Stanford/analysis/data/' if platform.system() == 'Windows' else  '/data2/locross/data',
-    'checkpoint_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/' if platform.system() == 'Windows' else  '/data2/locross/analysis/',
-    'results_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/results/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/results',
-    'model_config_dir': '/Users/locro/Documents/Stanford/SocialWorldModeling/model_configs/' if platform.system() == 'Windows' else  '/home/locross/SocialWorldModeling/model_configs/',
+    'analysis_dir': analysis_dir,
+    'data_path': data_path,
+    'data_dir': data_dir,
+    'checkpoint_dir': checkpoint_dir,
+    'results_dir': results_dir,
+    'model_config_dir': model_config_dir,
     # general training parameters for all models
     'batch_size': 8 if platform.system() == 'Windows' else 2048,
-    'lr': 1e-5,
+    'lr': 1e-4,
     'epochs': int(3e4),
     'save_every': 200,
     #'model_keys': list(MODEL_DICT_VAL.keys()),
-    'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','rssm_cont_h_2048_lr1e-4_s1','md_mlp_2048_lr3e-4_s1'],
+    'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','rssm_cont_h_2048_lr1e-4_s1','md_mlp_2048_lr3e-4_s1','transformer_iris'],
     #'model_keys': ['imma','gat','rfm','rfm_rnn'],
     #'model_keys': ['rssm_disc_ds2', 'rssm_disc_ds3', 'rssm_cont_ds3', 'mp_ds3', 'md_ds3', 'transformer_iris'],
     #'model_keys': ['rssm_disc_ds3', 'mp_ds2', 'event_context_mp'],
