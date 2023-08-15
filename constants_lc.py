@@ -209,7 +209,36 @@ MODEL_DICT_VAL=  {
     'hdelta_30steps': {
         'class': EventModel, 'config': 'hierarchical_delta_emodel.json',
         'model_dir': 'hdelta_30steps', 'model_label': 'HDelta 30 Step'},
-
+    'rssm_ds1000': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
+        'model_dir': 'rssm_ds1000', 'model_label': 'RSSM DS1000'},
+    'rssm_ds20000': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
+        'model_dir': 'rssm_ds20000', 'model_label': 'RSSM DS20000'},
+    'mp_ds1000': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
+        'model_dir': 'mp_ds1000', 'model_label': 'MP DS1000'},
+    'mp_ds20000': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
+        'model_dir': 'mp_ds20000', 'model_label': 'MP DS20000'},
+    'rssm_cont_ds1000': {
+        'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_2048.json',
+        'model_dir': 'rssm_cont_ds1000', 'model_label': 'RSSM Cont DS1000'},
+    'rssm_cont_ds20000': {
+        'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_2048.json',
+        'model_dir': 'rssm_cont_ds20000', 'model_label': 'RSSM Cont DS20000'},
+    'md_ds1000': {
+        'class': MultistepDelta, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
+        'model_dir': 'md_ds1000', 'model_label': 'MD DS1000'},
+    'md_ds20000': {
+        'class': MultistepDelta, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
+        'model_dir': 'md_ds20000', 'model_label': 'MD DS20000'},
+    'transformer_ds1000': {
+        'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
+        'model_dir': 'transformer_ds1000', 'model_label': 'Transformer DS1000'},
+    'transformer_ds20000': {
+        'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
+        'model_dir': 'transformer_ds20000', 'model_label': 'Transformer DS20000'},
 }
 # Get the hostname of the machine
 hostname = socket.gethostname()

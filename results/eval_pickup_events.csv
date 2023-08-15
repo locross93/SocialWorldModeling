@@ -1,2 +1,6 @@
 ,model,score,epoch,dataset
-0,RSSM 1 Step Rollout,0.532733224222586,/data2/locross/analysis/models/rssm_1step/rssm_1step_epoch14200,swm_data.pkl
+0,MP-S1,0.26229508196721313,/data2/locross/analysis/models/mp_mlp_2048_lr3e-4_s1/mp_mlp_2048_lr3e-4_s1_epoch29999,swm_data.pkl
+1,RSSM-S1,0.26229508196721313,/data2/locross/analysis/models/rssm_disc_h_2048_lr3e-4_s1/rssm_disc_h_2048_lr3e-4_s1_epoch24200,swm_data.pkl
+2,RSSM-Cont-S1,0.18032786885245902,/data2/locross/analysis/models/rssm_cont_h_2048_lr1e-4_s1/rssm_cont_h_2048_lr1e-4_s1_epoch9000,swm_data.pkl
+3,MP-S1,0.2540983606557377,/data2/locross/analysis/models/md_mlp_2048_lr3e-4_s1/md_mlp_2048_lr3e-4_s1_epoch13800,swm_data.pkl
+4,Transformer Iris Concat Pos Embd lr1e-4,0.29508196721311475,/data2/locross/analysis/models/transformer_iris_concat_pos_embd_lr1e-4/transformer_iris_concat_pos_embd_lr1e-4_epoch28800,swm_data.pkl

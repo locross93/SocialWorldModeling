@@ -520,6 +520,8 @@ class Analysis(object):
             # rollout model for the rest of the trajectory
             rollout_length = num_timepoints - burn_in_length
             rollout_x = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu().detach()
+            # replace any nan or inf values with 0
+            rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x)] = 0
             # get end portion of true trajectory to compare to rollout
             real_traj = x[:,burn_in_length:,:].to("cpu")
             assert rollout_x.size() == real_traj.size()
