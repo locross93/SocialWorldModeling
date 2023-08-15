@@ -7,6 +7,7 @@ Created on Mon Feb  6 12:00:58 2023
 
 import json
 import os
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 import torch
 import pickle
 import numpy as np
@@ -173,6 +174,19 @@ model_keys = {
     'Multistep Delta DS3' : 'Multistep Delta',
     'Transformer Iris Concat Pos Embd lr1e-4' : 'Transformer'
     }
+
+
+# Filtering rows where 'model' is in the keys of the model_keys dictionary
+df_results = df[df['model'].isin(model_keys.keys())].copy()
+
+# Replacing the 'model' values using the model_keys dictionary
+df_results['model'] = df_results['model'].map(model_keys)
+
+# Displaying the first few rows of the new dataframe
+df_results.head()
+
+breakpoint()
+
 save_figs = True
 if save_figs:
     save_file = result_path.split('.')[0] + '.png'

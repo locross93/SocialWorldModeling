@@ -454,7 +454,7 @@ class Analysis(object):
             # get event horizon from end state
             event_horizon = closest_event_ind - burn_in_ind
             event_state = input_data[i,closest_event_ind,:]
-            assert torch.equal(event_state, x[closest_event_ind,:])
+            assert torch.equal(event_state, x[:,closest_event_ind,:])
             # first normalize event_horizon
             event_horizon = float((event_horizon - 1) / ((300 - 50) - 1))
             event_state = torch.cat([event_state, torch.tensor(event_horizon).unsqueeze(0)], dim=-1)
