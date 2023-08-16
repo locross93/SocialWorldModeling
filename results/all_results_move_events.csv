@@ -28,5 +28,8 @@
 26,0.4204474715295324,0.4202659632926695,0.9998256928708384,TF Emb2048 S1,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s1/tf_emb2048_lr1e-4_s1_epoch600,data_5_31_23.pkl
 27,0.4202277637408912,0.420179454312397,0.9999128464354192,TF Emb2048 S2,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s2/tf_emb2048_lr1e-4_s2_epoch600,data_5_31_23.pkl
 28,0.4204474715295324,0.4202659632926695,0.9998256928708384,TF Emb2048 S3,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s3/tf_emb2048_lr1e-4_s3_epoch600,data_5_31_23.pkl
-29,0.7547328719469771,0.9560733384262796,0.43629074429144155,SGNet-H512,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default_lr1e-4/sgnet_cvae_default_lr1e-4_epoch1000,data_5_31_23.pkl
+29,0.7547328719469771,0.9560733384262796,0.4362907442914415,SGNet-H512,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_default_lr1e-4/sgnet_cvae_default_lr1e-4_epoch1000,data_5_31_23.pkl
 30,0.7508879856457578,0.862937062937063,0.4839637441171344,SGNet-H256,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet_cvae_hidden_size256_lr1e-4/sgnet_cvae_hidden_size256_lr1e-4_epoch1200,data_5_31_23.pkl
+31,0.5542128968471932,0.4833174451858913,0.8837371448492244,GT End State S1,/mnt/fs2/locross/analysis/models/gt_end_state_s1/mp_model_epoch4600,swm_data.pkl
+32,0.5596689735984474,0.4867948041988209,0.885131601882517,GT End State S2,/mnt/fs2/locross/analysis/models/gt_end_state_s2/mp_model_epoch6400,swm_data.pkl
+33,0.5565930645574719,0.4849147146861785,0.8894892801115566,GT End State S3,/mnt/fs2/locross/analysis/models/gt_end_state_s3/mp_model_epoch6000,swm_data.pkl
