@@ -64,7 +64,7 @@ MODEL_DICT_VAL=  {
         'model_dir': 'rssm_cont_h_2048_lr1e-4_s3', 'model_label': 'RSSM-Cont-S3'},
     'md_mlp_2048_lr3e-4_s1' : {
         'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
-        'model_dir': 'md_mlp_2048_lr3e-4_s1', 'model_label': 'MP-S1'},
+        'model_dir': 'md_mlp_2048_lr3e-4_s1', 'model_label': 'MD-S1'},
     'md_mlp_2048_lr3e-4_s2' : {
         'class': MultistepPredictor, 'config': 'multistep_delta_ds2_mlp_hidden_size_2048.json',
         'model_dir': 'md_mlp_2048_lr3e-4_s2', 'model_label': 'MD-S2'},
