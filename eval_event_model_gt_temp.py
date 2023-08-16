@@ -657,7 +657,11 @@ class Analysis(object):
                     rollout_x = []
                     for i in tqdm(range(0, total_trials, batch_size)):
                         x = real_trajs[i: i+batch_size, :, :]
-                        y = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu()
+                        # end state
+                        print('Use End State to Condition World Model')
+                        if args.use_end_state:
+                            y  = model.mp_model.forward_rollout(x.cuda(), x[:,-1,:].cuda(), burn_in_length, rollout_length).cpu()
+                        #y = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu()
                         rollout_x.append(y)
                         torch.cuda.empty_cache()
                     rollout_x = torch.cat(rollout_x, dim=0)
