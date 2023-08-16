@@ -19,7 +19,7 @@ from typing import List, Tuple, Dict, Any
 from tqdm import tqdm
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
-from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
+from constants import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
 from analysis_utils import load_config, get_highest_numbered_file, get_data_columns, init_model_class, inverse_normalize
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
@@ -139,6 +139,7 @@ class Analysis(object):
         real_trajs = []
         imag_trajs = []
 
+        print('10 more frames of burn in')
         for i,row in enumerate(single_goal_trajs):
             if i%50 == 0:
                 print(i)
@@ -154,6 +155,8 @@ class Analysis(object):
                 else:
                     # TO DO - don't include trial if not enough burn in available
                     steps2pickup = steps2pickup - 1
+            # VERY TEMP - 10 MORE FRAMES OF BURNIN
+            steps2pickup = steps2pickup + 10
             # store the steps before pick up with real frames in imagined_trajs
             imagined_trajs[i,:steps2pickup,:] = x[:,:steps2pickup,:].cpu()
             # rollout model for the rest of the trajectory

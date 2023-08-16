@@ -89,15 +89,15 @@ MODEL_DICT_VAL=  {
     # 'tf_emb1024_lr1e-4_s3': {
     #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_1024_config.json',
     #     'model_dir': 'tf_emb1024_lr1e-4_s3', 'model_label': 'TF Emb1024 S3'},
-    # 'tf_emb2048_lr1e-4_s1': {
-    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
-    #     'model_dir': 'tf_emb2048_lr1e-4_s1', 'model_label': 'TF Emb2048 S1'},
-    # 'tf_emb2048_lr1e-4_s2': {
-    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
-    #     'model_dir': 'tf_emb2048_lr1e-4_s2', 'model_label': 'TF Emb2048 S2', "epoch": "400"},
-    # 'tf_emb2048_lr1e-4_s3': {
-    #     'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
-    #     'model_dir': 'tf_emb2048_lr1e-4_s3', 'model_label': 'TF Emb2048 S3'},
+    'tf_emb2048_lr1e-4_s1': {
+        'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
+        'model_dir': 'tf_emb2048_lr1e-4_s1', 'model_label': 'TF Emb2048 S1'},
+    'tf_emb2048_lr1e-4_s2': {
+        'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
+        'model_dir': 'tf_emb2048_lr1e-4_s2', 'model_label': 'TF Emb2048 S2', "epoch": "400"},
+    'tf_emb2048_lr1e-4_s3': {
+        'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
+        'model_dir': 'tf_emb2048_lr1e-4_s3', 'model_label': 'TF Emb2048 S3'},
     'sgnet_cvae_lr1e-4': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
         'model_dir': 'sgnet_cvae_default_lr1e-4', 'model_label': 'SGNet-H512'},
@@ -134,7 +134,12 @@ DEFAULT_VALUES = {
     'save_every': 200,
     # eval parameters
     #'model_keys': [ 'trans_wm_replay_early', 'mp_replay_early', 'transformer_iris_concat_pos_embd_lr1e-4', 'mp_4096_ds3', 'md_4096_ds3',],
-    'model_keys': list(MODEL_DICT_VAL.keys()),
+    'model_keys': ['mp_mlp_2048_lr3e-4_s1', 'mp_mlp_2048_lr3e-4_s2', 'mp_mlp_2048_lr3e-4_s3', 
+                   'rssm_disc_h_2048_lr3e-4_s1', 'rssm_disc_h_2048_lr3e-4_s2', 'rssm_disc_h_2048_lr3e-4_s3', 
+                    'rssm_cont_h_2048_lr1e-4_s1', 'rssm_cont_h_2048_lr1e-4_s2', 'rssm_cont_h_2048_lr1e-4_s3',
+                    'md_mlp_2048_lr3e-4_s1', 'md_mlp_2048_lr3e-4_s2', 'md_mlp_2048_lr3e-4_s3',
+                    'tf_emb2048_lr1e-4_s1', 'tf_emb2048_lr1e-4_s2', 'tf_emb2048_lr1e-4_s3'],
+    #'model_keys': list(MODEL_DICT_VAL.keys()),
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
@@ -143,8 +148,9 @@ DEFAULT_VALUES = {
 
 DATASET_NUMS = {
     'train_test_splits_3D_dataset.pkl': 1,
-    'dataset_5_25_23.pkl': 2, 
-    'swm_data': 3
+    'dataset_5_25_23.pkl': 2,
+    'swm_data.pkl': 3,
+    'data_norm_velocity.pkl': 4,
 }
 
 BEHV_CATE_DICT = {
