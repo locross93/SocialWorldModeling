@@ -139,7 +139,6 @@ class Analysis(object):
         real_trajs = []
         imag_trajs = []
 
-        print('10 more frames of burn in')
         for i,row in enumerate(single_goal_trajs):
             if i%50 == 0:
                 print(i)
@@ -155,8 +154,6 @@ class Analysis(object):
                 else:
                     # TO DO - don't include trial if not enough burn in available
                     steps2pickup = steps2pickup - 1
-            # VERY TEMP - 10 MORE FRAMES OF BURNIN
-            steps2pickup = steps2pickup + 10
             # store the steps before pick up with real frames in imagined_trajs
             imagined_trajs[i,:steps2pickup,:] = x[:,:steps2pickup,:].cpu()
             # rollout model for the rest of the trajectory
@@ -173,7 +170,6 @@ class Analysis(object):
         x_true = torch.cat(real_trajs, dim=1)
         x_hat = torch.cat(imag_trajs, dim=1)
         full_trajs = input_data[single_goal_trajs,:,:].cpu()
-        #breakpoint()
         if 'min_max_values' in self.exp_info_dict:
             # data is normalize, project it back into regular input space
             min_values, max_values = self.exp_info_dict['min_max_values']
