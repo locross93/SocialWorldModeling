@@ -159,7 +159,8 @@ def plot_eval_wm_results(result_path, save_figs=True, title_fontsize=title_fonts
                      label_fontsize=label_fontsize,
                      legend_fontsize=label_fontsize)
 
-goal_path = 'results/all_results_goal_events.csv'
+#goal_path = 'results/all_results_goal_events.csv'
+goal_path = 'results/goal_events_10_more_burnin.csv'
 event_type = goal_path.split('_')[-2]
 #df = pd.read_csv(result_path, index_col=0)
 df = process_plot_data(goal_path)
@@ -168,11 +169,21 @@ model_keys = {
     'GT End State S1' : 'Hierarchical Oracle Model',
     'GT End State S2' : 'Hierarchical Oracle Model',
     'GT End State S3' : 'Hierarchical Oracle Model',
-    'Multistep Predictor DS3' : 'Multistep Predictor',
-    'RSSM Discrete DS3' : 'RSSM Discrete',
-    'RSSM Continuous Replay Early' : 'RSSM Continuous',
-    'Multistep Delta DS3' : 'Multistep Delta',
-    'Transformer Iris Concat Pos Embd lr1e-4' : 'Transformer'
+    'MP-S1' : 'Multistep Predictor',
+    'MP-S2' : 'Multistep Predictor',
+    'MP-S3' : 'Multistep Predictor',
+    'RSSM-S1' : 'RSSM Discrete',
+    'RSSM-S2' : 'RSSM Discrete',
+    'RSSM-S3' : 'RSSM Discrete',
+    'RSSM-Cont-S1' : 'RSSM Continuous',
+    'RSSM-Cont-S2' : 'RSSM Continuous',
+    'RSSM-Cont-S3' : 'RSSM Continuous',
+    'MD-S1' : 'Multistep Delta',
+    'MD-S2' : 'Multistep Delta',
+    'MD-S3' : 'Multistep Delta',
+    'TF Emb2048 S1' : 'Transformer',
+    'TF Emb2048 S2' : 'Transformer',
+    'TF Emb2048 S3' : 'Transformer',
     }
 
 
