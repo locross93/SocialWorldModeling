@@ -1,6 +1,4 @@
 ,model,score,epoch,dataset
-0,MP-S1,0.26229508196721313,/data2/locross/analysis/models/mp_mlp_2048_lr3e-4_s1/mp_mlp_2048_lr3e-4_s1_epoch29999,swm_data.pkl
-1,RSSM-S1,0.26229508196721313,/data2/locross/analysis/models/rssm_disc_h_2048_lr3e-4_s1/rssm_disc_h_2048_lr3e-4_s1_epoch24200,swm_data.pkl
-2,RSSM-Cont-S1,0.18032786885245902,/data2/locross/analysis/models/rssm_cont_h_2048_lr1e-4_s1/rssm_cont_h_2048_lr1e-4_s1_epoch9000,swm_data.pkl
-3,MP-S1,0.2540983606557377,/data2/locross/analysis/models/md_mlp_2048_lr3e-4_s1/md_mlp_2048_lr3e-4_s1_epoch13800,swm_data.pkl
-4,Transformer Iris Concat Pos Embd lr1e-4,0.29508196721311475,/data2/locross/analysis/models/transformer_iris_concat_pos_embd_lr1e-4/transformer_iris_concat_pos_embd_lr1e-4_epoch28800,swm_data.pkl
+0,GT End State S1,0.2160392798690671,/mnt/fs2/locross/analysis/models/gt_end_state_s1/mp_model_epoch4600,swm_data.pkl
+1,GT End State S2,0.18576104746317512,/mnt/fs2/locross/analysis/models/gt_end_state_s2/mp_model_epoch6400,swm_data.pkl
+2,GT End State S3,0.2037643207855974,/mnt/fs2/locross/analysis/models/gt_end_state_s3/mp_model_epoch6000,swm_data.pkl

@@ -4,9 +4,10 @@ Created on Mon Feb  6 12:00:58 2023
 
 @author: locro
 """
-#%%
+
 import json
 import os
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 import torch
 import pickle
 import numpy as np
@@ -14,9 +15,7 @@ import pandas as pd
 import matplotlib.pylab as plt
 import seaborn as sns
 import scipy.stats as stats
-#%%
 
-#%%
 title_fontsize=28
 xtick_fontsize=12
 label_fontsize=20
@@ -159,27 +158,55 @@ def plot_eval_wm_results(result_path, save_figs=True, title_fontsize=title_fonts
                      xtick_fontsize=xtick_fontsize, 
                      label_fontsize=label_fontsize,
                      legend_fontsize=label_fontsize)
-#%%
 
-#%%
 goal_path = 'results/all_results_goal_events.csv'
+event_type = goal_path.split('_')[-2]
+#df = pd.read_csv(result_path, index_col=0)
+df = process_plot_data(goal_path)
+
+model_keys = {
+    'GT End State S1' : 'Hierarchical Oracle Model',
+    'GT End State S2' : 'Hierarchical Oracle Model',
+    'GT End State S3' : 'Hierarchical Oracle Model',
+    'Multistep Predictor DS3' : 'Multistep Predictor',
+    'RSSM Discrete DS3' : 'RSSM Discrete',
+    'RSSM Continuous Replay Early' : 'RSSM Continuous',
+    'Multistep Delta DS3' : 'Multistep Delta',
+    'Transformer Iris Concat Pos Embd lr1e-4' : 'Transformer'
+    }
+
+
+# Filtering rows where 'model' is in the keys of the model_keys dictionary
+df_results = df[df['model'].isin(model_keys.keys())].copy()
+
+# Replacing the 'model' values using the model_keys dictionary
+df_results['model'] = df_results['model'].map(model_keys)
+
+# Displaying the first few rows of the new dataframe
+df_results.head()
+
+breakpoint()
+
+save_figs = True
+if save_figs:
+    save_file = result_path.split('.')[0] + '.png'
+else:
+    save_file = None
+
 plot_eval_wm_results(goal_path, title_fontsize=title_fontsize, 
                      xtick_fontsize=xtick_fontsize, 
                      label_fontsize=label_fontsize,
                      legend_fontsize=label_fontsize)
-#%%
 
-#%%
-multigoal_path = 'results/all_results_multigoal_events.csv'
-plot_eval_wm_results(multigoal_path)
-#%%
+# multigoal_path = 'results/all_results_multigoal_events.csv'
+# plot_eval_wm_results(multigoal_path)
+# #%%
 
-#%%
-move_path = 'results/all_results_move_events.csv'
-plot_eval_wm_results(move_path)
-#%%
+# #%%
+# move_path = 'results/all_results_move_events.csv'
+# plot_eval_wm_results(move_path)
+# #%%
 
-#%%
-pickup_path = 'results/all_results_pickup_events.csv'
-plot_eval_wm_results(pickup_path)
-#%%
+# #%%
+# pickup_path = 'results/all_results_pickup_events.csv'
+# plot_eval_wm_results(pickup_path)

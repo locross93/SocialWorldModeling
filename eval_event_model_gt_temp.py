@@ -422,12 +422,11 @@ class Analysis(object):
         batch_inds = np.array(batch_inds)
         imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
         
-        #imagined_trajs = np.zeros(input_data.shape)
         for i in tqdm(goal_inds):
             counter += 1
             if counter % 100 == 0:
                 print(i)
-            x = input_data[i,:,:]#.unsqueeze(0)
+            x = input_data[i,:,:].unsqueeze(0)
             if i in single_goal_trajs:
                 # burn in to a few frames past the goal, so it is clear it is a single goal trial - TO DO THIS WILL BE DIFF FOR DS2
                 # get the only goal point in the trajectory
@@ -454,11 +453,11 @@ class Analysis(object):
                 closest_event_ind = np.min(traj_event_inds[np.where(traj_event_inds > burn_in_ind)[0]])
             # get event horizon from end state
             event_horizon = closest_event_ind - burn_in_ind
-            event_state = input_data[i,closest_event_ind,:]
-            assert torch.equal(event_state, x[closest_event_ind,:])
+            event_state = input_data[i,closest_event_ind,:].unsqueeze(0)
+            assert torch.equal(event_state, x[:,closest_event_ind,:])
             # first normalize event_horizon
             event_horizon = float((event_horizon - 1) / ((300 - 50) - 1))
-            event_state = torch.cat([event_state, torch.tensor(event_horizon).unsqueeze(0)], dim=-1)
+            event_state = torch.cat([event_state, torch.tensor(event_horizon).unsqueeze(0).unsqueeze(0)], dim=-1)
             # Call MSPredictorEventContext's forward_rollout with event_hat
             with torch.no_grad():
                 rollout_x  = model.mp_model.forward_rollout(x.cuda(), event_state.cuda(), burn_in_length, rollout_length).cpu()

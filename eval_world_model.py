@@ -19,7 +19,7 @@ from typing import List, Tuple, Dict, Any
 from tqdm import tqdm
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
-from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
+from constants import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
 from analysis_utils import load_config, get_highest_numbered_file, get_data_columns, init_model_class, inverse_normalize
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
@@ -170,7 +170,6 @@ class Analysis(object):
         x_true = torch.cat(real_trajs, dim=1)
         x_hat = torch.cat(imag_trajs, dim=1)
         full_trajs = input_data[single_goal_trajs,:,:].cpu()
-        #breakpoint()
         if 'min_max_values' in self.exp_info_dict:
             # data is normalize, project it back into regular input space
             min_values, max_values = self.exp_info_dict['min_max_values']
@@ -186,9 +185,9 @@ class Analysis(object):
             full_trajs = full_trajs[:,:,::2]
         mse = ((x_true - x_hat)**2).mean().item()
 
-        scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num, obj_dist_thr=2.0, agent_dist_thr=1.0)
+        #scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num, obj_dist_thr=2.0, agent_dist_thr=1.0)
         # Easier
-        #scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num, obj_dist_thr=2.0, agent_dist_thr=None)
+        scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num, obj_dist_thr=2.0, agent_dist_thr=None)
         # evaluate whether only appropriate goals (after object picked up) are reconstructed
         pickup_subset = pickup_timepoints[single_goal_trajs,:]
         indices = np.argwhere(pickup_subset > -1)

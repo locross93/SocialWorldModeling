@@ -32,10 +32,13 @@
 30,Event Context World Model,0.3870703764320785,1.821455121040344,5400,swm_data.pkl
 31,RSSM 1 Step Rollout,0.3584288052373158,2.411444902420044,/data2/locross/analysis/models/rssm_1step/rssm_1step_epoch10400,swm_data.pkl
 32,RSSM 5 Step Rollout,0.2013093289689034,2.3391599655151367,/data2/locross/analysis/models/rssm_5step/rssm_5step_epoch9800,swm_data.pkl
-33,RSSM 10 Step Rollout,0.23240589198036,2.3981001377105717,/data2/locross/analysis/models/rssm_10step/rssm_10step_epoch9200,swm_data.pkl
+33,RSSM 10 Step Rollout,0.23240589198036,2.398100137710572,/data2/locross/analysis/models/rssm_10step/rssm_10step_epoch9200,swm_data.pkl
 34,RSSM 20 Step Rollout,0.1563011456628477,2.473283290863037,/data2/locross/analysis/models/rssm_20step/rssm_20step_epoch8200,swm_data.pkl
 35,RSSM Discrete DS3,0.3150572831423895,2.273829460144043,/data2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch29999,swm_data.pkl
 36,MP-S1,0.0851063829787234,2.163022994995117,/data2/locross/analysis/models/mp_mlp_2048_lr3e-4_s1/mp_mlp_2048_lr3e-4_s1_epoch29999,swm_data.pkl
-37,RSSM-S1,0.24386252045826515,2.1874940395355225,/data2/locross/analysis/models/rssm_disc_h_2048_lr3e-4_s1/rssm_disc_h_2048_lr3e-4_s1_epoch24200,swm_data.pkl
-38,RSSM-Cont-S1,0.0016366612111292963,,/data2/locross/analysis/models/rssm_cont_h_2048_lr1e-4_s1/rssm_cont_h_2048_lr1e-4_s1_epoch9000,swm_data.pkl
-39,MP-S1,0.02618657937806874,2.2612075805664062,/data2/locross/analysis/models/md_mlp_2048_lr3e-4_s1/md_mlp_2048_lr3e-4_s1_epoch13800,swm_data.pkl
+37,RSSM-S1,0.2438625204582651,2.1874940395355225,/data2/locross/analysis/models/rssm_disc_h_2048_lr3e-4_s1/rssm_disc_h_2048_lr3e-4_s1_epoch24200,swm_data.pkl
+38,RSSM-Cont-S1,0.0016366612111292,,/data2/locross/analysis/models/rssm_cont_h_2048_lr1e-4_s1/rssm_cont_h_2048_lr1e-4_s1_epoch9000,swm_data.pkl
+39,MP-S1,0.0261865793780687,2.2612075805664062,/data2/locross/analysis/models/md_mlp_2048_lr3e-4_s1/md_mlp_2048_lr3e-4_s1_epoch13800,swm_data.pkl
+40,GT End State S1,0.9950900163666121,0.4531250596046448,/mnt/fs2/locross/analysis/models/gt_end_state_s1/mp_model_epoch4400,swm_data.pkl
+41,GT End State S2,0.9950900163666121,0.44203710556030273,/mnt/fs2/locross/analysis/models/gt_end_state_s2/mp_model_epoch6200,swm_data.pkl
+42,GT End State S3,0.9934533551554828,0.4422409236431122,/mnt/fs2/locross/analysis/models/gt_end_state_s3/mp_model_epoch5800,swm_data.pkl

@@ -1,2 +1,2 @@
 ,model,score,MSE,epoch,dataset
-0,Feudal 10 Step,0.0,3.3284881114959717,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/feudal_10steps/mp_model_epoch2800,swm_data.pkl
+0,MP-S1,0.22131147540983606,2.12984299659729,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/mp_mlp_2048_lr3e-4_s1/mp_mlp_2048_lr3e-4_s1_epoch29999,swm_data.pkl

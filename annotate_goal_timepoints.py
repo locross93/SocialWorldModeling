@@ -12,7 +12,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 from analysis_utils import get_data_columns
 
 
-def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_location=False, plot=True, ds_num=2, obj_dist_thr=2.0, agent_dist_thr=1.0):
+def eval_recon_goals(input_matrices, recon_matrices, model_name='', final_location=False, plot=True, ds_num=2, obj_dist_thr=2.0, agent_dist_thr=None):
     if hasattr(recon_matrices, 'requires_grad') and recon_matrices.requires_grad:
         recon_matrices = recon_matrices.detach().numpy()
         
