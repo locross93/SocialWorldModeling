@@ -606,7 +606,7 @@ class Analysis(object):
                 batch_size = 32
             else:
                 batch_size = args.batch_size          
-            result = self.compute_displacement_error(model, batch_size=batch_size, partial=self.args.partial)
+            result = self.compute_displacement_error(model, batch_size=batch_size)
         else:
             raise NotImplementedError(f'Evaluation type {self.args.eval_type} not implemented')    
         
