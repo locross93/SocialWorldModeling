@@ -185,6 +185,21 @@ MODEL_DICT_VAL=  {
     'sgnet_10': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
         'model_dir': 'sgnet_cvae_default', 'model_label': 'SGNet 10'},
+    'sgnet_5': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_5step_goal.json',
+        'model_dir': 'sgnet_cvae_5step_goal', 'model_label': 'SGNet 5'},
+    'sgnet_1': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_1step_goal.json',
+        'model_dir': 'sgnet_cvae_1step_goal', 'model_label': 'SGNet 1'},
+    'sgnet_cvae_hidden_size256': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size256_config.json',
+        'model_dir': 'sgnet_cvae_hidden_size256', 'model_label': 'SGNet 256'},
+    'sgnet_cvae_hidden_size128': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size128_config.json',
+        'model_dir': 'sgnet_cvae_hidden_size128', 'model_label': 'SGNet 128'},
+    'sgnet_cvae_hidden_size64': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
+        'model_dir': 'sgnet_cvae_hidden_size64', 'model_label': 'SGNet 64'},
     'feudal_5steps': {
         'class': EventModel, 'config': 'hierarchical_event_model.json',
         'model_dir': 'feudal_5steps', 'model_label': 'Feudal 5 Step'},
