@@ -187,10 +187,10 @@ MODEL_DICT_VAL=  {
         'model_dir': 'sgnet_cvae_default', 'model_label': 'SGNet 10'},
     'sgnet_5': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_5step_goal.json',
-        'model_dir': 'sgnet_cvae_5step_goal', 'model_label': 'SGNet 5'},
+        'model_dir': 'sgnet_cvae_5step', 'model_label': 'SGNet 5'},
     'sgnet_1': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_1step_goal.json',
-        'model_dir': 'sgnet_cvae_1step_goal', 'model_label': 'SGNet 1'},
+        'model_dir': 'sgnet_cvae_1step', 'model_label': 'SGNet 1'},
     'sgnet_cvae_hidden_size256': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size256_config.json',
         'model_dir': 'sgnet_cvae_hidden_size256', 'model_label': 'SGNet 256'},
