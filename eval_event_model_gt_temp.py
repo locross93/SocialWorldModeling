@@ -657,7 +657,6 @@ class Analysis(object):
                     for i in tqdm(range(0, total_trials, batch_size)):
                         x = real_trajs[i: i+batch_size, :, :]
                         # end state
-                        print('Use End State to Condition World Model')
                         if args.use_end_state:
                             event_state = x[:,-1,:]
                             # get event horizon from end state
@@ -667,8 +666,7 @@ class Analysis(object):
                             # copy event_horizon for every batch element
                             event_horizon = torch.tensor([event_horizon]*x.size(0)).unsqueeze(1)
                             event_state = torch.cat([event_state, event_horizon], dim=-1)
-                            breakpoint()
-                            y  = model.mp_model.forward_rollout(x.cuda(), x[:,-1,:].cuda(), burn_in_length, rollout_length).cpu()
+                            y  = model.mp_model.forward_rollout(x.cuda(), event_state.cuda(), burn_in_length, rollout_length).cpu()
                         #y = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu()
                         rollout_x.append(y)
                         torch.cuda.empty_cache()
