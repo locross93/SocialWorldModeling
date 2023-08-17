@@ -178,12 +178,15 @@ class Analysis(object):
             x_hat = inverse_normalize(x_hat, max_values.astype(np.float32), min_values.astype(np.float32), velocity)
             full_trajs = inverse_normalize(full_trajs, max_values.astype(np.float32), min_values.astype(np.float32), velocity)
         if any('vel' in item for item in self.data_columns):
-            #breakpoint()
             # remove velocity columns
             x_true = x_true[:,:,::2]
             x_hat = x_hat[:,:,::2]
             full_trajs = full_trajs[:,:,::2]
-        mse = ((x_true - x_hat)**2).mean().item()
+        # mse = ((x_true - x_hat)**2).mean().item()
+        # compute average displacement error by computing euclidean distance between predicted and real trajectories
+        ade = torch.mean(torch.norm(x_hat - x_true, p=2, dim=-1))
+        # compute final displacement error
+        fde = torch.mean(torch.norm(x_hat[:, -1] - x_true[:, -1], p=2, dim=-1))
 
         #scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num, obj_dist_thr=2.0, agent_dist_thr=1.0)
         # Easier
@@ -193,7 +196,7 @@ class Analysis(object):
         indices = np.argwhere(pickup_subset > -1)
         accuracy = np.mean(y_recon[indices[:,0],indices[:,1]])
         
-        result = {'model': self.model_name, 'score': accuracy, 'MSE': mse}        
+        result = {'model': self.model_name, 'score': accuracy, 'ADE': ade, 'FDE': fde}        
         return result
            
     def eval_multigoal_events_in_rollouts(self, model, input_data, partial=1.0) -> Dict[str, Any]:        
@@ -444,6 +447,7 @@ class Analysis(object):
         num_objs = 3
         obj_pick_up_flag = np.zeros([num_trials, 3])
         for i in range(num_trials):
+            print(i)
             trial_x = input_matrices[i,:,:]
             for j in range(num_objs):
                 pos_inds = [data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
@@ -459,6 +463,7 @@ class Analysis(object):
                     
         recon_pick_up_flag = np.zeros([num_trials, 3])
         for i in range(num_trials):
+            print(i)
             trial_x = recon_matrices[i,:,:]
             for j in range(num_objs):
                 pos_inds = [data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
