@@ -624,7 +624,7 @@ class Analysis(object):
                     # compute average displacement error by computing euclidean distance between predicted and real trajectories
                     ade = torch.mean(torch.norm(rollout_x - real_trajs, p=2, dim=-1))
                     # compute final displacement error
-                    fde = torch.mean(torch.norm(rollout_x[:, -1] - real_trajs[:, -1], p=2, dim=-1))
+                    fde = torch.mean(torch.norm(rollout_x[:, -1, :] - real_trajs[:, -1, :], p=2, dim=-1))
                     result['all_trials'] = {'ade': ade, 'fde': fde}
 
                     #rollout_x = rollout_x.reshape(rollout_x.size(0), -1)
