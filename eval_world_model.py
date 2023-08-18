@@ -138,7 +138,12 @@ class Analysis(object):
             ade_per_trial.append(torch.mean(distance))
             
             # Compute FDE for this trial by taking the distance at the final timestep
-            fde_per_trial.append(distance[0, -1])
+            breakpoint()
+            # if distance is 2 dim
+            if len(distance.shape) == 2:
+                fde_per_trial.append(distance[0, -1])
+            elif len(distance.shape) == 1:
+                fde_per_trial.append(distance[-1])
 
         # Compute overall ADE and FDE by averaging across trials
         ADE = torch.mean(torch.tensor(ade_per_trial))
