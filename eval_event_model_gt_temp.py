@@ -136,7 +136,10 @@ class Analysis(object):
             ade_per_trial.append(torch.mean(distance))
             
             # Compute FDE for this trial by taking the distance at the final timestep
-            fde_per_trial.append(distance[0, -1])
+            if len(distance.shape) == 2:
+                fde_per_trial.append(distance[0, -1])
+            elif len(distance.shape) == 1:
+                fde_per_trial.append(distance[-1])
 
         # Compute overall ADE and FDE by averaging across trials
         ADE = torch.mean(torch.tensor(ade_per_trial))
@@ -434,7 +437,7 @@ class Analysis(object):
             batch_inds.append(i)
             batch_trajs.append(x)
             batch_events.append(event_state)
-            real_trajs.append(x)
+            real_trajs.append(x[burn_in_length:,:])
             if counter > 0 and counter % self.args.batch_size == 0:
                 batch_x = torch.stack(batch_trajs, dim=0)
                 batch_x = batch_x.to(self.args.device)#model.DEVICE)
@@ -463,6 +466,9 @@ class Analysis(object):
         #rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
         batch_inds = np.array(batch_inds)
         imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
+        # append real and imagined trajs to lists
+        for rollout_trial in rollout_x:
+            imag_trajs.append(rollout_trial)
         
         for i in tqdm(goal_inds):
             counter += 1
