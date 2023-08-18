@@ -1,0 +1,2 @@
+,accuracy,precision,recall,model,epoch,dataset
+0,0.4734336665568128,0.44153858533837614,0.9564232177096044,MP-S1,5600,swm_data.pkl

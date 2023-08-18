@@ -182,6 +182,7 @@ class Analysis(object):
                 else:
                     # TO DO - don't include trial if not enough burn in available
                     steps2pickup = steps2pickup - 1
+            steps2pickup = steps2pickup + 5
             # store the steps before pick up with real frames in imagined_trajs
             imagined_trajs[i,:steps2pickup,:] = x[:,:steps2pickup,:].cpu()
             # rollout model for the rest of the trajectory
