@@ -405,6 +405,9 @@ class Analysis(object):
         rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
         batch_inds = np.array(batch_inds)
         imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
+        # append real and imagined trajs to lists
+        for rollout_trial in rollout_x:
+            imag_trajs.append(rollout_trial)
         
         for i in tqdm(goal_inds):
             counter += 1
