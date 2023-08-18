@@ -552,7 +552,7 @@ class Analysis(object):
                     # largest y delta should be beginning or end of the sequence
                     obj_delta_event = obj_pos_delta[pick_up_event,:]
                     amax_delta = np.argmax(obj_delta_event[:,1])
-                    index_percentage = amax_delta / len(obj_delta_event) * 100
+                    index_percentage = amax_delta / len(obj_delta_event)
                     if index_percentage < 0.1 or index_percentage > 0.9:
                         picked_up = True
                         dropped = True
