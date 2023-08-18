@@ -384,7 +384,7 @@ class Analysis(object):
             imagined_trajs[i,:burn_in_length,:] = x[:burn_in_length,:].cpu()
             batch_inds.append(i)
             batch_trajs.append(x)
-            real_trajs.append(x)
+            real_trajs.append(x[burn_in_length:,:])
             if counter > 0 and counter % self.args.batch_size == 0:
                 batch_x = torch.stack(batch_trajs, dim=0)
                 batch_x = torch.stack(batch_trajs, dim=0)
