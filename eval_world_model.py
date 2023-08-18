@@ -183,6 +183,8 @@ class Analysis(object):
             # rollout model for the rest of the trajectory
             rollout_length = self.num_timepoints - steps2pickup        
             rollout_x = model.forward_rollout(x.cuda(), steps2pickup, rollout_length).cpu().detach()
+            # Replace any nan, inf, or outliers values with 0
+            rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x) | (torch.abs(rollout_x) > 1e3)] = 0
             # get end portion of true trajectory to compare to rollout
             real_traj = x[:,steps2pickup:,:].to("cpu")
             assert rollout_x.size() == real_traj.size()
@@ -218,7 +220,7 @@ class Analysis(object):
         indices = np.argwhere(pickup_subset > -1)
         accuracy = np.mean(y_recon[indices[:,0],indices[:,1]])
         
-        result = {'model': self.model_name, 'score': accuracy, 'ADE': ade, 'FDE': fde}        
+        result = {'model': self.model_name, 'score': accuracy, 'ADE': ade, 'FDE': fde}      
         return result
            
     def eval_multigoal_events_in_rollouts(self, model, input_data, partial=1.0) -> Dict[str, Any]:        
@@ -248,6 +250,8 @@ class Analysis(object):
             # rollout model for the rest of the trajectory
             rollout_length = self.num_timepoints - steps2pickup
             rollout_x = model.forward_rollout(x.cuda(), steps2pickup, rollout_length).cpu().detach()
+            # Replace any nan, inf, or outliers values with 0
+            rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x) | (torch.abs(rollout_x) > 1e3)] = 0
             # get end portion of true trajectory to compare to rollout
             real_traj = x[:,steps2pickup:,:].to("cpu")                
             assert rollout_x.size() == real_traj.size()
@@ -386,6 +390,8 @@ class Analysis(object):
                 batch_x = torch.stack(batch_trajs, dim=0)
                 batch_x = batch_x.to(self.args.device)#model.DEVICE)
                 rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
+                # Replace any nan, inf, or outliers values with 0
+                rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x) | (torch.abs(rollout_x) > 1e3)] = 0
                 batch_inds = np.array(batch_inds)
                 imagined_trajs[batch_inds,burn_in_length:,:] = rollout_x
                 # append real and imagined trajs to lists
@@ -424,6 +430,8 @@ class Analysis(object):
             if x.dtype == torch.float64:
                 x = x.float()
             rollout_x = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu().detach()
+            # Replace any nan, inf, or outliers values with 0
+            rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x) | (torch.abs(rollout_x) > 1e3)] = 0
             # get end portion of true trajectory to compare to rollout
             real_traj = x[:,burn_in_length:,:].to("cpu")                
             assert rollout_x.size() == real_traj.size()
@@ -568,8 +576,8 @@ class Analysis(object):
             # rollout model for the rest of the trajectory
             rollout_length = num_timepoints - burn_in_length
             rollout_x = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu().detach()
-            # replace any nan or inf values with 0
-            rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x)] = 0
+            # Replace any nan, inf, or outliers values with 0
+            rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x) | (torch.abs(rollout_x) > 1e3)] = 0
             # get end portion of true trajectory to compare to rollout
             real_traj = x[:,burn_in_length:,:].to("cpu")
             assert rollout_x.size() == real_traj.size()
@@ -600,6 +608,8 @@ class Analysis(object):
             with torch.no_grad():
                 if batch_size is None: 
                     rollout_x = model.forward_rollout(real_trajs.cuda(), burn_in_length, rollout_length).cpu()
+                    # Replace any nan, inf, or outliers values with 0
+                    rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x) | (torch.abs(rollout_x) > 1e3)] = 0
                 else:
                     rollout_x = []
                     for i in tqdm(range(0, total_trials, batch_size)):
@@ -608,6 +618,8 @@ class Analysis(object):
                         rollout_x.append(y)
                         torch.cuda.empty_cache()
                     rollout_x = torch.cat(rollout_x, dim=0)
+                    # Replace any nan, inf, or outliers values with 0
+                    rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x) | (torch.abs(rollout_x) > 1e3)] = 0
 
                     # compute average displacement error by computing euclidean distance between predicted and real trajectories
                     ade = torch.mean(torch.norm(rollout_x - real_trajs, p=2, dim=-1))
