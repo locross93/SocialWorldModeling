@@ -123,6 +123,30 @@ class Analysis(object):
         return model
 
 
+    def calculate_ADE_FDE(self, real_trajs, imag_trajs):
+        ade_per_trial = []
+        fde_per_trial = []
+
+        for real_traj, imag_traj in zip(real_trajs, imag_trajs):
+            # Check if both real and imagined trajectories have the same shape
+            assert real_traj.shape == imag_traj.shape
+            
+            # Calculate Euclidean distance between corresponding points
+            distance = torch.norm(real_traj - imag_traj, dim=-1)
+            
+            # Compute ADE for this trial by taking the average over timesteps
+            ade_per_trial.append(torch.mean(distance))
+            
+            # Compute FDE for this trial by taking the distance at the final timestep
+            fde_per_trial.append(distance[0, -1])
+
+        # Compute overall ADE and FDE by averaging across trials
+        ADE = torch.mean(torch.tensor(ade_per_trial))
+        FDE = torch.mean(torch.tensor(fde_per_trial))
+
+        return ADE.item(), FDE.item()
+
+
     def eval_goal_events_in_rollouts(self, model, input_data, level=1, partial=1.0) -> Dict[str, typing.Any]:
         if self.ds_num == 1:
             # first dataset
@@ -183,10 +207,8 @@ class Analysis(object):
             x_hat = x_hat[:,:,::2]
             full_trajs = full_trajs[:,:,::2]
         # mse = ((x_true - x_hat)**2).mean().item()
-        # compute average displacement error by computing euclidean distance between predicted and real trajectories
-        ade = torch.mean(torch.norm(x_hat - x_true, p=2, dim=-1))
-        # compute final displacement error
-        fde = torch.mean(torch.norm(x_hat[:, -1] - x_true[:, -1], p=2, dim=-1))
+        # compute average displacement error and final displacement error
+        ade, fde = self.calculate_ADE_FDE(real_trajs, imag_trajs)
 
         #scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num, obj_dist_thr=2.0, agent_dist_thr=1.0)
         # Easier
@@ -235,7 +257,8 @@ class Analysis(object):
         
         x_true = torch.cat(real_trajs, dim=1)
         x_hat = torch.cat(imag_trajs, dim=1)
-        mse = ((x_true - x_hat)**2).mean().item()
+        #mse = ((x_true - x_hat)**2).mean().item()
+        ade, fde = self.calculate_ADE_FDE(real_trajs, imag_trajs)
         
         full_trajs = input_data[multi_goal_trajs,:,:].cpu()
         scores, y_labels, y_recon = eval_recon_goals(full_trajs, imagined_trajs, final_location=False, plot=False, ds_num=self.ds_num)
@@ -254,14 +277,22 @@ class Analysis(object):
         acc_g2 = np.mean(goals_obj2)
         acc_g3 = np.mean(goals_obj3)
         
+        # result = {
+        #     'model': self.model_name,
+        #     'g2_acc': acc_g2,
+        #     'g2_goal_num': '2nd Goal',
+        #     'g2_mse': mse,
+        #     'g3_acc': acc_g3,
+        #     'g3_goal_num': '3rd Goal',
+        #     'g3_mse': mse}
         result = {
             'model': self.model_name,
             'g2_acc': acc_g2,
             'g2_goal_num': '2nd Goal',
-            'g2_mse': mse,
             'g3_acc': acc_g3,
             'g3_goal_num': '3rd Goal',
-            'g3_mse': mse}
+            'ADE': ade,
+            'FDE': fde}
         
         return result
     
@@ -329,7 +360,10 @@ class Analysis(object):
         goal_inds = np.concatenate([single_goal_trajs, multi_goal_trajs])        
         non_goal_trajs = [i for i in range(len(input_data)) if i not in goal_inds]
         non_goal_trajs = non_goal_trajs[ :int(len(input_data)*partial)]
-        goal_inds =  np.random.choice(goal_inds, size=int(len(goal_inds)*partial), replace=False)                                    
+        goal_inds =  np.random.choice(goal_inds, size=int(len(goal_inds)*partial), replace=False)     
+
+        real_trajs = []
+        imag_trajs = []                               
 
         # compute non goal trajs first with batches
         counter = 0
@@ -346,6 +380,7 @@ class Analysis(object):
             imagined_trajs[i,:burn_in_length,:] = x[:burn_in_length,:].cpu()
             batch_inds.append(i)
             batch_trajs.append(x)
+            real_trajs.append(x)
             if counter > 0 and counter % self.args.batch_size == 0:
                 batch_x = torch.stack(batch_trajs, dim=0)
                 batch_x = torch.stack(batch_trajs, dim=0)
@@ -353,6 +388,9 @@ class Analysis(object):
                 rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
                 batch_inds = np.array(batch_inds)
                 imagined_trajs[batch_inds,burn_in_length:,:] = rollout_x
+                # append real and imagined trajs to lists
+                for rollout_trial in rollout_x:
+                    imag_trajs.append(rollout_trial)
                 batch_trajs = []
                 batch_inds = []
         # compute last batch that is less than batch_size
@@ -386,6 +424,11 @@ class Analysis(object):
             if x.dtype == torch.float64:
                 x = x.float()
             rollout_x = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu().detach()
+            # get end portion of true trajectory to compare to rollout
+            real_traj = x[:,burn_in_length:,:].to("cpu")                
+            assert rollout_x.size() == real_traj.size()
+            real_trajs.append(real_traj)
+            imag_trajs.append(rollout_x)
             # store the steps after pick up with predicted frames in imagined_trajs
             imagined_trajs[i,burn_in_length:,:] = rollout_x
                             
@@ -394,6 +437,9 @@ class Analysis(object):
         result, obj_moved_flag, recon_moved_flag = self._eval_move_events(
             input_data, imagined_trajs, self.args.move_threshold)
         result['model'] = self.model_name
+        ade, fde = self.calculate_ADE_FDE(real_trajs, imag_trajs)
+        result['ADE'] = ade
+        result['FDE'] = fde
         return result
 
 
@@ -447,7 +493,6 @@ class Analysis(object):
         num_objs = 3
         obj_pick_up_flag = np.zeros([num_trials, 3])
         for i in range(num_trials):
-            print(i)
             trial_x = input_matrices[i,:,:]
             for j in range(num_objs):
                 pos_inds = [data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
@@ -463,7 +508,6 @@ class Analysis(object):
                     
         recon_pick_up_flag = np.zeros([num_trials, 3])
         for i in range(num_trials):
-            print(i)
             trial_x = recon_matrices[i,:,:]
             for j in range(num_objs):
                 pos_inds = [data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
@@ -540,7 +584,8 @@ class Analysis(object):
         pickup_subset = pickup_timepoints[single_goal_trajs,:]
         indices = np.argwhere(pickup_subset > -1)
         accuracy = np.mean(y_recon[indices[:,0],indices[:,1]])
-        result = {'model': self.model_name, 'score': accuracy}        
+        ade, fde = self.calculate_ADE_FDE(real_trajs, imag_trajs)
+        result = {'model': self.model_name, 'score': accuracy, 'ADE': ade, 'FDE': fde}        
         return result
 
     def compute_displacement_error(self, model, batch_size=None):
@@ -580,7 +625,7 @@ class Analysis(object):
                         # compute average displacement error by computing euclidean distance between predicted and real trajectories
                         ade = torch.mean(torch.norm(behavior_rollout_x - behavior_real_trajs, p=2, dim=-1))
                         # compute final displacement error
-                        fde = torch.mean(torch.norm(behavior_rollout_x[:, -1] - behavior_real_trajs[:, -1], p=2, dim=-1))
+                        fde = torch.mean(torch.norm(behavior_rollout_x[:, -1, :] - behavior_real_trajs[:, -1, :], p=2, dim=-1))
                         result[behavior_key] = {'ade': ade, 'fde': fde}
                     #result[burn_in_length] = behavior_result        
         result['model'] = self.model_name              
