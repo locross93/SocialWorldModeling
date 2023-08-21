@@ -1,2 +1,2 @@
-,model,score,ADE,FDE,epoch,dataset
-0,SGNet 10 S3,0.14754098360655737,8.658536911010742,8.678329467773438,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet10_s3/sgnet10_s3_epoch1400,swm_data.pkl
+,0,1,2
+0,2000,sgnet_10,"{'model': 'SGNet 10', 'score': 0.22131147540983606, 'ADE': 8.414884567260742, 'FDE': 8.538440704345703, 'epoch': '2000', 'dataset': 'swm_data.pkl'}"

@@ -2912,7 +2912,7 @@ class EventModel:
             # Recompute event_hat every pred_interval steps
             x_hat = []
             x_burnin = x[:,:burn_in_length,:]
-            num_intervals = rollout_length // self.ep_model.pred_interval
+            num_intervals = math.ceil(rollout_length / self.ep_model.pred_interval)
             for i in range(num_intervals):
                 if self.ep_model.predict_horizon:
                     self.event_hat, self.event_horizon_hat = self.predict_next_event(x_burnin)
