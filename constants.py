@@ -109,7 +109,16 @@ MODEL_DICT_VAL=  {
         'model_dir': 'gt_end_state_s3', 'model_label': 'GT End State S3', 'epoch': '5800'},
     'sgnet_cvae_lr1e-4': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
-        'model_dir': 'sgnet_cvae_default_lr1e-4', 'model_label': 'SGNet-H512'},
+        'model_dir': 'sgnet_cvae_default_lr1e-4', 'model_label': 'SGNet-H512'},\
+    'sgnet_10': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
+        'model_dir': 'sgnet_cvae_default', 'model_label': 'SGNet 10'},
+    'sgnet10_s2': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
+        'model_dir': 'sgnet10_s2', 'model_label': 'SGNet 10 S2'},
+    'sgnet10_s3': {
+        'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
+        'model_dir': 'sgnet10_s3', 'model_label': 'SGNet 10 S3'},
     # 'sgnet_cvae_hidden64_lr1e-4': {
     #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
     #     'model_dir': 'sgnet_cvae_hidden_size64_lr1e-4', 'model_label': 'SGNet-H64'},
@@ -123,8 +132,8 @@ MODEL_DICT_VAL=  {
 data_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/data/'
 checkpoint_dir_ccn = '/mnt/fs2/ziyxiang/swm_data_and_results/checkpoint/'
 data_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/data/'
-#checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'   # this has SGNet
-checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/'
+checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'   # this has SGNet
+#checkpoint_dir_ccn2 = '/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/'
 
 
 DEFAULT_VALUES = {

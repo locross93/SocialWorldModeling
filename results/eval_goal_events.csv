@@ -1,2 +1,2 @@
 ,model,score,ADE,FDE,epoch,dataset
-0,RSSM-Cont-S1,0.02459016393442623,9.582812309265137,10.612903594970703,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s1/rssm_cont_h_2048_lr1e-4_s1_epoch9000,swm_data.pkl
+0,SGNet 10 S3,0.14754098360655737,8.658536911010742,8.678329467773438,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/sgnet10_s3/sgnet10_s3_epoch1400,swm_data.pkl
