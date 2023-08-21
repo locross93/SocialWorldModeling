@@ -2892,6 +2892,7 @@ class EventModel:
             return event_hat
     
     def forward_rollout(self, x, burn_in_length, rollout_length):
+        breakpoint()
         if self.ep_model.predict_horizon:
             self.event_hat, self.event_horizon_hat = self.predict_next_event(x[:,:burn_in_length,:])
         else:

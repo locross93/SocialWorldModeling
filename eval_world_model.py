@@ -69,11 +69,13 @@ class Analysis(object):
             self.data_columns = get_data_columns(DATASET_NUMS[self.args.dataset])
 
 
-    def load_model(self, model_key) -> torch.nn.Module:
+    def load_model(self, model_key, epoch=None) -> torch.nn.Module:
         """
         Load the trained model from the checkpoint directory
         """
         model_info = MODEL_DICT_VAL[model_key]
+        if epoch is not None:
+            model_info['epoch'] = epoch
         self.model_name = model_info['model_label']        
         # set device, this assumes only one gpu is available to the script
         DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -649,8 +651,8 @@ class Analysis(object):
         result['model'] = self.model_name              
         return result
 
-    def eval_one_model(self, model_key) -> Dict[str, Any]:        
-        model = self.load_model(model_key)        
+    def eval_one_model(self, model_key, epoch=None) -> Dict[str, Any]:        
+        model = self.load_model(model_key, epoch)        
         result = {}
         result['Model'] = MODEL_DICT_VAL[model_key]['model_label']
 
@@ -727,10 +729,45 @@ class Analysis(object):
                 df_results.to_csv(all_results_file)
 
 
+    def sweep_checkpoints(self, args, start_epoch, end_epoch, interval):
+        # Placeholder for storing results
+        sweep_results = []
+        self.results = []
+
+        # Iterating through the checkpoints at specific intervals
+        for epoch in range(start_epoch, end_epoch + 1, interval):
+            print(f"==== Evaluating checkpoint at epoch {epoch} ====")
+            
+            # Iterating through the provided model keys
+            for model_key in args.model_keys:
+                # Loading model information
+                model_info = MODEL_DICT_VAL[model_key]
+                
+                # Constructing the model file name based on the epoch
+                model_dir = os.path.join(args.checkpoint_dir, 'models', model_info['model_dir'])
+                model_file_name = os.path.join(model_dir, f"model_{epoch}.pth")  # Assuming this naming convention
+                
+                epoch_str = str(epoch)
+                result = self.eval_one_model(model_key, epoch_str)
+                
+                # Storing the result
+                sweep_results.append((epoch, model_key, result))
+                print(f"Result: {result}")
+        
+        # Finding the checkpoint that maximizes evaluation accuracy
+        optimal_result = max(sweep_results, key=lambda x: x[2]['score'])
+        print(f"Optimal checkpoint found at epoch {optimal_result[0]} for model {optimal_result[1]} with accuracy {optimal_result[2]['score']}")
+        self.results.append(optimal_result)
+
+
     def run(self) -> None:
         self.load_data()
-        self.eval_all_models()
-        self.save_results()
+        if self.args.sweep_checkpoints is not None:
+            self.sweep_checkpoints(self.args, self.args.sweep_checkpoints[0], self.args.sweep_checkpoints[1], self.args.sweep_checkpoints[2])
+            self.save_results()
+        else:
+            self.eval_all_models()
+            self.save_results()
 
 
 def load_args():
@@ -777,6 +814,7 @@ def load_args():
                         help='Number of frames to burn in for non-goal events')
     parser.add_argument('--partial', type=float, default=1.0,         
                         help='Partial evaluation')
+    parser.add_argument('--sweep_checkpoints', nargs=3, type=int, default=[600, 3400, 600], help='Sweep through checkpoints [start, end, interval]')
     return parser.parse_args()
 
 
