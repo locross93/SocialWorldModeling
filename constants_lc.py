@@ -213,7 +213,7 @@ MODEL_DICT_VAL=  {
         'class': EventModel, 'config': 'hierarchical_event_model.json',
         'model_dir': 'feudal_10steps', 'model_label': 'Feudal 10 Step'},
     'feudal_20steps': {
-        'class': EventModel, 'config': 'hierarchical_event_model.json',
+        'class': EventModel, 'config': 'hierarchical_event_model_20steps.json',
         'model_dir': 'feudal_20steps', 'model_label': 'Feudal 20 Step'},
     'feudal_30steps': {
         'class': EventModel, 'config': 'hierarchical_event_model.json',

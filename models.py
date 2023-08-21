@@ -2696,6 +2696,10 @@ class EventPredictor(nn.Module):
             self.pred_delta = config['pred_delta']
         else:
             self.pred_delta = False
+        if 'pred_interval' in config:
+            self.pred_interval = config['pred_interval']
+        else:
+            self.pred_interval = None
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         
         if self.rnn_type == 'GRU':
@@ -2892,18 +2896,40 @@ class EventModel:
             return event_hat
     
     def forward_rollout(self, x, burn_in_length, rollout_length):
-        breakpoint()
-        if self.ep_model.predict_horizon:
-            self.event_hat, self.event_horizon_hat = self.predict_next_event(x[:,:burn_in_length,:])
-        else:
-           self.event_hat = self.predict_next_event(x[:,:burn_in_length,:])
+        if self.ep_model.pred_interval is None or self.ep_model.pred_interval > rollout_length:
+            if self.ep_model.predict_horizon:
+                self.event_hat, self.event_horizon_hat = self.predict_next_event(x[:,:burn_in_length,:])
+            else:
+                self.event_hat = self.predict_next_event(x[:,:burn_in_length,:])
 
-        # condition ms predictor on predicted next event
-        if self.mp_model.input_pred_horizon:
-            # concatenate event_hat and event_horizon_hat
-            self.event_hat = torch.cat([self.event_hat, self.event_horizon_hat.unsqueeze(1)], dim=-1)
-        # Call MSPredictorEventContext's forward_rollout with event_hat
-        x_hat = self.mp_model.forward_rollout(x, self.event_hat, burn_in_length, rollout_length)
+            # condition ms predictor on predicted next event
+            if self.mp_model.input_pred_horizon:
+                # concatenate event_hat and event_horizon_hat
+                self.event_hat = torch.cat([self.event_hat, self.event_horizon_hat.unsqueeze(1)], dim=-1)
+            # Call MSPredictorEventContext's forward_rollout with event_hat
+            x_hat = self.mp_model.forward_rollout(x, self.event_hat, burn_in_length, rollout_length)
+        else:
+            # Recompute event_hat every pred_interval steps
+            x_hat = []
+            x_burnin = x[:,:burn_in_length,:]
+            num_intervals = rollout_length // self.ep_model.pred_interval
+            for i in range(num_intervals):
+                if self.ep_model.predict_horizon:
+                    self.event_hat, self.event_horizon_hat = self.predict_next_event(x_burnin)
+                else:
+                    self.event_hat = self.predict_next_event(x_burnin)
+                # condition ms predictor on predicted next event
+                if self.mp_model.input_pred_horizon:
+                    # concatenate event_hat and event_horizon_hat
+                    self.event_hat = torch.cat([self.event_hat, self.event_horizon_hat.unsqueeze(1)], dim=-1)
+                # Call MSPredictorEventContext's forward_rollout with event_hat
+                x_hat_temp = self.mp_model.forward_rollout(x_burnin, self.event_hat, burn_in_length, self.ep_model.pred_interval)
+                x_hat.append(x_hat_temp)
+                # update x_burnin by concatenating x_burnin with x_hat_temp
+                x_burnin = torch.cat([x_burnin, x_hat_temp], dim=1)
+                burn_in_length = x_burnin.size(1)
+            x_hat = torch.cat(x_hat, dim=1)
+            breakpoint()
 
         return x_hat
 
