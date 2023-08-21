@@ -184,13 +184,13 @@ MODEL_DICT_VAL=  {
         'model_dir': 'gt_end_state_s3', 'model_label': 'GT End State S3'},
     'sgnet_10': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
-        'model_dir': 'sgnet_cvae_default', 'model_label': 'SGNet 10'},
+        'model_dir': 'sgnet_cvae_default', 'epoch': '2000', 'model_label': 'SGNet 10'},
     'sgnet10_s2': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
-        'model_dir': 'sgnet10_s2', 'model_label': 'SGNet 10 S2'},
+        'model_dir': 'sgnet10_s2', 'epoch': '1800', 'model_label': 'SGNet 10 S2'},
     'sgnet10_s3': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
-        'model_dir': 'sgnet10_s3', 'model_label': 'SGNet 10 S3'},
+        'model_dir': 'sgnet10_s3', 'epoch': '1600', 'model_label': 'SGNet 10 S3'},
     'sgnet_5': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_5step_goal.json',
         'model_dir': 'sgnet_cvae_5step', 'model_label': 'SGNet 5'},
@@ -325,12 +325,8 @@ DEFAULT_VALUES = {
     'save_every': 200,
     #'model_keys': list(MODEL_DICT_VAL.keys()),
     #'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','rssm_cont_h_2048_lr1e-4_s1','md_mlp_2048_lr3e-4_s1','transformer_iris'],
-    #'model_keys': ['imma','gat','rfm','rfm_rnn'],
-    #'model_keys': ['rssm_disc_ds2', 'rssm_disc_ds3', 'rssm_cont_ds3', 'mp_ds3', 'md_ds3', 'transformer_iris'],
-    #'model_keys': ['rssm_disc_ds3', 'mp_ds2', 'event_context_mp'],
-    #'model_keys': ['rssm_1step', 'rssm_5step', 'rssm_10step', 'rssm_20step', 'rssm_disc_ds3'],
-    #'model_keys': ['event_context_mp', 'em_dropout', 'event_model2', 'emodel_no_horizon', 'pred_end_state', 'em_2048', 'em_lr5e-5', 'em_min_horizon', 'em_gt'],   
-    'model_keys': ['gt_end_state_s1', 'gt_end_state_s2', 'gt_end_state_s3'], 
+    'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','tf_emb2048_lr1e-4_s1'],
+    #'model_keys': ['sgnet_10', 'sgnet10_s2', 'sgnet10_s3'], 
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,

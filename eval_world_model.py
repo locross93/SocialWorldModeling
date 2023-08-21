@@ -79,11 +79,11 @@ class Analysis(object):
         self.model_name = model_info['model_label']        
         # set device, this assumes only one gpu is available to the script
         DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-        setattr(args, 'device', DEVICE)
+        setattr(self.args, 'device', DEVICE)
         config_file = os.path.join(self.args.model_config_dir, model_info['config'])
         config = load_config(config_file)
         model_type = config['model_type']        
-        model = init_model_class(config, args)
+        model = init_model_class(config, self.args)
 
         event_models = ['event_model']
         if model_type in event_models:
@@ -99,11 +99,11 @@ class Analysis(object):
                 print('Loading from last checkpoint', mp_weights_path)
                 self.epoch = mp_weights_path
                 model.load_weights(ep_weights_path, mp_weights_path)
-            model.mp_model.device = args.device
-            model.ep_model.device = args.device
-            model.device = args.device
-            model.mp_model.to(args.device)
-            model.ep_model.to(args.device)
+            model.mp_model.device = self.args.device
+            model.ep_model.device = self.args.device
+            model.device = self.args.device
+            model.mp_model.to(self.args.device)
+            model.ep_model.to(self.args.device)
         else:
             # load checkpoint weights
             # checkpoints are in folder named after model
@@ -118,8 +118,8 @@ class Analysis(object):
                 print('Loading from last checkpoint', latest_checkpoint)
                 self.epoch = latest_checkpoint
                 model.load_state_dict(torch.load(latest_checkpoint))
-            model.device = args.device
-            model.to(args.device)
+            model.device = self.args.device
+            model.to(self.args.device)
         model.eval()
 
         return model
@@ -152,7 +152,7 @@ class Analysis(object):
         return ADE.item(), FDE.item()
 
 
-    def eval_goal_events_in_rollouts(self, model, input_data, level=1, partial=1.0) -> Dict[str, typing.Any]:
+    def eval_goal_events_in_rollouts(self, model, input_data, offset=0, partial=1.0) -> Dict[str, typing.Any]:
         if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
@@ -174,15 +174,16 @@ class Analysis(object):
             x = input_data[row,:,:].unsqueeze(0)
             # get the only pick up point in the trajectory
             steps2pickup = np.max(pickup_timepoints[row,:]).astype(int)
-            if level == 2:
-                # burn in to several frames before pick up point
-                if steps2pickup > 15:
-                    steps2pickup = steps2pickup - 15
-                elif steps2pickup > 10:
-                    steps2pickup = steps2pickup - 5
-                else:
-                    # TO DO - don't include trial if not enough burn in available
-                    steps2pickup = steps2pickup - 1
+            if offset != 0:
+                # burn in to frames before or after pick up point to control difficulty
+                steps2pickup = steps2pickup + offset
+                # if steps2pickup > 15:
+                #     steps2pickup = steps2pickup - 15
+                # elif steps2pickup > 10:
+                #     steps2pickup = steps2pickup - 5
+                # else:
+                #     # TO DO - don't include trial if not enough burn in available
+                #     steps2pickup = steps2pickup - 1
             # store the steps before pick up with real frames in imagined_trajs
             imagined_trajs[i,:steps2pickup,:] = x[:,:steps2pickup,:].cpu()
             # rollout model for the rest of the trajectory
