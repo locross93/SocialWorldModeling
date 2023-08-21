@@ -820,7 +820,7 @@ def load_args():
                         help='Number of frames to burn in for non-goal events')
     parser.add_argument('--partial', type=float, default=1.0,         
                         help='Partial evaluation')
-    parser.add_argument('--sweep_checkpoints', nargs=3, type=int, default=[600, 3400, 600], help='Sweep through checkpoints [start, end, interval]')
+    parser.add_argument('--sweep_checkpoints', nargs=3, type=int, default=None, help='Sweep through checkpoints [start, end, interval]')
     return parser.parse_args()
 
 
