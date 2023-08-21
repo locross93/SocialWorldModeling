@@ -1,59 +1,80 @@
-,model,score,MSE,epoch,dataset
-0,Multistep Predictor,0.1761603375527426,2.071599006652832,/mnt/fs2/locross/analysis/models/multistep_predictor/multistep_predictor_epoch14000,dataset_5_25_23.pkl
-1,RSSM Discrete,0.4124472573839662,2.209904432296753,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch5500,dataset_5_25_23.pkl
-2,RSSM Continuous,0.0527426160337552,inf,/mnt/fs2/locross/analysis/models/rssm_cont_ds2/rssm_cont_ds2_epoch1000,dataset_5_25_23.pkl
-3,Multistep Predictor DS3,0.0049099836333878,2.5033535957336426,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch1400,data_5_31_23.pkl
-4,Multistep Predictor DS3,0.0957446808510638,2.1988141536712646,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch2400,data_5_31_23.pkl
-5,Multistep Delta DS3,0.0024549918166939,2.137028217315674,/mnt/fs2/locross/analysis/models/multistep_delta_ds3/multistep_delta_ds3_epoch3600,data_5_31_23.pkl
-6,Multistep Delta,0.4481327800829875,3.306190252304077,/mnt/fs2/locross/analysis/models/multistep_delta_h1024_l2_mlp1024_l2/multistep_delta_h1024_l2_mlp1024_l2_epoch421000,train_test_splits_3D_dataset.pkl
-7,Multistep Predictor,0.3360995850622407,3.7660412788391113,/mnt/fs2/locross/analysis/models/multistep_predictor_ds1/multistep_predictor_ds1_epoch127000,train_test_splits_3D_dataset.pkl
-8,RSSM Discrete DS1,0.7136929460580913,2.1622567176818848,/mnt/fs2/locross/analysis/models/rssm_disc_bi50_2/rssm_disc_bi50_2_epoch8500,train_test_splits_3D_dataset.pkl
-9,RSSM Continuous DS1,0.1120331950207468,,/mnt/fs2/locross/analysis/models/rssm_cont_h1024_l2_mlp1024/rssm_cont_h1024_l2_mlp1024_epoch3500,train_test_splits_3D_dataset.pkl
-10,Multistep Predictor DS3,0.1808510638297872,2.055659294128418,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch3200,data_5_31_23.pkl
-11,Multistep Predictor DS3,0.1808510638297872,2.055659294128418,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch3200,data_5_31_23.pkl
-12,Multistep Predictor Norm Velocity,0.0,0.0221959892660379,/mnt/fs2/locross/analysis/models/mp_norm_vel/mp_norm_vel_epoch3400,data_norm_velocity.pkl
-13,Multistep Predictor DS3,0.3829787234042553,2.3980209827423096,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch4200,data_5_31_23.pkl
-14,Multistep Delta DS3,0.0065466448445171,2.286868095397949,/mnt/fs2/locross/analysis/models/multistep_delta_ds3/multistep_delta_ds3_epoch5600,data_5_31_23.pkl
-15,RSSM Continuous,0.0270049099836333,3.526322364807129,/mnt/fs2/locross/analysis/models/rssm_cont_ds2/rssm_cont_ds2_epoch2600,data_5_31_23.pkl
-16,RSSM Discrete DS2,0.4075286415711948,2.199857234954834,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch7500,data_5_31_23.pkl
-17,RSSM Discrete DS3,0.044189852700491,2.392019271850586,/mnt/fs2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch4200,data_5_31_23.pkl
-18,RSSM Continuous Replay Early,0.1415711947626841,5.669225692749023,/mnt/fs2/locross/analysis/models/rssm_cont_replay_early/rssm_cont_replay_early_epoch800,data_5_31_23.pkl
-19,MP Replay Early,0.0572831423895253,2.493995428085327,/mnt/fs2/locross/analysis/models/mp_replay_early/mp_replay_early_epoch5000,data_5_31_23.pkl
-20,Transformer WM Replay Early,0.0049099836333878,3.3123326301574707,/mnt/fs2/locross/analysis/models/transformer_wm_replay_early/transformer_wm_replay_early_epoch13600,data_5_31_23.pkl
-21,MP Replay Early,0.1260229132569558,2.105642318725586,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/mp_replay_early/mp_replay_early_epoch1400,data_5_31_23.pkl
-22,Transformer Iris Concat Pos Embd lr1e-4,0.2978723404255319,4.334659099578857,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/transformer_iris_concat_pos_embd_lr1e-4/transformer_iris_concat_pos_embd_lr1e-4_epoch25600,data_5_31_23.pkl
-23,MP 4096 DS3,0.0392798690671031,2.356709241867065,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/mp_4096_ds3/mp_4096_ds3_epoch600,data_5_31_23.pkl
-24,MD 4096 DS3,0.0,2.034997701644897,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/multistep_delta_ds3/multistep_delta_ds3_epoch800,data_5_31_23.pkl
-25,Event Context World Model,0.0024549918166939,2.417630434036255,/data2/locross/analysis/models/event_context_world/mp_model_epoch4200,swm_data.pkl
-26,RSSM Discrete DS3,0.3248772504091653,2.292362928390503,/data2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch29999,swm_data.pkl
-27,Multistep Predictor,0.1873977086743044,2.0192625522613525,6000,swm_data.pkl
-28,Event Context World Model,0.0106382978723404,2.420804738998413,/data2/locross/analysis/models/event_context_world/mp_model_epoch5600,swm_data.pkl
-29,Event Context World Model,0.4042553191489361,1.813272953033448,/data2/locross/analysis/models/event_context_world/mp_model_epoch6200,swm_data.pkl
-30,Event Context World Model,0.3870703764320785,1.821455121040344,5400,swm_data.pkl
-31,RSSM 1 Step Rollout,0.3584288052373158,2.411444902420044,/data2/locross/analysis/models/rssm_1step/rssm_1step_epoch10400,swm_data.pkl
-32,RSSM 5 Step Rollout,0.2013093289689034,2.3391599655151367,/data2/locross/analysis/models/rssm_5step/rssm_5step_epoch9800,swm_data.pkl
-33,RSSM 10 Step Rollout,0.23240589198036,2.398100137710572,/data2/locross/analysis/models/rssm_10step/rssm_10step_epoch9200,swm_data.pkl
-34,RSSM 20 Step Rollout,0.1563011456628477,2.473283290863037,/data2/locross/analysis/models/rssm_20step/rssm_20step_epoch8200,swm_data.pkl
-35,RSSM Discrete DS3,0.3150572831423895,2.273829460144043,/data2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch29999,swm_data.pkl
-36,MP-S1,0.0851063829787234,2.163022994995117,/data2/locross/analysis/models/mp_mlp_2048_lr3e-4_s1/mp_mlp_2048_lr3e-4_s1_epoch29999,swm_data.pkl
-37,RSSM-S1,0.2438625204582651,2.1874940395355225,/data2/locross/analysis/models/rssm_disc_h_2048_lr3e-4_s1/rssm_disc_h_2048_lr3e-4_s1_epoch24200,swm_data.pkl
-38,RSSM-Cont-S1,0.0016366612111292,,/data2/locross/analysis/models/rssm_cont_h_2048_lr1e-4_s1/rssm_cont_h_2048_lr1e-4_s1_epoch9000,swm_data.pkl
-39,MP-S1,0.0261865793780687,2.2612075805664062,/data2/locross/analysis/models/md_mlp_2048_lr3e-4_s1/md_mlp_2048_lr3e-4_s1_epoch13800,swm_data.pkl
-40,GT End State S1,0.995090016366612,0.4531250596046448,/mnt/fs2/locross/analysis/models/gt_end_state_s1/mp_model_epoch4400,swm_data.pkl
-41,GT End State S2,0.995090016366612,0.4420371055603027,/mnt/fs2/locross/analysis/models/gt_end_state_s2/mp_model_epoch6200,swm_data.pkl
-42,GT End State S3,0.9934533551554828,0.4422409236431122,/mnt/fs2/locross/analysis/models/gt_end_state_s3/mp_model_epoch5800,swm_data.pkl
-43,MP-S1,0.16284779050736498,2.1561808586120605,5600,swm_data.pkl
-44,MP-S2,0.17921440261865793,2.186723470687866,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s2/mp_mlp_2048_lr3e-4_s2_epoch29999,swm_data.pkl
-45,MP-S3,0.1783960720130933,2.1577377319335938,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s3/mp_mlp_2048_lr3e-4_s3_epoch29999,swm_data.pkl
-46,RSSM-S1,0.36333878887070375,2.1750693321228027,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s1/rssm_disc_h_2048_lr3e-4_s1_epoch24200,swm_data.pkl
-47,RSSM-S2,0.3486088379705401,2.1374573707580566,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s2/rssm_disc_h_2048_lr3e-4_s2_epoch24400,swm_data.pkl
-48,RSSM-S3,0.29132569558101473,2.216087818145752,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s3/rssm_disc_h_2048_lr3e-4_s3_epoch24400,swm_data.pkl
-49,RSSM-Cont-S1,0.05564648117839607,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s1/rssm_cont_h_2048_lr1e-4_s1_epoch9000,swm_data.pkl
-50,RSSM-Cont-S2,0.03518821603927987,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s2/rssm_cont_h_2048_lr1e-4_s2_epoch8800,swm_data.pkl
-51,RSSM-Cont-S3,0.04091653027823241,3.175750494003296,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s3/rssm_cont_h_2048_lr1e-4_s3_epoch1400,swm_data.pkl
-52,MD-S1,0.06464811783960721,2.2533669471740723,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s1/md_mlp_2048_lr3e-4_s1_epoch13800,swm_data.pkl
-53,MD-S2,0.07364975450081833,2.3224453926086426,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s2/md_mlp_2048_lr3e-4_s2_epoch13400,swm_data.pkl
-54,MD-S3,0.05237315875613748,2.3009307384490967,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s3/md_mlp_2048_lr3e-4_s3_epoch13400,swm_data.pkl
-55,TF Emb2048 S1,0.34615384615384615,4.459645748138428,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s1/tf_emb2048_lr1e-4_s1_epoch4000,swm_data.pkl
-56,TF Emb2048 S2,0.3469721767594108,4.541991233825684,400,swm_data.pkl
-57,TF Emb2048 S3,0.32978723404255317,5.075939178466797,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s3/tf_emb2048_lr1e-4_s3_epoch4000,swm_data.pkl
+,model,score,MSE,epoch,dataset,ADE,FDE
+0,Multistep Predictor,0.1761603375527426,2.071599006652832,/mnt/fs2/locross/analysis/models/multistep_predictor/multistep_predictor_epoch14000,dataset_5_25_23.pkl,,
+1,RSSM Discrete,0.4124472573839662,2.209904432296753,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch5500,dataset_5_25_23.pkl,,
+2,RSSM Continuous,0.0527426160337552,inf,/mnt/fs2/locross/analysis/models/rssm_cont_ds2/rssm_cont_ds2_epoch1000,dataset_5_25_23.pkl,,
+3,Multistep Predictor DS3,0.0049099836333878,2.5033535957336426,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch1400,data_5_31_23.pkl,,
+4,Multistep Predictor DS3,0.0957446808510638,2.1988141536712646,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch2400,data_5_31_23.pkl,,
+5,Multistep Delta DS3,0.0024549918166939,2.137028217315674,/mnt/fs2/locross/analysis/models/multistep_delta_ds3/multistep_delta_ds3_epoch3600,data_5_31_23.pkl,,
+6,Multistep Delta,0.4481327800829875,3.306190252304077,/mnt/fs2/locross/analysis/models/multistep_delta_h1024_l2_mlp1024_l2/multistep_delta_h1024_l2_mlp1024_l2_epoch421000,train_test_splits_3D_dataset.pkl,,
+7,Multistep Predictor,0.3360995850622407,3.7660412788391113,/mnt/fs2/locross/analysis/models/multistep_predictor_ds1/multistep_predictor_ds1_epoch127000,train_test_splits_3D_dataset.pkl,,
+8,RSSM Discrete DS1,0.7136929460580913,2.1622567176818848,/mnt/fs2/locross/analysis/models/rssm_disc_bi50_2/rssm_disc_bi50_2_epoch8500,train_test_splits_3D_dataset.pkl,,
+9,RSSM Continuous DS1,0.1120331950207468,,/mnt/fs2/locross/analysis/models/rssm_cont_h1024_l2_mlp1024/rssm_cont_h1024_l2_mlp1024_epoch3500,train_test_splits_3D_dataset.pkl,,
+10,Multistep Predictor DS3,0.1808510638297872,2.055659294128418,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch3200,data_5_31_23.pkl,,
+11,Multistep Predictor DS3,0.1808510638297872,2.055659294128418,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch3200,data_5_31_23.pkl,,
+12,Multistep Predictor Norm Velocity,0.0,0.0221959892660379,/mnt/fs2/locross/analysis/models/mp_norm_vel/mp_norm_vel_epoch3400,data_norm_velocity.pkl,,
+13,Multistep Predictor DS3,0.3829787234042553,2.3980209827423096,/mnt/fs2/locross/analysis/models/mp_ds3/mp_ds3_epoch4200,data_5_31_23.pkl,,
+14,Multistep Delta DS3,0.0065466448445171,2.286868095397949,/mnt/fs2/locross/analysis/models/multistep_delta_ds3/multistep_delta_ds3_epoch5600,data_5_31_23.pkl,,
+15,RSSM Continuous,0.0270049099836333,3.526322364807129,/mnt/fs2/locross/analysis/models/rssm_cont_ds2/rssm_cont_ds2_epoch2600,data_5_31_23.pkl,,
+16,RSSM Discrete DS2,0.4075286415711948,2.199857234954834,/mnt/fs2/locross/analysis/models/rssm_ds2/rssm_ds2_epoch7500,data_5_31_23.pkl,,
+17,RSSM Discrete DS3,0.044189852700491,2.392019271850586,/mnt/fs2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch4200,data_5_31_23.pkl,,
+18,RSSM Continuous Replay Early,0.1415711947626841,5.669225692749023,/mnt/fs2/locross/analysis/models/rssm_cont_replay_early/rssm_cont_replay_early_epoch800,data_5_31_23.pkl,,
+19,MP Replay Early,0.0572831423895253,2.493995428085327,/mnt/fs2/locross/analysis/models/mp_replay_early/mp_replay_early_epoch5000,data_5_31_23.pkl,,
+20,Transformer WM Replay Early,0.0049099836333878,3.3123326301574707,/mnt/fs2/locross/analysis/models/transformer_wm_replay_early/transformer_wm_replay_early_epoch13600,data_5_31_23.pkl,,
+21,MP Replay Early,0.1260229132569558,2.105642318725586,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/mp_replay_early/mp_replay_early_epoch1400,data_5_31_23.pkl,,
+22,Transformer Iris Concat Pos Embd lr1e-4,0.2978723404255319,4.334659099578857,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/transformer_iris_concat_pos_embd_lr1e-4/transformer_iris_concat_pos_embd_lr1e-4_epoch25600,data_5_31_23.pkl,,
+23,MP 4096 DS3,0.0392798690671031,2.356709241867065,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/mp_4096_ds3/mp_4096_ds3_epoch600,data_5_31_23.pkl,,
+24,MD 4096 DS3,0.0,2.034997701644897,/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/models/multistep_delta_ds3/multistep_delta_ds3_epoch800,data_5_31_23.pkl,,
+25,Event Context World Model,0.0024549918166939,2.417630434036255,/data2/locross/analysis/models/event_context_world/mp_model_epoch4200,swm_data.pkl,,
+26,RSSM Discrete DS3,0.3248772504091653,2.292362928390503,/data2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch29999,swm_data.pkl,,
+27,Multistep Predictor,0.1873977086743044,2.0192625522613525,6000,swm_data.pkl,,
+28,Event Context World Model,0.0106382978723404,2.420804738998413,/data2/locross/analysis/models/event_context_world/mp_model_epoch5600,swm_data.pkl,,
+29,Event Context World Model,0.4042553191489361,1.813272953033448,/data2/locross/analysis/models/event_context_world/mp_model_epoch6200,swm_data.pkl,,
+30,Event Context World Model,0.3870703764320785,1.821455121040344,5400,swm_data.pkl,,
+31,RSSM 1 Step Rollout,0.3584288052373158,2.411444902420044,/data2/locross/analysis/models/rssm_1step/rssm_1step_epoch10400,swm_data.pkl,,
+32,RSSM 5 Step Rollout,0.2013093289689034,2.3391599655151367,/data2/locross/analysis/models/rssm_5step/rssm_5step_epoch9800,swm_data.pkl,,
+33,RSSM 10 Step Rollout,0.23240589198036,2.398100137710572,/data2/locross/analysis/models/rssm_10step/rssm_10step_epoch9200,swm_data.pkl,,
+34,RSSM 20 Step Rollout,0.1563011456628477,2.473283290863037,/data2/locross/analysis/models/rssm_20step/rssm_20step_epoch8200,swm_data.pkl,,
+35,RSSM Discrete DS3,0.3150572831423895,2.273829460144043,/data2/locross/analysis/models/rssm_disc_ds3/rssm_disc_ds3_epoch29999,swm_data.pkl,,
+36,MP-S1,0.0851063829787234,2.163022994995117,/data2/locross/analysis/models/mp_mlp_2048_lr3e-4_s1/mp_mlp_2048_lr3e-4_s1_epoch29999,swm_data.pkl,,
+37,RSSM-S1,0.2438625204582651,2.1874940395355225,/data2/locross/analysis/models/rssm_disc_h_2048_lr3e-4_s1/rssm_disc_h_2048_lr3e-4_s1_epoch24200,swm_data.pkl,,
+38,RSSM-Cont-S1,0.0016366612111292,,/data2/locross/analysis/models/rssm_cont_h_2048_lr1e-4_s1/rssm_cont_h_2048_lr1e-4_s1_epoch9000,swm_data.pkl,,
+39,MP-S1,0.0261865793780687,2.2612075805664062,/data2/locross/analysis/models/md_mlp_2048_lr3e-4_s1/md_mlp_2048_lr3e-4_s1_epoch13800,swm_data.pkl,,
+40,GT End State S1,0.995090016366612,0.4531250596046448,/mnt/fs2/locross/analysis/models/gt_end_state_s1/mp_model_epoch4400,swm_data.pkl,,
+41,GT End State S2,0.995090016366612,0.4420371055603027,/mnt/fs2/locross/analysis/models/gt_end_state_s2/mp_model_epoch6200,swm_data.pkl,,
+42,GT End State S3,0.9934533551554828,0.4422409236431122,/mnt/fs2/locross/analysis/models/gt_end_state_s3/mp_model_epoch5800,swm_data.pkl,,
+43,MP-S1,0.1628477905073649,2.1561808586120605,5600,swm_data.pkl,,
+44,MP-S2,0.1792144026186579,2.186723470687866,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s2/mp_mlp_2048_lr3e-4_s2_epoch29999,swm_data.pkl,,
+45,MP-S3,0.1783960720130933,2.1577377319335938,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s3/mp_mlp_2048_lr3e-4_s3_epoch29999,swm_data.pkl,,
+46,RSSM-S1,0.3633387888707037,2.1750693321228027,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s1/rssm_disc_h_2048_lr3e-4_s1_epoch24200,swm_data.pkl,,
+47,RSSM-S2,0.3486088379705401,2.1374573707580566,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s2/rssm_disc_h_2048_lr3e-4_s2_epoch24400,swm_data.pkl,,
+48,RSSM-S3,0.2913256955810147,2.216087818145752,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s3/rssm_disc_h_2048_lr3e-4_s3_epoch24400,swm_data.pkl,,
+49,RSSM-Cont-S1,0.055646481178396,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s1/rssm_cont_h_2048_lr1e-4_s1_epoch9000,swm_data.pkl,,
+50,RSSM-Cont-S2,0.0351882160392798,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s2/rssm_cont_h_2048_lr1e-4_s2_epoch8800,swm_data.pkl,,
+51,RSSM-Cont-S3,0.0409165302782324,3.175750494003296,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s3/rssm_cont_h_2048_lr1e-4_s3_epoch1400,swm_data.pkl,,
+52,MP-S1,0.0646481178396072,2.2533669471740723,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s1/md_mlp_2048_lr3e-4_s1_epoch13800,swm_data.pkl,,
+53,MD-S2,0.0736497545008183,2.3224453926086426,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s2/md_mlp_2048_lr3e-4_s2_epoch13400,swm_data.pkl,,
+54,MD-S3,0.0523731587561374,2.3009307384490967,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s3/md_mlp_2048_lr3e-4_s3_epoch13400,swm_data.pkl,,
+55,TF Emb2048 S1,0.3461538461538461,4.459645748138428,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s1/tf_emb2048_lr1e-4_s1_epoch4000,swm_data.pkl,,
+56,TF Emb2048 S2,0.3469721767594108,4.541991233825684,400,swm_data.pkl,,
+57,TF Emb2048 S3,0.3297872340425531,5.075939178466797,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s3/tf_emb2048_lr1e-4_s3_epoch4000,swm_data.pkl,,
+58,MP-S1,0.1980360065466448,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s1/mp_mlp_2048_lr3e-4_s1_epoch29999,swm_data.pkl,8.142996788024902,8.489765167236328
+59,MP-S2,0.1792144026186579,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s2/mp_mlp_2048_lr3e-4_s2_epoch29999,swm_data.pkl,8.22907543182373,8.53892707824707
+60,MP-S3,0.1783960720130933,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s3/mp_mlp_2048_lr3e-4_s3_epoch29999,swm_data.pkl,8.135848045349121,8.522451400756836
+61,RSSM-S1,0.3690671031096563,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s1/rssm_disc_h_2048_lr3e-4_s1_epoch24200,swm_data.pkl,8.098723411560059,8.284380912780762
+62,RSSM-S2,0.3281505728314239,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s2/rssm_disc_h_2048_lr3e-4_s2_epoch24400,swm_data.pkl,8.138832092285156,8.388358116149902
+63,RSSM-S3,0.2643207855973813,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s3/rssm_disc_h_2048_lr3e-4_s3_epoch24400,swm_data.pkl,8.342867851257324,8.525533676147461
+64,RSSM-Cont-S1,0.0572831423895253,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s1/rssm_cont_h_2048_lr1e-4_s1_epoch9000,swm_data.pkl,9.267745018005373,9.95297908782959
+65,RSSM-Cont-S2,0.0343698854337152,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s2/rssm_cont_h_2048_lr1e-4_s2_epoch8800,swm_data.pkl,9.0586519241333,9.617687225341797
+66,RSSM-Cont-S3,0.0433715220949263,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s3/rssm_cont_h_2048_lr1e-4_s3_epoch1400,swm_data.pkl,9.99513053894043,11.95155906677246
+67,MD-S1,0.0646481178396072,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s1/md_mlp_2048_lr3e-4_s1_epoch13800,swm_data.pkl,8.408164978027344,8.629386901855469
+68,MD-S2,0.0736497545008183,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s2/md_mlp_2048_lr3e-4_s2_epoch13400,swm_data.pkl,8.566217422485352,8.807543754577637
+69,MD-S3,0.0523731587561374,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s3/md_mlp_2048_lr3e-4_s3_epoch13400,swm_data.pkl,8.517756462097168,8.827617645263672
+70,TF Emb2048 S1,0.3461538461538461,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s1/tf_emb2048_lr1e-4_s1_epoch4000,swm_data.pkl,11.995018005371094,12.772320747375488
+71,TF Emb2048 S2,0.2086743044189852,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s2/tf_emb2048_lr1e-4_s2_epoch4000,swm_data.pkl,12.388489723205566,13.610971450805664
+72,TF Emb2048 S3,0.3297872340425531,,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s3/tf_emb2048_lr1e-4_s3_epoch4000,swm_data.pkl,12.832002639770508,14.14901638031006
+73,GT End State S1,0.0057283142389525,,4400,swm_data.pkl,8.63057804107666,8.850144386291504
+74,GT End State S2,0.0073649754500818,,6200,swm_data.pkl,8.740114212036133,8.899181365966797
+75,GT End State S3,0.0180032733224222,,5800,swm_data.pkl,8.621192932128906,8.817893981933594
+76,GT End State S1,0.9942716857610474,,4400,swm_data.pkl,2.7998831272125244,1.289705753326416
+77,GT End State S2,0.9950900163666121,,6200,swm_data.pkl,2.6970479488372803,1.0460084676742554
+78,GT End State S3,0.9934533551554828,,5800,swm_data.pkl,2.6828272342681885,1.0452040433883667
