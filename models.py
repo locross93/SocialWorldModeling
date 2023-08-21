@@ -2929,7 +2929,8 @@ class EventModel:
                 x_burnin = torch.cat([x_burnin, x_hat_temp], dim=1)
                 burn_in_length = x_burnin.size(1)
             x_hat = torch.cat(x_hat, dim=1)
-            breakpoint()
+            # take the first rollout_length steps and discard leftover steps
+            x_hat = x_hat[:,:rollout_length,:]
 
         return x_hat
 
