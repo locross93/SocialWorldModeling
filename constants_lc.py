@@ -239,6 +239,9 @@ MODEL_DICT_VAL=  {
     'transformer_ds20000': {
         'class': TransformerWorldModel, 'config': 'tf_concat_pos_embd_emb_2048_config.json',
         'model_dir': 'transformer_ds20000', 'model_label': 'Transformer DS20000'},
+    'rssm_disc_h_2048_lr3e-4_s2': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
+        'model_dir': 'rssm_disc_h_2048_lr3e-4_s2', 'model_label': 'RSSM-S2'},
 }
 # Get the hostname of the machine
 hostname = socket.gethostname()

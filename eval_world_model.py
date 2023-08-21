@@ -19,7 +19,7 @@ from typing import List, Tuple, Dict, Any
 from tqdm import tqdm
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
-from constants import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
+from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
 from analysis_utils import load_config, get_highest_numbered_file, get_data_columns, init_model_class, inverse_normalize
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
@@ -493,6 +493,12 @@ class Analysis(object):
             multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
             
         # TO DO, ANALYZE EVERY PICKUP EVENT SEPARATELY, INCLUDING MULTI GOAL TRAJS
+        #TEMP
+        scores, y_labels, y_recon = self.eval_pickup_events(input_data, input_data)
+        pickup_subset = pickup_timepoints[single_goal_trajs,:]
+        indices = np.argwhere(pickup_subset > -1)
+        accuracy = np.mean(y_recon[indices[:,0],indices[:,1]])
+        breakpoint()
         
         single_goal_trajs = single_goal_trajs[:int(partial*len(single_goal_trajs))]
         num_single_goal_trajs = len(single_goal_trajs)

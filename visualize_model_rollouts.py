@@ -301,6 +301,8 @@ if __name__ == '__main__':
         burn_in_length = args.burn_in_length
     print('Burn in length: {}'.format(burn_in_length))
     
+    breakpoint()
+    
     rollout_length = input_data.size(1) - burn_in_length
     x = input_data[traj_ind,:,:].unsqueeze(0)
     if x.dtype == torch.float64:

@@ -160,10 +160,12 @@ def plot_eval_wm_results(result_path, save_figs=True, title_fontsize=title_fonts
                      legend_fontsize=label_fontsize)
 
 #goal_path = 'results/all_results_goal_events.csv'
-goal_path = 'results/goal_events_10_more_burnin.csv'
-event_type = goal_path.split('_')[-2]
+#result_path = 'results/all_results_goal_events_submission.csv'
+#result_path = 'results/goal_events_10_more_burnin.csv'
+result_path = 'results/all_results_multigoal_events_submission.csv'
+event_type = result_path.split('_')[-2]
 #df = pd.read_csv(result_path, index_col=0)
-df = process_plot_data(goal_path)
+df = process_plot_data(result_path)
 
 model_keys = {
     'GT End State S1' : 'Hierarchical Oracle Model',
@@ -181,6 +183,9 @@ model_keys = {
     'MD-S1' : 'Multistep Delta',
     'MD-S2' : 'Multistep Delta',
     'MD-S3' : 'Multistep Delta',
+    'TF-Emb2048-S1' : 'Transformer',
+    'TF-Emb2048-S2' : 'Transformer',
+    'TF-Emb2048-S3' : 'Transformer',
     'TF Emb2048 S1' : 'Transformer',
     'TF Emb2048 S2' : 'Transformer',
     'TF Emb2048 S3' : 'Transformer',
@@ -193,18 +198,13 @@ df_results = df[df['model'].isin(model_keys.keys())].copy()
 # Replacing the 'model' values using the model_keys dictionary
 df_results['model'] = df_results['model'].map(model_keys)
 
-# Displaying the first few rows of the new dataframe
-df_results.head()
-
-breakpoint()
-
 save_figs = True
 if save_figs:
     save_file = result_path.split('.')[0] + '.png'
 else:
     save_file = None
 
-plot_eval_wm_results(goal_path, title_fontsize=title_fontsize, 
+plot_eval_wm_results(result_path, title_fontsize=title_fontsize, 
                      xtick_fontsize=xtick_fontsize, 
                      label_fontsize=label_fontsize,
                      legend_fontsize=label_fontsize)
