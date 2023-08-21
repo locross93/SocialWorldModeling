@@ -207,28 +207,28 @@ MODEL_DICT_VAL=  {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
         'model_dir': 'sgnet_cvae_hidden_size64', 'model_label': 'SGNet 64'},
     'feudal_5steps': {
-        'class': EventModel, 'config': 'hierarchical_event_model.json',
+        'class': EventModel, 'config': 'hierarchical_event_model_5steps.json',
         'model_dir': 'feudal_5steps', 'model_label': 'Feudal 5 Step'},
     'feudal_10steps': {
-        'class': EventModel, 'config': 'hierarchical_event_model.json',
+        'class': EventModel, 'config': 'hierarchical_event_model_10steps.json',
         'model_dir': 'feudal_10steps', 'model_label': 'Feudal 10 Step'},
     'feudal_20steps': {
         'class': EventModel, 'config': 'hierarchical_event_model_20steps.json',
         'model_dir': 'feudal_20steps', 'model_label': 'Feudal 20 Step'},
     'feudal_30steps': {
-        'class': EventModel, 'config': 'hierarchical_event_model.json',
+        'class': EventModel, 'config': 'hierarchical_event_model_30steps.json',
         'model_dir': 'feudal_30steps', 'model_label': 'Feudal 30 Step'},
     'hdelta_5steps': {
-        'class': EventModel, 'config': 'hierarchical_delta_emodel.json',
+        'class': EventModel, 'config': 'hierarchical_delta_emodel_5steps.json',
         'model_dir': 'hdelta_5steps', 'model_label': 'HDelta 5 Step'},
     'hdelta_10steps': {
-        'class': EventModel, 'config': 'hierarchical_delta_emodel.json',
+        'class': EventModel, 'config': 'hierarchical_delta_emodel_10steps.json',
         'model_dir': 'hdelta_10steps', 'model_label': 'HDelta 10 Step'},
     'hdelta_20steps': {
-        'class': EventModel, 'config': 'hierarchical_delta_emodel.json',
+        'class': EventModel, 'config': 'hierarchical_delta_emodel_20steps.json',
         'model_dir': 'hdelta_20steps', 'model_label': 'HDelta 20 Step'},
     'hdelta_30steps': {
-        'class': EventModel, 'config': 'hierarchical_delta_emodel.json',
+        'class': EventModel, 'config': 'hierarchical_delta_emodel_30steps.json',
         'model_dir': 'hdelta_30steps', 'model_label': 'HDelta 30 Step'},
     'rssm_ds1000': {
         'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
