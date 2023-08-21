@@ -53,6 +53,7 @@ class SGNet_CVAE(nn.Module):
             self.enc_steps = config["enc_steps"] # observation step
         if "dec_steps" in config:            
             self.dec_steps = config["dec_steps"] # prediction step
+        
         self.dropout = config["dropout"]
         self.feature_extractor = nn.Sequential(nn.Linear(self.input_dim, self.hidden_size),
                                               nn.ReLU(inplace=True))
@@ -91,7 +92,7 @@ class SGNet_CVAE(nn.Module):
         self.dec_cell = nn.GRUCell(self.hidden_size + self.hidden_size//4, self.hidden_size)
     
     def SGE(self, goal_hidden):
-        # initial goal input with zero
+        # initial goal input with zero        
         goal_input = goal_hidden.new_zeros((goal_hidden.size(0), self.hidden_size//4))
         # initial trajectory tensor
         goal_traj = goal_hidden.new_zeros(goal_hidden.size(0), self.dec_steps, self.pred_dim)
