@@ -193,6 +193,17 @@ def plot_placement(df, legend=False):
         plt.legend(handles=handles, loc='upper left', bbox_to_anchor=(1.15, 1.0), fontsize=12, title='Model Name')
     plt.tight_layout()
     plt.show()
+    
+BEHV_CATE_DICT = {
+            'colab_gathereing': ['leader_follower', 'follower_leader'],
+            'adversarial_gathering': ['adversarial_gathering', 'gathering_adversarial'],
+            'ss gathering': ['random_gathering', 'gathering_static', 'static_gathering', 'gathering_random'],
+            'ms gatherinng': ['static_multistep', 'multistep_static', 'random_multistep', 'multistep_random'],
+            'chasing': ['chaser_runner', 'runner_chaser'],
+            'mimicry': ['random_mimic', 'mimic_random'],
+            'random': ['random_gathering', 'random_mimic', 'mimic_random', 'random_multistep',
+                       'random_random', 'multistep_random', 'gathering_random']
+}
 
 CATE_BEHV_DICT = {}#{v: k for k, vs in BEHV_CATE_DICT.items() for v in vs}
 for k, vs in BEHV_CATE_DICT.items():
@@ -205,6 +216,15 @@ for k, vs in BEHV_CATE_DICT.items():
 result_path = 'results/eval_displacement.pkl'
 results = pickle.load(open(result_path, 'rb'))
 
+result_path2 = 'results/gt_end_state_displacement.pkl'
+results2 = pickle.load(open(result_path2, 'rb'))
+
+results = results + results2
+
+result = results[0]
+displacement_vals = result[50]  
+all_behaviors = [behavior for behavior in displacement_vals]
+
 # {model_name: {behavior: [val_by_seed]}
 model_seed_ade_dict = {}
 model_seed_fde_dict = {}
@@ -214,12 +234,17 @@ for result in results:
     elif ' ' in result['model']:
         model_name = '_'.join(result['model'].split(' ')[: -1])
     print(result['model'])
-    displacement_vals = result[50]    
+    if model_name == 'GT_End_State':
+        displacement_vals = result
+        ade_key = 'ade'
+    else:
+        displacement_vals = result[50]   
+        ade_key = 'mde'
     if model_name not in model_seed_ade_dict:
         model_seed_ade_dict[model_name] = {}
         model_seed_fde_dict[model_name] = {}
-        for behavior in displacement_vals:            
-            ade = displacement_vals[behavior]['mde'].item()
+        for behavior in all_behaviors:            
+            ade = displacement_vals[behavior][ade_key].item()
             fde = displacement_vals[behavior]['fde'].item()
             for cat in CATE_BEHV_DICT[behavior]:
                 if cat in model_seed_ade_dict[model_name]:
@@ -229,8 +254,8 @@ for result in results:
                     model_seed_ade_dict[model_name][cat] = [ade]
                     model_seed_fde_dict[model_name][cat] = [fde]
     else:
-        for behavior in displacement_vals:
-            ade = displacement_vals[behavior]['mde'].item()
+        for behavior in all_behaviors:
+            ade = displacement_vals[behavior][ade_key].item()
             fde = displacement_vals[behavior]['fde'].item()
             for cat in CATE_BEHV_DICT[behavior]:            
                 if cat in model_seed_ade_dict[model_name]:
@@ -261,3 +286,40 @@ plot_placement(ade_df)
 fde_df = create_data_df(model_seed_fde_dict)
 plot_placement(fde_df, legend=True)
 #%%
+
+model_keys = {
+    'GT_End_State' : 'Hierarchical Oracle Model',
+    'MP' : 'Multistep Predictor',
+    'RSSM' : 'RSSM Discrete',
+    'RSSM_Cont' : 'RSSM Continuous',
+    'MD' : 'Multistep Delta',
+    'TF_Emb2048' : 'Transformer',
+    }
+
+behavior_keys = {
+    'colab_gathereing': 'Collaborative Gathering',
+    'adversarial_gathering': 'Adversarial Gathering',
+    'ss gathering': 'Single-step Gathering',
+    'ms gatherinng': 'Multi-step Gathering',
+    'chasing': 'Chasing',
+    'mimicry': 'Mimicry',
+    'random': 'Random',
+    }
+
+# Filtering rows where 'model' is in the keys of the model_keys dictionary
+ade_df_results = ade_df[ade_df['Model'].isin(model_keys.keys())].copy()
+
+# Replacing the 'model' values using the model_keys dictionary
+ade_df_results['Model'] = ade_df_results['Model'].map(model_keys)
+
+# Replace the 'behavior' values using the behavior_keys dictionary
+ade_df_results['Behavior'] = ade_df_results['Behavior'].map(behavior_keys)
+
+# repeat for fde_df
+fde_df_results = fde_df[fde_df['Model'].isin(model_keys.keys())].copy()
+fde_df_results['Model'] = fde_df_results['Model'].map(model_keys)
+fde_df_results['Behavior'] = fde_df_results['Behavior'].map(behavior_keys)
+
+# save dataframes
+ade_df_results.to_csv('results/ade_results.csv')
+fde_df_results.to_csv('results/fde_results.csv')
