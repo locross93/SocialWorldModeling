@@ -657,6 +657,7 @@ class Analysis(object):
             real_trajs = self.input_data[:, -rollout_length:, :]
             burn_ins = self.input_data[:, :burn_in_length, :]
             input_data = self.input_data
+            result, obj_moved_flag, recon_moved_flag = self._eval_move_events(input_data, input_data, self.args.move_threshold)
             
             with torch.no_grad():
                 if batch_size is None: 
@@ -676,8 +677,26 @@ class Analysis(object):
                         torch.cuda.empty_cache()
                     rollout_x = torch.cat(rollout_x_list, dim=0).cpu()
                     rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x) | (torch.abs(rollout_x) > 1e3)] = 0                    
-                    move_flags = torch.from_numpy(np.concatenate(move_flags, axis=0))                    
-                    if still_obj:                                                
+                    move_flags = torch.from_numpy(np.concatenate(move_flags, axis=0))   
+                    if still_obj:
+                        num_trials = rollout_x.shape[0]
+                        num_objs = 3
+                        dims = ['x', 'y', 'z']
+                        displacement_by_time = []
+                        for i in range(num_trials):
+                            trial_x = rollout_x[i,:,:]
+                            real_x = real_trajs[i,:,:]
+                            for j in range(num_objs):
+                                if not obj_moved_flag[i,j]:
+                                    pos_inds = [self.data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
+                                    trial_obj_pos = trial_x[:,pos_inds]
+                                    real_obj_pos = real_x[:,pos_inds]
+                                    step_de = torch.norm(trial_obj_pos - real_obj_pos, p=2, dim=-1)
+                                    displacement_by_time.append(step_de)
+                        time_disp_array = torch.stack(displacement_by_time, dim=0)
+                        avg_disp_by_time = time_disp_array.mean(dim=0)
+                        result['all_trials'] = {'step_de': avg_disp_by_time} 
+                    elif still_obj and len(obj_moved_flag) == 0:                                                
                         # only compute displacement for still objects, and only compute displacement with positions
                         rollout_x = rollout_x.reshape(rollout_x.shape[0], rollout_x.shape[1], -1, 7)
                         rollout_x = rollout_x[:, :, :3, :3]

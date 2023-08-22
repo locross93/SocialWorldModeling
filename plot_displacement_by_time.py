@@ -1,4 +1,7 @@
 import seaborn as sns
+import pickle
+import numpy as np
+import matplotlib.pyplot as plt
 
 def plot_combined_displacement_errors(data):
     # Set up the Seaborn colorblind palette
@@ -18,7 +21,6 @@ def plot_combined_displacement_errors(data):
     axes[0].set_ylabel("Displacement Error")
     axes[0].legend()
     axes[0].grid(True)
-    breakpoint()
 
     # Cumulative Displacement Errors    
     for entry in data:
@@ -37,9 +39,9 @@ def plot_combined_displacement_errors(data):
 
     # Save the combined plot as a high-quality PNG
     if 'still_obj' in result_path:
-        file_path_combined = "./combined_displacement_errors_still_obj.png"
+        file_path_combined = "./results/combined_displacement_errors_still_obj_new.png"
     else:
-        file_path_combined = "./combined_displacement_errors.png"
+        file_path_combined = "./results/combined_displacement_errors.png"
     plt.savefig(file_path_combined, dpi=500)
 
     plt.show()
@@ -47,8 +49,10 @@ def plot_combined_displacement_errors(data):
 
 
 # Plotting the displacement errors for each model with distinct colors
-result_path = './results/eval_displacement_still_obj.pkl'
+#result_path = './results/eval_displacement_still_obj.pkl'
+result_path = './results/mp_disp_by_t4_still_obj.pkl'
+#result_path = './results/disp_by_time_submission_still_obj.pkl'
+#result_path = './results/disp_by_time_burninflag_still_obj.pkl'
 # result_path = './results/eval_displacement.pkl'
 data = pickle.load(open(result_path, "rb"))
-breakpoint()
 plot_combined_displacement_errors(data)
