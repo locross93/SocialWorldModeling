@@ -704,11 +704,15 @@ class Analysis(object):
         result = {}        
         for burn_in_length in burn_in_lengths:
             print(f"Burn in length {burn_in_length}")            
-            rollout_length = traj_length - burn_in_length        
-            real_trajs = self.input_data[:, -rollout_length:, :]
+            rollout_length = traj_length - burn_in_length 
+            real_trajs = self.input_data
+            real_rollout = self.input_data[:, -rollout_length:, :]
+
             with torch.no_grad():
                 if batch_size is None: 
                     rollout_x = model.forward_rollout(real_trajs.cuda(), burn_in_length, rollout_length).cpu()
+                    # Replace any nan, inf, or outliers values with 0
+                    rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x) | (torch.abs(rollout_x) > 1e3)] = 0
                 else:
                     rollout_x = []
                     for i in tqdm(range(0, total_trials, batch_size)):
@@ -728,11 +732,11 @@ class Analysis(object):
                         rollout_x.append(y)
                         torch.cuda.empty_cache()
                     rollout_x = torch.cat(rollout_x, dim=0)
-
+                    assert rollout_x.size() == real_rollout.size()
                     # compute average displacement error by computing euclidean distance between predicted and real trajectories
-                    ade = torch.mean(torch.norm(rollout_x - real_trajs, p=2, dim=-1))
+                    ade = torch.mean(torch.norm(rollout_x - real_rollout, p=2, dim=-1))
                     # compute final displacement error
-                    fde = torch.mean(torch.norm(rollout_x[:, -1, :] - real_trajs[:, -1, :], p=2, dim=-1))
+                    fde = torch.mean(torch.norm(rollout_x[:, -1, :] - real_rollout[:, -1, :], p=2, dim=-1))
                     result['all_trials'] = {'ade': ade, 'fde': fde}
 
                     #rollout_x = rollout_x.reshape(rollout_x.size(0), -1)
@@ -741,7 +745,7 @@ class Analysis(object):
                     for behavior_key in behavior_keys:
                         behavior_idxs = self.exp_info_dict['val'][behavior_key]
                         behavior_rollout_x = rollout_x[behavior_idxs]
-                        behavior_real_trajs = real_trajs[behavior_idxs]                        
+                        behavior_real_trajs = real_rollout[behavior_idxs]                        
                         # compute average displacement error by computing euclidean distance between predicted and real trajectories
                         ade = torch.mean(torch.norm(behavior_rollout_x - behavior_real_trajs, p=2, dim=-1))
                         # compute final displacement error
