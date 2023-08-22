@@ -683,6 +683,7 @@ class Analysis(object):
                         num_objs = 3
                         dims = ['x', 'y', 'z']
                         displacement_by_time = []
+                        total_disp_by_time = []
                         for i in range(num_trials):
                             trial_x = rollout_x[i,:,:]
                             real_x = real_trajs[i,:,:]
@@ -693,9 +694,14 @@ class Analysis(object):
                                     real_obj_pos = real_x[:,pos_inds]
                                     step_de = torch.norm(trial_obj_pos - real_obj_pos, p=2, dim=-1)
                                     displacement_by_time.append(step_de)
+                                    # get the total delta from sum(d0, d1...dt) at each timepoint - what's used for detect_object_move and jittering
+                                    first_disp = torch.norm(trial_obj_pos[0,:] - real_obj_pos[0,:], p=2, dim=-1)
+                                    obj_pos_delta = torch.norm(trial_obj_pos[1:,:] - trial_obj_pos[:-1,:], p=2, dim=-1)
+                                    # concaneate first disp with the rest of the displacements
+                                    total_disp_by_time = torch.cat([first_disp.unsqueeze(0), np.cumsum(obj_pos_delta, axis=0)], dim=0)
                         time_disp_array = torch.stack(displacement_by_time, dim=0)
                         avg_disp_by_time = time_disp_array.mean(dim=0)
-                        result['all_trials'] = {'step_de': avg_disp_by_time} 
+                        result['all_trials'] = {'step_de': avg_disp_by_time, 'cum_disp': total_disp_by_time} 
                     elif still_obj and len(obj_moved_flag) == 0:                                                
                         # only compute displacement for still objects, and only compute displacement with positions
                         rollout_x = rollout_x.reshape(rollout_x.shape[0], rollout_x.shape[1], -1, 7)

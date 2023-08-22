@@ -22,12 +22,18 @@ def plot_combined_displacement_errors(data):
     axes[0].legend()
     axes[0].grid(True)
 
+    # # Cumulative Displacement Errors    
+    # for entry in data:
+    #     model_name = entry['model']
+    #     step_de = np.array(entry['all_trials']['step_de'])
+    #     cumulative_de = np.cumsum(step_de, axis=0)
+    #     axes[1].plot(cumulative_de, label=model_name)
+
     # Cumulative Displacement Errors    
     for entry in data:
         model_name = entry['model']
-        step_de = np.array(entry['all_trials']['step_de'])
-        cumulative_de = np.cumsum(step_de, axis=0)
-        axes[1].plot(cumulative_de, label=model_name)
+        cum_disp = np.array(entry['all_trials']['cum_disp'])
+        axes[1].plot(cum_disp, label=model_name)
 
     axes[1].set_title("Cumulative Displacement Errors")
     axes[1].set_xlabel("Timestep")
@@ -50,9 +56,10 @@ def plot_combined_displacement_errors(data):
 
 # Plotting the displacement errors for each model with distinct colors
 #result_path = './results/eval_displacement_still_obj.pkl'
-result_path = './results/mp_disp_by_t4_still_obj.pkl'
+#result_path = './results/mp_disp_by_t4_still_obj.pkl'
 #result_path = './results/disp_by_time_submission_still_obj.pkl'
 #result_path = './results/disp_by_time_burninflag_still_obj.pkl'
 # result_path = './results/eval_displacement.pkl'
+result_path = './results/disp_by_time_correct_still_obj.pkl'
 data = pickle.load(open(result_path, "rb"))
 plot_combined_displacement_errors(data)
