@@ -309,6 +309,7 @@ elif 'node1-ccn2cluster.stanford.edu' in hostname:
     results_dir = '/data3/locross/SocialWorldModeling/results/'
     model_config_dir = '/data3/locross/SocialWorldModeling/model_configs/'
 
+
 DEFAULT_VALUES = {
 	'train_seed': 911320,
     'eval_seed': 911320, #834869, #(good for SGNet & RSSM Discrete) 
@@ -325,8 +326,8 @@ DEFAULT_VALUES = {
     'save_every': 200,
     #'model_keys': list(MODEL_DICT_VAL.keys()),
     #'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','rssm_cont_h_2048_lr1e-4_s1','md_mlp_2048_lr3e-4_s1','transformer_iris'],
-    'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','tf_emb2048_lr1e-4_s1'],
-    #'model_keys': ['sgnet_10', 'sgnet10_s2', 'sgnet10_s3'], 
+    #'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','tf_emb2048_lr1e-4_s1'],
+    'model_keys': ['sgnet_10', 'sgnet10_s2', 'sgnet10_s3'],     
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,

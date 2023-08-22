@@ -19,7 +19,7 @@ from typing import List, Tuple, Dict, Any
 from tqdm import tqdm
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
-from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
+from constants import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
 from analysis_utils import load_config, get_highest_numbered_file, get_data_columns, init_model_class, inverse_normalize
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
@@ -152,7 +152,7 @@ class Analysis(object):
         return ADE.item(), FDE.item()
 
 
-    def eval_goal_events_in_rollouts(self, model, input_data, offset=0, partial=1.0) -> Dict[str, typing.Any]:
+    def eval_goal_events_in_rollouts(self, model, input_data, offset=5, partial=1.0) -> Dict[str, typing.Any]:
         if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
@@ -177,6 +177,8 @@ class Analysis(object):
             if offset != 0:
                 # burn in to frames before or after pick up point to control difficulty
                 steps2pickup = steps2pickup + offset
+                if i == 0:
+                    print('Offset:',offset)
                 # if steps2pickup > 15:
                 #     steps2pickup = steps2pickup - 15
                 # elif steps2pickup > 10:
@@ -609,11 +611,12 @@ class Analysis(object):
         total_trials, traj_length, _ = self.input_data.shape
         behavior_keys = list(self.exp_info_dict['val'].keys())[2: -5]
         burn_in_lengths = [50]    #, 100, 150, 150, 200, 250]        
-        result = {}        
+        result = {}
         for burn_in_length in burn_in_lengths:
             print(f"Burn in length {burn_in_length}")            
             rollout_length = traj_length - burn_in_length        
             real_trajs = self.input_data[:, -rollout_length:, :]
+            
             with torch.no_grad():
                 if batch_size is None: 
                     rollout_x = model.forward_rollout(real_trajs.cuda(), burn_in_length, rollout_length).cpu()
@@ -629,13 +632,13 @@ class Analysis(object):
                     rollout_x = torch.cat(rollout_x, dim=0)
                     # Replace any nan, inf, or outliers values with 0
                     rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x) | (torch.abs(rollout_x) > 1e3)] = 0
-
+                    step_de = torch.norm(rollout_x - real_trajs, p=2, dim=-1).mean(dim=0)
                     # compute average displacement error by computing euclidean distance between predicted and real trajectories
                     ade = torch.mean(torch.norm(rollout_x - real_trajs, p=2, dim=-1))
                     # compute final displacement error
                     fde = torch.mean(torch.norm(rollout_x[:, -1, :] - real_trajs[:, -1, :], p=2, dim=-1))
-                    result['all_trials'] = {'ade': ade, 'fde': fde}
-
+                    result['all_trials'] = {
+                        'ade': ade, 'fde': fde, 'step_de': step_de}
                     #rollout_x = rollout_x.reshape(rollout_x.size(0), -1)
                     #real_trajs = real_trajs.reshape(real_trajs.size(0), -1)
                     #behavior_result = {}
@@ -704,8 +707,9 @@ class Analysis(object):
         result_save_dir = os.path.join(self.args.analysis_dir, 'results')
         if not os.path.exists(result_save_dir):
             os.makedirs(result_save_dir)
-        if self.args.eval_type == 'displacement':
-            save_path = os.path.join(result_save_dir, f'{save_file}.pkl')
+        if self.args.eval_type == 'displacement':            
+            save_path = os.path.join(result_save_dir, f'{save_file}.pkl')            
+            print(f"Saving results to {save_path}")
             with open(save_path, 'wb') as f:
                 pickle.dump(self.results, f)
         else:  
