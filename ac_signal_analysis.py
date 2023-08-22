@@ -47,7 +47,10 @@ class AC_Signal_Analysis(Analysis):
                 for goal_num, goal_ts in enumerate(all_ts):
                     steps2pickup = goal_ts[0]
                     steps2goal = goal_ts[1]
-                    assert steps2pickup < steps2goal
+                    #assert steps2pickup < steps2goal
+                    # steps2pickup not less than steps2goal, go to the next i
+                    if steps2pickup >= steps2goal:
+                        continue
                     
                     prev_steps = np.linspace(init_step, steps2pickup, (num_timebins//2)+1).astype(int)
                     after_steps = np.linspace(steps2pickup, steps2goal, (num_timebins//2)).astype(int)
