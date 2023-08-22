@@ -72,6 +72,7 @@ class AC_Signal_Analysis(Analysis):
                     init_step = steps2goal
     
         df_plot = pd.DataFrame(results)
+        df_plot['MSE Normalized'] = df_plot.groupby('Model')['MSE'].transform(lambda x: (x - x.min()) / (x.max() - x.min()))
 
         # Replacing the 'Model' values using the model_keys dictionary
         model_keys = {
@@ -92,7 +93,7 @@ class AC_Signal_Analysis(Analysis):
         df_plot.to_csv(save_path)
 
         if self.args.goal_type == 'single_step':
-            sns.lineplot(x='Time To Goal', y='MSE', hue='Model', data=df_plot)
+            sns.lineplot(x='Time To Goal', y='MSE Normalized', hue='Model', data=df_plot)
             plt.xlabel('Time To Goal %', fontsize=16)
             plt.ylabel('MSE - 30 Step Rollout', fontsize=18)
             plt.xticks(np.arange(0, 1.25, step=0.25)) 
@@ -101,7 +102,7 @@ class AC_Signal_Analysis(Analysis):
             plt.savefig(save_path_plot, dpi=300, bbox_inches='tight')
             plt.show()
         elif self.args.goal_type == 'multi_step':
-            sns.lineplot(x='Time To Goal', y='MSE', hue='Model', data=df_plot)
+            sns.lineplot(x='Time To Goal', y='MSE Normalized', hue='Model', data=df_plot)
             plt.xlabel('Time To Goal %', fontsize=16)
             plt.ylabel('MSE - 30 Step Rollout', fontsize=18)
             plt.xticks(np.arange(0, 3.25, step=0.25)) 
