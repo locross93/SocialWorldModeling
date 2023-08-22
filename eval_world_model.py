@@ -559,12 +559,6 @@ class Analysis(object):
             multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
             
         # TO DO, ANALYZE EVERY PICKUP EVENT SEPARATELY, INCLUDING MULTI GOAL TRAJS
-        #TEMP
-        scores, y_labels, y_recon = self.eval_pickup_events(input_data, input_data)
-        pickup_subset = pickup_timepoints[single_goal_trajs,:]
-        indices = np.argwhere(pickup_subset > -1)
-        accuracy = np.mean(y_recon[indices[:,0],indices[:,1]])
-        breakpoint()
         
         single_goal_trajs = single_goal_trajs[:int(partial*len(single_goal_trajs))]
         num_single_goal_trajs = len(single_goal_trajs)

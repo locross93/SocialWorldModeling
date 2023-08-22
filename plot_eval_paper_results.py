@@ -216,10 +216,13 @@ for k, vs in BEHV_CATE_DICT.items():
 result_path = 'results/eval_displacement.pkl'
 results = pickle.load(open(result_path, 'rb'))
 
-result_path2 = 'results/gt_end_state_displacement.pkl'
-results2 = pickle.load(open(result_path2, 'rb'))
+result_path2 = 'results/sgnet_displacement.pkl'
+results2 = pickle.load(open(result_path, 'rb'))
 
-results = results + results2
+result_path3 = 'results/gt_end_state_displacement.pkl'
+results3 = pickle.load(open(result_path2, 'rb'))
+
+results = results + results2 + results3
 
 result = results[0]
 displacement_vals = result[50]  
