@@ -19,7 +19,7 @@ from typing import List, Tuple, Dict, Any
 from tqdm import tqdm
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
-from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
+from constants import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
 from analysis_utils import load_config, get_highest_numbered_file, get_data_columns, init_model_class, inverse_normalize
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
@@ -152,7 +152,7 @@ class Analysis(object):
         return ADE.item(), FDE.item()
 
 
-    def eval_goal_events_in_rollouts(self, model, input_data, offset=0, partial=1.0) -> Dict[str, typing.Any]:
+    def eval_goal_events_in_rollouts(self, model, input_data, offset=5, partial=1.0) -> Dict[str, typing.Any]:
         if self.ds_num == 1:
             # first dataset
             pickup_timepoints = annotate_pickup_timepoints(self.loaded_dataset, train_or_val='val', pickup_or_move='move', ds_num=self.ds_num)
@@ -177,6 +177,8 @@ class Analysis(object):
             if offset != 0:
                 # burn in to frames before or after pick up point to control difficulty
                 steps2pickup = steps2pickup + offset
+                if i == 0:
+                    print('Offset:',offset)
                 # if steps2pickup > 15:
                 #     steps2pickup = steps2pickup - 15
                 # elif steps2pickup > 10:
