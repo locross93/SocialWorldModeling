@@ -38,12 +38,23 @@ model_keys = {
     'TF Emb2048 S1' : 'Transformer',
     'TF Emb2048 S2' : 'Transformer',
     'TF Emb2048 S3' : 'Transformer',
+    'SGNet 10': 'SGNet',
+    'SGNet 10 S2': 'SGNet',
+    'SGNet 10 S3': 'SGNet',
     }
 
 
 # GOAL EVENTS
 result_path = 'results/goal_events2plot.csv'
 df = pd.read_csv(result_path, index_col=0)
+
+result_path2 = 'results/sgnet_goal_events.csv'
+df2 = pd.read_csv(result_path2, index_col=0)
+
+save_file = 'results/figures/all_results_goal_events_submission'
+
+#concat df and df2
+df = pd.concat([df, df2], axis=0)
 
 # Filtering rows where 'model' is in the keys of the model_keys dictionary
 df_results = df[df['model'].isin(model_keys.keys())].copy()
@@ -56,12 +67,12 @@ title_fontsize=40
 xtick_fontsize=18
 label_fontsize=36
 legend_fontsize=28
-model_order = ['Hierarchical Oracle Model', 'Multistep Predictor', 'RSSM Discrete', 'RSSM Continuous', 'Multistep Delta', 'Transformer']
+model_order = ['Hierarchical Oracle Model', 'Multistep Predictor', 'RSSM Discrete', 'RSSM Continuous', 'Multistep Delta', 'Transformer', 'SGNet']
 
 # Split each model name into two lines if it contains two words
 model_labels = ['\n'.join(model.split()) if len(model.split()) > 1 else model for model in model_order]
 
-plt.figure(figsize=(12, 6))
+plt.figure(figsize=(13, 6))
 bar_plot = sns.barplot(x='model', y='score', data=df_results, palette=sn_palette, errorbar="se", capsize=0.1, order=model_order)
 sns.despine(top=True, right=True)    
 #bar_plot.set_xticklabels(bar_plot.get_xticklabels(), rotation=45, horizontalalignment='right')
@@ -75,6 +86,6 @@ plt.ylim([0, 1])
 
 # Set the x-tick labels with the modified model names
 bar_plot.set_xticklabels(model_labels, fontsize=xtick_fontsize, rotation=0, horizontalalignment='center')
-# if save_file is not None:
-#     plt.savefig(save_file, dpi=300, bbox_inches='tight')    
+if save_file is not None:
+    plt.savefig(save_file, dpi=300, bbox_inches='tight')    
 plt.show()
