@@ -1,0 +1,2 @@
+,model,score,ADE,FDE,epoch,dataset
+0,MP-S1,0.22131147540983606,8.103740692138672,8.377474784851074,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s1/mp_mlp_2048_lr3e-4_s1_epoch29999,swm_data.pkl
