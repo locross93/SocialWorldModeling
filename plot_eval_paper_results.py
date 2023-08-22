@@ -133,8 +133,8 @@ def get_displacement(displacement_vals, dis_type='mde'):
 def create_data_df(data_dict):
     data = []
     for model, behaviors in data_dict.items():
-        for behavior, (mean, sterr) in behaviors.items():
-            data.append({'Model': model, 'Behavior': behavior, 'Mean': mean, 'StdErr': sterr})
+        for behavior, (mean, std) in behaviors.items():
+            data.append({'Model': model, 'Behavior': behavior, 'Mean': mean, 'Std': std})
     return pd.DataFrame(data)
 
 def plot_placement(df, legend=False):

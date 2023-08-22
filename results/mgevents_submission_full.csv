@@ -1,0 +1,22 @@
+,model,g2_acc,g2_goal_num,g3_acc,g3_goal_num,ADE,FDE,epoch,dataset
+0,MP-S1,0.5741127348643006,2nd Goal,0.31315240083507306,3rd Goal,8.62276840209961,9.14931869506836,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s1/mp_mlp_2048_lr3e-4_s1_epoch29999,swm_data.pkl
+1,MP-S2,0.569937369519833,2nd Goal,0.2985386221294363,3rd Goal,8.569683074951172,9.053544998168945,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s2/mp_mlp_2048_lr3e-4_s2_epoch29999,swm_data.pkl
+2,MP-S3,0.5511482254697286,2nd Goal,0.3048016701461378,3rd Goal,8.625978469848633,9.177632331848145,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/mp_mlp_2048_lr3e-4_s3/mp_mlp_2048_lr3e-4_s3_epoch29999,swm_data.pkl
+3,RSSM-S1,0.32150313152400833,2nd Goal,0.016701461377870562,3rd Goal,9.994623184204102,10.776795387268066,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s1/rssm_disc_h_2048_lr3e-4_s1_epoch24200,swm_data.pkl
+4,RSSM-S2,0.2818371607515658,2nd Goal,0.018789144050104383,3rd Goal,10.10252571105957,10.965852737426758,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s2/rssm_disc_h_2048_lr3e-4_s2_epoch24400,swm_data.pkl
+5,RSSM-S3,0.2797494780793319,2nd Goal,0.012526096033402923,3rd Goal,10.005054473876953,10.880927085876465,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_disc_h_2048_lr3e-4_s3/rssm_disc_h_2048_lr3e-4_s3_epoch24400,swm_data.pkl
+6,RSSM-Cont-S1,0.08559498956158663,2nd Goal,0.07306889352818371,3rd Goal,10.180115699768066,10.44420337677002,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s1/rssm_cont_h_2048_lr1e-4_s1_epoch9000,swm_data.pkl
+7,RSSM-Cont-S2,0.06263048016701461,2nd Goal,0.04175365344467641,3rd Goal,10.31467342376709,10.673412322998047,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s2/rssm_cont_h_2048_lr1e-4_s2_epoch8800,swm_data.pkl
+8,RSSM-Cont-S3,0.012526096033402923,2nd Goal,0.027139874739039668,3rd Goal,11.689615249633789,13.476168632507324,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/rssm_cont_h_2048_lr1e-4_s3/rssm_cont_h_2048_lr1e-4_s3_epoch1400,swm_data.pkl
+9,MD-S1,0.2630480167014614,2nd Goal,0.12943632567849686,3rd Goal,9.476786613464355,10.111473083496094,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s1/md_mlp_2048_lr3e-4_s1_epoch13800,swm_data.pkl
+10,MD-S2,0.2881002087682672,2nd Goal,0.1419624217118998,3rd Goal,9.323638916015625,9.829482078552246,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s2/md_mlp_2048_lr3e-4_s2_epoch13400,swm_data.pkl
+11,MD-S3,0.2651356993736952,2nd Goal,0.13569937369519833,3rd Goal,9.414009094238281,10.016831398010254,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/md_mlp_2048_lr3e-4_s3/md_mlp_2048_lr3e-4_s3_epoch13400,swm_data.pkl
+12,TF Emb2048 S1,0.5073068893528184,2nd Goal,0.4572025052192067,3rd Goal,12.926874160766602,14.287732124328613,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s1/tf_emb2048_lr1e-4_s1_epoch4000,swm_data.pkl
+13,TF Emb2048 S2,0.3862212943632568,2nd Goal,0.31941544885177453,3rd Goal,14.077783584594727,16.356355667114258,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s2/tf_emb2048_lr1e-4_s2_epoch4000,swm_data.pkl
+14,TF Emb2048 S3,0.4279749478079332,2nd Goal,0.3465553235908142,3rd Goal,13.850301742553711,16.27707290649414,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s3/tf_emb2048_lr1e-4_s3_epoch4000,swm_data.pkl
+0,GT End State S1,0.9916492693110647,2nd Goal,1.0,3rd Goal,3.7574663162231445,1.1165738105773926,4400,swm_data.pkl
+1,GT End State S2,0.9916492693110647,2nd Goal,1.0,3rd Goal,3.7144384384155273,0.7937474250793457,6200,swm_data.pkl
+2,GT End State S3,0.9916492693110647,2nd Goal,1.0,3rd Goal,3.752070426940918,1.0324132442474365,5800,swm_data.pkl
+0,SGNet 10,0.3966597077244259,2nd Goal,0.1440501043841336,3rd Goal,9.359580993652344,9.806836128234863,2000,swm_data.pkl
+1,SGNet 10 S2,0.325678496868476,2nd Goal,0.0918580375782881,3rd Goal,9.546154022216797,10.06545639038086,1800,swm_data.pkl
+2,SGNet 10 S3,0.23382045929018788,2nd Goal,0.08559498956158663,3rd Goal,9.87067699432373,10.427510261535645,1600,swm_data.pkl
