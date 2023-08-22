@@ -323,3 +323,30 @@ fde_df_results['Behavior'] = fde_df_results['Behavior'].map(behavior_keys)
 # save dataframes
 ade_df_results.to_csv('results/ade_results.csv')
 fde_df_results.to_csv('results/fde_results.csv')
+
+""" Displacement error through time"""
+#%%
+# Define a list of distinct colors
+colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+def plot_displacement_errors_distinct_colors(data):
+    plt.figure(figsize=(14, 8))
+    
+    # Iterate over each model's data and plot the step_de values with distinct colors
+    for i, model_data in enumerate(data):
+        model_name = model_data['model']
+        step_de = model_data['all_trials']['step_de'].numpy()
+        plt.plot(step_de, label=model_name, color=colors[i % len(colors)])
+    
+    plt.title('Displacement Errors Across Time Steps')
+    plt.xlabel('Time Steps')
+    plt.ylabel('Displacement Error')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+# Plotting the displacement errors for each model with distinct colors
+result_path = 'results/eval_displacement.pkl'
+data = pickle.load(open(result_path, "rb"))
+plot_displacement_errors_distinct_colors(data)
+
