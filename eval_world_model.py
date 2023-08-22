@@ -19,7 +19,7 @@ from typing import List, Tuple, Dict, Any
 from tqdm import tqdm
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
-from constants import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
+from constants_lc import DEFAULT_VALUES, MODEL_DICT_VAL, DATASET_NUMS
 from analysis_utils import load_config, get_highest_numbered_file, get_data_columns, init_model_class, inverse_normalize
 from annotate_pickup_timepoints import annotate_pickup_timepoints
 from annotate_goal_timepoints import eval_recon_goals, annotate_goal_timepoints
@@ -409,14 +409,15 @@ class Analysis(object):
                 batch_trajs = []
                 batch_inds = []
         # compute last batch that is less than batch_size
-        batch_x = torch.stack(batch_trajs, dim=0)
-        batch_x = batch_x.to(self.args.device)#model.DEVICE)
-        rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
-        batch_inds = np.array(batch_inds)
-        imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
-        # append real and imagined trajs to lists
-        for rollout_trial in rollout_x:
-            imag_trajs.append(rollout_trial)
+        if len(batch_trajs) > 0:
+            batch_x = torch.stack(batch_trajs, dim=0)
+            batch_x = batch_x.to(self.args.device)#model.DEVICE)
+            rollout_x = model.forward_rollout(batch_x, burn_in_length, rollout_length).cpu().detach()
+            batch_inds = np.array(batch_inds)
+            imagined_trajs[batch_inds,burn_in_length:,:] =  rollout_x
+            # append real and imagined trajs to lists
+            for rollout_trial in rollout_x:
+                imag_trajs.append(rollout_trial)
         
         for i in tqdm(goal_inds):
             counter += 1
