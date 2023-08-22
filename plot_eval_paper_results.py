@@ -212,18 +212,27 @@ for k, vs in BEHV_CATE_DICT.items():
             CATE_BEHV_DICT[v].append(k)
         else:
             CATE_BEHV_DICT[v] = [k]
+            
+os.chdir('/Users/locro/Documents/Stanford/SocialWorldModeling')
 
-result_path = 'results/eval_displacement.pkl'
+result_path = 'results/displacement_submission.pkl'
 results = pickle.load(open(result_path, 'rb'))
 
-result_path2 = 'results/gt_end_state_displacement.pkl'
+result_path2 = 'results/sgnet_displacement.pkl'
 results2 = pickle.load(open(result_path2, 'rb'))
 
-results = results + results2
+result_path3 = 'results/gt_end_state_displacement.pkl'
+results3 = pickle.load(open(result_path3, 'rb'))
 
-result = results[0]
-displacement_vals = result[50]  
-all_behaviors = [behavior for behavior in displacement_vals]
+results = results + results2 + results3
+
+#result = results[0]
+#displacement_vals = result[50]  
+#all_behaviors = [behavior for behavior in displacement_vals]
+all_behaviors = ['leader_follower', 'follower_leader', 'adversarial_gathering', 'gathering_adversarial',
+                 'random_gathering', 'gathering_static', 'static_gathering', 'gathering_random',
+                 'static_multistep', 'multistep_static', 'random_multistep', 'multistep_random',
+                 'chaser_runner', 'runner_chaser','random_mimic', 'mimic_random','random_random']
 
 # {model_name: {behavior: [val_by_seed]}
 model_seed_ade_dict = {}
@@ -234,12 +243,14 @@ for result in results:
     elif ' ' in result['model']:
         model_name = '_'.join(result['model'].split(' ')[: -1])
     print(result['model'])
-    if model_name == 'GT_End_State':
-        displacement_vals = result
-        ade_key = 'ade'
-    else:
-        displacement_vals = result[50]   
-        ade_key = 'mde'
+    displacement_vals = result
+    ade_key = 'ade'
+    # if model_name == 'GT_End_State':
+    #     displacement_vals = result
+    #     ade_key = 'ade'
+    # else:
+    #     displacement_vals = result[50]   
+    #     ade_key = 'mde'
     if model_name not in model_seed_ade_dict:
         model_seed_ade_dict[model_name] = {}
         model_seed_fde_dict[model_name] = {}
@@ -279,12 +290,12 @@ for model in model_seed_ade_dict:
 
 #%%
 ade_df = create_data_df(model_seed_ade_dict)
-plot_placement(ade_df)
+#plot_placement(ade_df)
 #%%
 
 #%%
 fde_df = create_data_df(model_seed_fde_dict)
-plot_placement(fde_df, legend=True)
+#plot_placement(fde_df, legend=True)
 #%%
 
 model_keys = {
@@ -294,6 +305,7 @@ model_keys = {
     'RSSM_Cont' : 'RSSM Continuous',
     'MD' : 'Multistep Delta',
     'TF_Emb2048' : 'Transformer',
+    'SGNet': 'SGNet'
     }
 
 behavior_keys = {
@@ -320,6 +332,50 @@ fde_df_results = fde_df[fde_df['Model'].isin(model_keys.keys())].copy()
 fde_df_results['Model'] = fde_df_results['Model'].map(model_keys)
 fde_df_results['Behavior'] = fde_df_results['Behavior'].map(behavior_keys)
 
+# Define the desired order of behaviors
+behavior_order = [
+    "Single-step Gathering",
+    "Multi-step Gathering",
+    "Collaborative Gathering",
+    "Adversarial Gathering",
+    "Random",
+    "Mimicry",
+    "Chasing"
+]
+
+# Reorder the DataFrame based on the specified sequence of behaviors
+ade_df_results = pd.concat([ade_df_results[ade_df_results['Behavior'] == behavior] for behavior in behavior_order])
+fde_df_results = pd.concat([fde_df_results[fde_df_results['Behavior'] == behavior] for behavior in behavior_order])
+
 # save dataframes
 ade_df_results.to_csv('results/ade_results.csv')
 fde_df_results.to_csv('results/fde_results.csv')
+
+# """ Displacement error through time"""
+# #%%
+# # Define a list of distinct colors
+# colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+# def plot_displacement_errors_distinct_colors(data):
+#     plt.figure(figsize=(14, 8))
+    
+#     # Iterate over each model's data and plot the step_de values with distinct colors
+#     for i, model_data in enumerate(data):
+#         model_name = model_data['model']
+#         step_de = model_data['all_trials']['step_de'].numpy()
+#         plt.plot(step_de, label=model_name, color=colors[i % len(colors)])
+    
+#     plt.title('Displacement Errors Across Time Steps')
+#     plt.xlabel('Time Steps')
+#     plt.ylabel('Displacement Error')
+#     plt.legend()
+#     plt.grid(True)
+#     plt.tight_layout()
+#     plt.show()
+
+# Plotting the displacement errors for each model with distinct colors
+# result_path = 'results/eval_displacement.pkl'
+# data = pickle.load(open(result_path, "rb"))
+# plot_displacement_errors_distinct_colors(data)
+
+
+

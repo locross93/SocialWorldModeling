@@ -562,12 +562,6 @@ class Analysis(object):
             multi_goal_trajs = self.exp_info_dict[self.args.train_or_val]['multi_goal_trajs']
             
         # TO DO, ANALYZE EVERY PICKUP EVENT SEPARATELY, INCLUDING MULTI GOAL TRAJS
-        #TEMP
-        scores, y_labels, y_recon = self.eval_pickup_events(input_data, input_data)
-        pickup_subset = pickup_timepoints[single_goal_trajs,:]
-        indices = np.argwhere(pickup_subset > -1)
-        accuracy = np.mean(y_recon[indices[:,0],indices[:,1]])
-        breakpoint()
         
         single_goal_trajs = single_goal_trajs[:int(partial*len(single_goal_trajs))]
         num_single_goal_trajs = len(single_goal_trajs)
@@ -618,11 +612,12 @@ class Analysis(object):
         total_trials, traj_length, _ = self.input_data.shape
         behavior_keys = list(self.exp_info_dict['val'].keys())[2: -5]
         burn_in_lengths = [50]    #, 100, 150, 150, 200, 250]        
-        result = {}        
+        result = {}
         for burn_in_length in burn_in_lengths:
             print(f"Burn in length {burn_in_length}")            
             rollout_length = traj_length - burn_in_length        
             real_trajs = self.input_data[:, -rollout_length:, :]
+            
             with torch.no_grad():
                 if batch_size is None: 
                     rollout_x = model.forward_rollout(real_trajs.cuda(), burn_in_length, rollout_length).cpu()
@@ -638,13 +633,13 @@ class Analysis(object):
                     rollout_x = torch.cat(rollout_x, dim=0)
                     # Replace any nan, inf, or outliers values with 0
                     rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x) | (torch.abs(rollout_x) > 1e3)] = 0
-
+                    step_de = torch.norm(rollout_x - real_trajs, p=2, dim=-1).mean(dim=0)
                     # compute average displacement error by computing euclidean distance between predicted and real trajectories
                     ade = torch.mean(torch.norm(rollout_x - real_trajs, p=2, dim=-1))
                     # compute final displacement error
                     fde = torch.mean(torch.norm(rollout_x[:, -1, :] - real_trajs[:, -1, :], p=2, dim=-1))
-                    result['all_trials'] = {'ade': ade, 'fde': fde}
-
+                    result['all_trials'] = {
+                        'ade': ade, 'fde': fde, 'step_de': step_de}
                     #rollout_x = rollout_x.reshape(rollout_x.size(0), -1)
                     #real_trajs = real_trajs.reshape(real_trajs.size(0), -1)
                     #behavior_result = {}
@@ -713,8 +708,9 @@ class Analysis(object):
         result_save_dir = os.path.join(self.args.analysis_dir, 'results')
         if not os.path.exists(result_save_dir):
             os.makedirs(result_save_dir)
-        if self.args.eval_type == 'displacement':
-            save_path = os.path.join(result_save_dir, f'{save_file}.pkl')
+        if self.args.eval_type == 'displacement':            
+            save_path = os.path.join(result_save_dir, f'{save_file}.pkl')            
+            print(f"Saving results to {save_path}")
             with open(save_path, 'wb') as f:
                 pickle.dump(self.results, f)
         else:  
