@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_combined_displacement_errors(data):
+def plot_combined_displacement_errors(data, results_path):
     # Set up the Seaborn colorblind palette
     sns.set_palette("colorblind")
     
@@ -44,10 +44,12 @@ def plot_combined_displacement_errors(data):
     plt.tight_layout()
 
     # Save the combined plot as a high-quality PNG
-    if 'still_obj' in result_path:
-        file_path_combined = "./results/combined_displacement_errors_still_obj_new.png"
-    else:
-        file_path_combined = "./results/combined_displacement_errors.png"
+    # file path replace pkl with png
+    file_path_combined = results_path.replace('pkl', 'png')
+    # if 'still_obj' in result_path:
+    #     file_path_combined = "./results/combined_displacement_errors_still_obj_gt.png"
+    # else:
+    #     file_path_combined = "./results/combined_displacement_errors.png"
     plt.savefig(file_path_combined, dpi=500)
 
     plt.show()
@@ -60,6 +62,7 @@ def plot_combined_displacement_errors(data):
 #result_path = './results/disp_by_time_submission_still_obj.pkl'
 #result_path = './results/disp_by_time_burninflag_still_obj.pkl'
 # result_path = './results/eval_displacement.pkl'
-result_path = './results/disp_by_time_correct_still_obj.pkl'
+#result_path = './results/norm_models_disp_by_time_still_obj.pkl'
+result_path = './results/gt_disp_by_time_still_obj.pkl'
 data = pickle.load(open(result_path, "rb"))
-plot_combined_displacement_errors(data)
+plot_combined_displacement_errors(data, result_path)

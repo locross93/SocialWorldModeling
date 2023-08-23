@@ -697,8 +697,9 @@ class Analysis(object):
                                     # get the total delta from sum(d0, d1...dt) at each timepoint - what's used for detect_object_move and jittering
                                     first_disp = torch.norm(trial_obj_pos[0,:] - real_obj_pos[0,:], p=2, dim=-1)
                                     obj_pos_delta = torch.norm(trial_obj_pos[1:,:] - trial_obj_pos[:-1,:], p=2, dim=-1)
-                                    # concaneate first disp with the rest of the displacements
-                                    total_disp_by_time = torch.cat([first_disp.unsqueeze(0), np.cumsum(obj_pos_delta, axis=0)], dim=0)
+                                    # concatenate first disp with the rest of the displacements
+                                    all_disp = torch.cat([first_disp.unsqueeze(0), obj_pos_delta], dim=0)
+                                    total_disp_by_time = all_disp.cumsum(dim=0)
                         time_disp_array = torch.stack(displacement_by_time, dim=0)
                         avg_disp_by_time = time_disp_array.mean(dim=0)
                         result['all_trials'] = {'step_de': avg_disp_by_time, 'cum_disp': total_disp_by_time} 

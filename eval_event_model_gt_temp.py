@@ -755,6 +755,83 @@ class Analysis(object):
         result['model'] = self.model_name              
         return result
 
+    def compute_displacement_error_by_time(self, model, batch_size=None):
+        still_obj = self.args.still_obj
+        print(f"Still obj: {still_obj}")
+        total_trials, traj_length, _ = self.input_data.shape
+        behavior_keys = list(self.exp_info_dict['val'].keys())[2: -5]
+        burn_in_lengths = [50]    #, 100, 150, 150, 200, 250]        
+        result = {}        
+        for burn_in_length in burn_in_lengths:
+            print(f"Burn in length {burn_in_length}")            
+            rollout_length = traj_length - burn_in_length 
+            real_trajs = self.input_data
+            real_rollout = self.input_data[:, -rollout_length:, :]
+            result, obj_moved_flag, recon_moved_flag = self._eval_move_events(real_trajs, real_trajs, self.args.move_threshold)
+
+            with torch.no_grad():
+                if batch_size is None: 
+                    rollout_x = model.forward_rollout(real_trajs.cuda(), burn_in_length, rollout_length).cpu()
+                    # Replace any nan, inf, or outliers values with 0
+                    rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x) | (torch.abs(rollout_x) > 1e3)] = 0
+                else:
+                    rollout_x = []
+                    for i in tqdm(range(0, total_trials, batch_size)):
+                        x = real_trajs[i: i+batch_size, :, :]
+                        # end state
+                        if args.use_end_state:
+                            event_state = x[:,-1,:]
+                            # get event horizon from end state
+                            event_horizon = 299 - burn_in_length
+                            # first normalize event_horizon
+                            event_horizon = float((event_horizon - 1) / ((300 - 50) - 1))
+                            # copy event_horizon for every batch element
+                            event_horizon = torch.tensor([event_horizon]*x.size(0)).unsqueeze(1)
+                            event_state = torch.cat([event_state, event_horizon], dim=-1)
+                            y  = model.mp_model.forward_rollout(x.cuda(), event_state.cuda(), burn_in_length, rollout_length).cpu()
+                        #y = model.forward_rollout(x.cuda(), burn_in_length, rollout_length).cpu()
+                        rollout_x.append(y)
+                        torch.cuda.empty_cache()
+                    rollout_x = torch.cat(rollout_x, dim=0)
+                    assert rollout_x.size() == real_rollout.size()
+                    if still_obj:
+                        num_trials = rollout_x.shape[0]
+                        num_objs = 3
+                        dims = ['x', 'y', 'z']
+                        displacement_by_time = []
+                        total_disp_by_time = []
+                        for i in range(num_trials):
+                            trial_x = rollout_x[i,:,:]
+                            real_x = real_rollout[i,:,:]
+                            for j in range(num_objs):
+                                if not obj_moved_flag[i,j]:
+                                    pos_inds = [self.data_columns.index('obj'+str(j)+'_'+dim) for dim in dims]
+                                    trial_obj_pos = trial_x[:,pos_inds]
+                                    real_obj_pos = real_x[:,pos_inds]
+                                    step_de = torch.norm(trial_obj_pos - real_obj_pos, p=2, dim=-1)
+                                    displacement_by_time.append(step_de)
+                                    # get the total delta from sum(d0, d1...dt) at each timepoint - what's used for detect_object_move and jittering
+                                    first_disp = torch.norm(trial_obj_pos[0,:] - real_obj_pos[0,:], p=2, dim=-1)
+                                    obj_pos_delta = torch.norm(trial_obj_pos[1:,:] - trial_obj_pos[:-1,:], p=2, dim=-1)
+                                    # concatenate first disp with the rest of the displacements
+                                    all_disp = torch.cat([first_disp.unsqueeze(0), obj_pos_delta], dim=0)
+                                    total_disp_by_time = all_disp.cumsum(dim=0)
+                        time_disp_array = torch.stack(displacement_by_time, dim=0)
+                        avg_disp_by_time = time_disp_array.mean(dim=0)
+                        result['all_trials'] = {'step_de': avg_disp_by_time, 'cum_disp': total_disp_by_time}
+                    else:                        
+                        # Replace any nan, inf, or outliers values with 0
+                        step_de = torch.norm(rollout_x - real_rollout, p=2, dim=-1).mean(dim=0)
+                        # compute average displacement error by computing euclidean distance between predicted and real trajectories
+                        ade = torch.mean(torch.norm(rollout_x - real_rollout, p=2, dim=-1))
+                        # compute final displacement error
+                        fde = torch.mean(torch.norm(rollout_x[:, -1, :] - real_rollout[:, -1, :], p=2, dim=-1))
+                        result['all_trials'] = {
+                            'ade': ade, 'fde': fde, 'step_de': step_de}
+
+        result['model'] = self.model_name              
+        return result
+
     def eval_one_model(self, model_key) -> Dict[str, Any]:        
         model = self.load_model(model_key)        
         result = {}
@@ -776,6 +853,12 @@ class Analysis(object):
             else:
                 batch_size = args.batch_size          
             result = self.compute_displacement_error(model, batch_size=batch_size)
+        elif self.args.eval_type == 'displacement_by_time':    # mean/final displacement error
+            if 'sgnet' in model_key:
+                batch_size = 32
+            else:
+                batch_size = args.batch_size
+            result = self.compute_displacement_error_by_time(model, batch_size=batch_size)
         else:
             raise NotImplementedError(f'Evaluation type {self.args.eval_type} not implemented')    
         
@@ -807,8 +890,11 @@ class Analysis(object):
         result_save_dir = os.path.join(self.args.analysis_dir, 'results')
         if not os.path.exists(result_save_dir):
             os.makedirs(result_save_dir)
-        if self.args.eval_type == 'displacement':
-            save_path = os.path.join(result_save_dir, f'{save_file}.pkl')
+        if self.args.eval_type == 'displacement' or self.args.eval_type == 'displacement_by_time':
+            if self.args.still_obj:
+                save_path = os.path.join(result_save_dir, f'{save_file}_still_obj.pkl')
+            else:
+                save_path = os.path.join(result_save_dir, f'{save_file}.pkl')  
             with open(save_path, 'wb') as f:
                 pickle.dump(self.results, f)
         else:  
@@ -816,14 +902,14 @@ class Analysis(object):
             df_results = pd.DataFrame(self.results)
             df_results.to_csv(save_path)
 
-        if self.args.plot and self.args.eval_type != 'displacement':
+        if self.args.plot and self.args.eval_type != 'displacement' and self.args.eval_type != 'displacement_by_time':
             figure_save_dir = os.path.join(self.args.analysis_dir, 'results', 'figures')
             if not os.path.exists(figure_save_dir):
                 os.makedirs(figure_save_dir)                
             plot_save_file = os.path.join(self.args.analysis_dir, 'results', 'figures', save_file)
             plot_eval_wm_results(df_results, self.args, plot_save_file)
             
-        if self.args.append_results and self.args.partial == 1.0 and self.args.eval_type != 'displacement':
+        if self.args.append_results and self.args.partial == 1.0 and self.args.eval_type != 'displacement' and self.args.eval_type != 'displacement_by_time':
             all_results_file = os.path.join(result_save_dir, 'all_results_'+self.args.eval_type+'.csv')
             if os.path.exists(all_results_file):
                 df_all_results = pd.read_csv(all_results_file, index_col=0)
@@ -884,6 +970,7 @@ def load_args():
     parser.add_argument('--partial', type=float, default=1.0,         
                         help='Partial evaluation')
     parser.add_argument('--use_end_state', type=bool, default=False, help='Use end state as ground truth next event')
+    parser.add_argument('--still_obj', action='store_true', default=False, help='Only evaluate still objects')
     return parser.parse_args()
 
 
