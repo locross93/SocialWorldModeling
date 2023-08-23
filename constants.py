@@ -112,13 +112,13 @@ MODEL_DICT_VAL=  {
         'model_dir': 'sgnet_cvae_default_lr1e-4', 'model_label': 'SGNet-H512'},\
     'sgnet_10': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
-        'model_dir': 'sgnet_cvae_default', 'model_label': 'SGNet 10'},
+        'model_dir': 'sgnet_cvae_default', 'epoch': '2000', 'model_label': 'SGNet 10'},
     'sgnet10_s2': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
-        'model_dir': 'sgnet10_s2', 'model_label': 'SGNet 10 S2'},
+        'model_dir': 'sgnet10_s2', 'epoch': '1800', 'model_label': 'SGNet 10 S2'},
     'sgnet10_s3': {
         'class': SGNet_CVAE, 'config': 'sgnet_cvae_default_config.json',
-        'model_dir': 'sgnet10_s3', 'model_label': 'SGNet 10 S3'},
+        'model_dir': 'sgnet10_s3', 'epoch': '1600', 'model_label': 'SGNet 10 S3'},
     # 'sgnet_cvae_hidden64_lr1e-4': {
     #     'class': SGNet_CVAE, 'config': 'sgnet_cvae_hidden_size64_config.json',
     #     'model_dir': 'sgnet_cvae_hidden_size64_lr1e-4', 'model_label': 'SGNet-H64'},
@@ -152,20 +152,22 @@ DEFAULT_VALUES = {
     'save_every': 200,
     # eval parameters
     #'model_keys': [ 'trans_wm_replay_early', 'mp_replay_early', 'transformer_iris_concat_pos_embd_lr1e-4', 'mp_4096_ds3', 'md_4096_ds3',],
-    #'model_keys': ['mp_mlp_2048_lr3e-4_s1', 'mp_mlp_2048_lr3e-4_s2', 'mp_mlp_2048_lr3e-4_s3', 
-    #                'rssm_disc_h_2048_lr3e-4_s1', 'rssm_disc_h_2048_lr3e-4_s2', 'rssm_disc_h_2048_lr3e-4_s3', 
-    #                 'rssm_cont_h_2048_lr1e-4_s1', 'rssm_cont_h_2048_lr1e-4_s2', 'rssm_cont_h_2048_lr1e-4_s3',
-    #                 'md_mlp_2048_lr3e-4_s1', 'md_mlp_2048_lr3e-4_s2', 'md_mlp_2048_lr3e-4_s3',
-    #                 'tf_emb2048_lr1e-4_s1', 'tf_emb2048_lr1e-4_s2', 'tf_emb2048_lr1e-4_s3'],
-    'model_keys': ['tf_emb2048_lr1e-4_s1', 'tf_emb2048_lr1e-4_s2', 'tf_emb2048_lr1e-4_s3'],
+    'model_keys': ['mp_mlp_2048_lr3e-4_s1', 'mp_mlp_2048_lr3e-4_s2', 'mp_mlp_2048_lr3e-4_s3', 
+                   'rssm_disc_h_2048_lr3e-4_s1', 'rssm_disc_h_2048_lr3e-4_s2', 'rssm_disc_h_2048_lr3e-4_s3', 
+                    'rssm_cont_h_2048_lr1e-4_s1', 'rssm_cont_h_2048_lr1e-4_s2', 'rssm_cont_h_2048_lr1e-4_s3',
+                    'md_mlp_2048_lr3e-4_s1', 'md_mlp_2048_lr3e-4_s2', 'md_mlp_2048_lr3e-4_s3',
+                    'tf_emb2048_lr1e-4_s1', 'tf_emb2048_lr1e-4_s2', 'tf_emb2048_lr1e-4_s3'],
+    #'model_keys': ['tf_emb2048_lr1e-4_s1', 'tf_emb2048_lr1e-4_s2', 'tf_emb2048_lr1e-4_s3'],
     #'model_keys': ['gt_end_state_s1', 'gt_end_state_s2', 'gt_end_state_s3'],
     #'model_keys': list(MODEL_DICT_VAL.keys()),
+    'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','rssm_cont_h_2048_lr1e-4_s1','md_mlp_2048_lr3e-4_s1'], 
+    #'model_keys': ['tf_emb2048_lr1e-4_s1', 'sgnet_10'],
     #'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','tf_emb2048_lr1e-4_s1'],
     #'model_keys': [
      #   'mp_mlp_2048_lr3e-4_s1', 'rssm_disc_h_2048_lr3e-4_s1', 
      #   'rssm_cont_h_2048_lr1e-4_s1', 'md_mlp_2048_lr3e-4_s1', 
         #'tf_emb2048_lr1e-4_s1', 'sgnet_10'],
-    'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement'],
+    'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement', 'displacement_by_time'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
     'dataset': 'swm_data.pkl'

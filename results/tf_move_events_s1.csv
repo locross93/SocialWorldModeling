@@ -1,0 +1,2 @@
+,accuracy,precision,recall,model,ADE,FDE,epoch,dataset
+0,0.42421912190120475,0.42180600529879303,0.9990413107896113,TF Emb2048 S1,10.938016891479492,12.63335132598877,/ccn2/u/ziyxiang/swm_data_and_results/submission_ckpt/models/tf_emb2048_lr1e-4_s1/tf_emb2048_lr1e-4_s1_epoch4000,swm_data.pkl

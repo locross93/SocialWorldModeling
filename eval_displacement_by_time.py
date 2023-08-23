@@ -656,28 +656,29 @@ class Analysis(object):
             rollout_length = traj_length - burn_in_length        
             real_trajs = self.input_data[:, -rollout_length:, :]
             burn_ins = self.input_data[:, :burn_in_length, :]
+            input_data = self.input_data
             
             with torch.no_grad():
                 if batch_size is None: 
                     with torch.no_grad():
-                        rollout_x = model.forward_rollout(burn_ins.cuda(), burn_in_length, rollout_length).cpu()
+                        rollout_x = model.forward_rollout(input_data.cuda(), burn_in_length, rollout_length).cpu()
                     # Replace any nan, inf, or outliers values with 0
                     rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x) | (torch.abs(rollout_x) > 1e3)] = 0
                 else:
-                    rollout_x = []
+                    rollout_x_list = []
                     move_flags = []
                     for i in tqdm(range(0, total_trials, batch_size)):
-                        x = burn_ins[i: i+batch_size, :, :]
+                        x = input_data[i: i+batch_size, :burn_in_length, :]
                         with torch.no_grad():
                             y = model.forward_rollout(x.cuda(), burn_in_length, rollout_length)
                         move_flags.append(self.get_obj_moved_flags(x))                        
-                        rollout_x.append(y)
+                        rollout_x_list.append(y)
                         torch.cuda.empty_cache()
-                    rollout_x = torch.cat(rollout_x, dim=0).cpu()
+                    rollout_x = torch.cat(rollout_x_list, dim=0).cpu()
                     rollout_x[torch.isnan(rollout_x) | torch.isinf(rollout_x) | (torch.abs(rollout_x) > 1e3)] = 0                    
                     move_flags = torch.from_numpy(np.concatenate(move_flags, axis=0))                    
                     if still_obj:                                                
-                        # only compute displacement for still ojbects, and only compute displacement with positions
+                        # only compute displacement for still objects, and only compute displacement with positions
                         rollout_x = rollout_x.reshape(rollout_x.shape[0], rollout_x.shape[1], -1, 7)
                         rollout_x = rollout_x[:, :, :3, :3]
                         real_trajs = real_trajs.reshape(real_trajs.shape[0], real_trajs.shape[1], -1, 7)
@@ -685,16 +686,19 @@ class Analysis(object):
                         move_flags = move_flags.unsqueeze(1).expand(-1, rollout_length, -1).cpu()
                         # get stable objects
                         rollout_x = rollout_x[move_flags == 0]
-                        rollout_x = rollout_x.reshape(-1, rollout_length, 9)
+                        #rollout_x = rollout_x.reshape(-1, rollout_length, 9)
+                        rollout_x = rollout_x.reshape(-1, rollout_length, 3)
                         real_trajs = real_trajs[move_flags == 0]
-                        real_trajs = real_trajs.reshape(-1, rollout_length, 9)
+                        #real_trajs = real_trajs.reshape(-1, rollout_length, 9)
+                        real_trajs = real_trajs.reshape(-1, rollout_length, 3)
                         # compute displacement error                        
                         step_de = torch.norm(rollout_x - real_trajs, p=2, dim=-1)
-                        for i in range(100):
-                            outname = f"tmp_figs/{self.model_name}_step_de_{i}.png"                            
-                            plt.plot(step_de[i])
-                            plt.savefig(outname, dpi=800)
-                            plt.close()
+                        #breakpoint()
+                        # for i in range(100):
+                        #     outname = f"tmp_figs/{self.model_name}_step_de_{i}.png"                            
+                        #     plt.plot(step_de[i])
+                        #     plt.savefig(outname, dpi=800)
+                        #     plt.close()
                         step_de = step_de.mean(dim=0)
                         # step_de = []
                         # for n_trial in tqdm(range(rollout_x.shape[0])):
