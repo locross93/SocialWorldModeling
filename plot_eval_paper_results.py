@@ -215,13 +215,22 @@ for k, vs in BEHV_CATE_DICT.items():
             
 os.chdir('/Users/locro/Documents/Stanford/SocialWorldModeling')
 
-result_path = 'results/displacement_submission.pkl'
+# result_path = 'results/displacement_submission.pkl'
+# results = pickle.load(open(result_path, 'rb'))
+
+# result_path2 = 'results/sgnet_displacement.pkl'
+# results2 = pickle.load(open(result_path2, 'rb'))
+
+# result_path3 = 'results/gt_end_state_displacement.pkl'
+# results3 = pickle.load(open(result_path3, 'rb'))
+
+result_path = 'results/fixed_displacement.pkl'
 results = pickle.load(open(result_path, 'rb'))
 
-result_path2 = 'results/sgnet_displacement.pkl'
+result_path2 = 'results/sgnet_new_displacement.pkl'
 results2 = pickle.load(open(result_path2, 'rb'))
 
-result_path3 = 'results/gt_end_state_displacement.pkl'
+result_path3 = 'results/gt_new_displacement.pkl'
 results3 = pickle.load(open(result_path3, 'rb'))
 
 results = results + results2 + results3
@@ -348,8 +357,8 @@ ade_df_results = pd.concat([ade_df_results[ade_df_results['Behavior'] == behavio
 fde_df_results = pd.concat([fde_df_results[fde_df_results['Behavior'] == behavior] for behavior in behavior_order])
 
 # save dataframes
-ade_df_results.to_csv('results/ade_results.csv')
-fde_df_results.to_csv('results/fde_results.csv')
+ade_df_results.to_csv('results/ade_results_new.csv')
+fde_df_results.to_csv('results/fde_results_new.csv')
 
 # """ Displacement error through time"""
 # #%%

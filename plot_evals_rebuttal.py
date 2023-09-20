@@ -129,6 +129,7 @@ fde_df_results = pd.concat([fde_df_results[fde_df_results.index == model] for mo
 ade_df_results.to_csv('results/eval_goal_events_ade.csv')
 fde_df_results.to_csv('results/eval_goal_events_fde.csv')
 
+##################################
 # MULTI GOAL EVENTS
 result_path = 'results/mgevents_submission_full.csv'
 df_results = pd.read_csv(result_path, index_col=0)
@@ -162,6 +163,38 @@ if save_file is not None:
     plt.savefig(save_file, dpi=300, bbox_inches='tight')
 plt.show()
 
+
+# Filtering rows where 'model' is in the keys of the model_keys dictionary
+df_results = df_results[df_results['model'].isin(model_keys.keys())].copy()
+
+# Replacing the 'model' values using the model_keys dictionary
+df_results['model'] = df_results['model'].map(model_keys)
+
+# get ade_df and fde_df that only take model and ade, fde columns
+ade_df = df_results[['model', 'ADE']].copy()
+ade_df_results = ade_df.groupby('model')['ADE'].agg(['mean', 'std'])
+fde_df = df_results[['model', 'FDE']].copy()
+fde_df_results = fde_df.groupby('model')['FDE'].agg(['mean', 'std'])
+
+# Define the desired order of behaviors
+model_order = [
+    'Multistep Predictor',
+    'RSSM Discrete',
+    'RSSM Continuous',
+    'Multistep Delta',
+    'Transformer',
+    'SGNet',
+    'Hierarchical Oracle Model'
+]
+
+# Reorder the DataFrame based on the specified sequence of behaviors
+ade_df_results = pd.concat([ade_df_results[ade_df_results.index == model] for model in model_order])
+fde_df_results = pd.concat([fde_df_results[fde_df_results.index == model] for model in model_order])
+
+ade_df_results.to_csv('results/eval_multigoal_events_ade.csv')
+fde_df_results.to_csv('results/eval_multigoal_events_fde.csv')
+
+##################################
 # PICKUP EVENTS
 result_path = 'results/pickup_events_submission_full.csv'
 df = pd.read_csv(result_path, index_col=0)
@@ -196,3 +229,112 @@ bar_plot.set_xticklabels(model_labels, fontsize=xtick_fontsize, rotation=0, hori
 if save_file is not None:
     plt.savefig(save_file, dpi=300, bbox_inches='tight')
 plt.show()
+
+# get ade_df and fde_df that only take model and ade, fde columns
+ade_df = df_results[['model', 'ADE']].copy()
+ade_df_results = ade_df.groupby('model')['ADE'].agg(['mean', 'std'])
+fde_df = df_results[['model', 'FDE']].copy()
+fde_df_results = fde_df.groupby('model')['FDE'].agg(['mean', 'std'])
+
+# Define the desired order of behaviors
+model_order = [
+    'Multistep Predictor',
+    'RSSM Discrete',
+    'RSSM Continuous',
+    'Multistep Delta',
+    'Transformer',
+    'SGNet',
+    'Hierarchical Oracle Model'
+]
+
+# Reorder the DataFrame based on the specified sequence of behaviors
+ade_df_results = pd.concat([ade_df_results[ade_df_results.index == model] for model in model_order])
+fde_df_results = pd.concat([fde_df_results[fde_df_results.index == model] for model in model_order])
+
+ade_df_results.to_csv('results/eval_pickup_events_ade.csv')
+fde_df_results.to_csv('results/eval_pickup_events_fde.csv')
+
+# MOVE EVENTS
+result_path = 'results/move_events_submission_full2.csv'
+df = pd.read_csv(result_path, index_col=0)
+
+f1_score = 2 * (df['precision'] * df['recall']) / (df['precision'] + df['recall'])
+df['f1_score'] = f1_score
+
+# Filtering rows where 'model' is in the keys of the model_keys dictionary
+df_results = df[df['model'].isin(model_keys.keys())].copy()
+
+# Replacing the 'model' values using the model_keys dictionary
+df_results['model'] = df_results['model'].map(model_keys)
+
+df_results = pd.melt(df_results, id_vars="model", value_vars=["f1_score", "precision", "recall"], var_name="Metric", value_name="Score")
+
+# Define the desired order of behaviors
+model_order = [
+    'Hierarchical Oracle Model',
+    'Multistep Predictor',
+    'RSSM Discrete',
+    'RSSM Continuous',
+    'Multistep Delta',
+    'Transformer',
+    'SGNet'
+]
+
+# Reorder the DataFrame based on the specified sequence of behaviors
+df_results = pd.concat([df_results[df_results['model'] == model] for model in model_order])
+
+save_file = 'results/figures/all_results_move_events_submission'
+
+# move events plot
+sn_palette='Set2'
+title_fontsize=40
+xtick_fontsize=18
+label_fontsize=36
+legend_fontsize=28
+#model_order = ['Hierarchical Oracle Model', 'Multistep Predictor', 'RSSM Discrete', 'RSSM Continuous', 'Multistep Delta', 'Transformer', 'SGNet']
+
+# Split each model name into two lines if it contains two words
+model_labels = ['\n'.join(model.split()) if len(model.split()) > 1 else model for model in model_order]
+
+plt.figure(figsize=(13, 6))
+bar_plot = sns.barplot(x='Metric', y='Score', hue='model', data=df_results, 
+            palette=sn_palette, capsize=0.1, errorbar="se")
+sns.despine(top=True, right=True)
+plt.title('Move Events Evaluation', fontsize=30) 
+plt.ylabel('Accuracy', fontsize=label_fontsize)
+plt.ylim([0, 1])
+# set x-tick labels to F1-Score, Precision, Recall
+bar_plot.set_xticklabels(['F1-Score', 'Precision', 'Recall'], fontsize=xtick_fontsize, rotation=0, horizontalalignment='center')
+bar_plot.set_xlabel('')  # Remove x-axis label
+# set legend outside of plot
+#plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+# Set the legend to be horizontal and under the plot
+plt.legend(bbox_to_anchor=(0.5, -0.1), loc='upper center', borderaxespad=0., ncol=7)
+plt.tight_layout()  # Adjust layout to make sure everything fits
+if save_file is not None:
+    plt.savefig(save_file, dpi=300, bbox_inches='tight')
+plt.show()
+
+# get ade_df and fde_df that only take model and ade, fde columns
+ade_df = df_results[['model', 'ADE']].copy()
+ade_df_results = ade_df.groupby('model')['ADE'].agg(['mean', 'std'])
+fde_df = df_results[['model', 'FDE']].copy()
+fde_df_results = fde_df.groupby('model')['FDE'].agg(['mean', 'std'])
+
+# Define the desired order of behaviors
+model_order = [
+    'Multistep Predictor',
+    'RSSM Discrete',
+    'RSSM Continuous',
+    'Multistep Delta',
+    'Transformer',
+    'SGNet',
+    'Hierarchical Oracle Model'
+]
+
+# Reorder the DataFrame based on the specified sequence of behaviors
+ade_df_results = pd.concat([ade_df_results[ade_df_results.index == model] for model in model_order])
+fde_df_results = pd.concat([fde_df_results[fde_df_results.index == model] for model in model_order])
+
+ade_df_results.to_csv('results/eval_move_events_ade.csv')
+fde_df_results.to_csv('results/eval_move_events_fde.csv')

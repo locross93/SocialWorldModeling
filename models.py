@@ -2944,3 +2944,122 @@ class EventModel:
         loss = loss_fn(x_supervise, x_hat)
         
         return loss
+    
+
+class EventPredictorStochastic(nn.Module):
+    def __init__(self, config):
+        super(EventPredictorStochastic, self).__init__()
+        self.input_size = config['input_size']
+        self.rnn_type = config['rnn_type']
+        self.rnn_hidden_size = config['rnn_hidden_size']
+        self.num_rnn_layers = config['num_rnn_layers']
+        self.mlp_hidden_size = config['mlp_hidden_size']
+        if 'mlp_num_layers' in config:
+            self.num_mlp_layers = config['num_mlp_layers']
+        else:
+            self.num_mlp_layers = 2
+        if 'dropout' in config:
+            self.dropout = config['dropout']
+        else:
+            self.dropout = 0
+        if 'pred_delta' in config:
+            self.pred_delta = config['pred_delta']
+        else:
+            self.pred_delta = False
+        if 'pred_interval' in config:
+            self.pred_interval = config['pred_interval']
+        else:
+            self.pred_interval = None
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        
+        if self.rnn_type == 'GRU':
+            self.rnn = nn.GRU(self.input_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, dropout=self.dropout, batch_first=True)
+        elif self.rnn_type == 'LSTM':
+            self.rnn = nn.LSTM(self.input_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, dropout=self.dropout, batch_first=True)
+        # For the stochastic bottleneck
+        self.mu_mlp = self.build_mlp(self.num_mlp_layers, self.rnn_hidden_size, self.mlp_hidden_size, self.rnn_hidden_size, nn.ReLU, out_sigmoid=False)
+        self.log_var_mlp = self.build_mlp(self.num_mlp_layers, self.rnn_hidden_size, self.mlp_hidden_size, self.rnn_hidden_size, nn.ReLU, out_sigmoid=False)
+        self.event_decoder = self.build_mlp(self.num_mlp_layers, self.rnn_hidden_size, self.mlp_hidden_size, self.input_size, nn.ReLU, out_sigmoid=False)
+        if config['predict_horizon']:
+            self.predict_horizon = True
+            self.horizon_loss_weight = config['horizon_loss_weight']
+            self.event_horizon_decoder = self.build_mlp(self.num_mlp_layers, self.rnn_hidden_size, self.mlp_hidden_size, 1, nn.ReLU, out_sigmoid=True) 
+        else:
+            self.predict_horizon = False
+
+    def build_mlp(self, num_layers, input_size, node_size, output_size, activation, out_sigmoid):
+        model = [nn.Linear(input_size, node_size)]
+        model += [activation()]
+        for i in range(num_layers-1):
+            model += [nn.Linear(node_size, node_size)]
+            model += [activation()]
+        model += [nn.Linear(node_size, output_size)]
+        if out_sigmoid:
+            # normalize output between 0 and 1
+            model += [nn.Sigmoid()]
+        return nn.Sequential(*model)
+
+    def forward(self, x, hidden):
+        rnn_out, hidden = self.rnn(x, hidden)
+
+        # Get mean and log variance from the bottleneck
+        self.mu = self.mu_mlp(rnn_out)
+        self.log_var = self.log_var_mlp(rnn_out)
+
+        # Sample from Gaussian
+        std = torch.exp(0.5 * self.log_var)
+        eps = torch.randn_like(std)
+        z = self.mu + eps * std  # Reparameterization trick
+
+        out_event_state = self.event_decoder(z)
+        if self.predict_horizon:
+            out_event_horizon = self.event_horizon_decoder(z)
+            return out_event_state, out_event_horizon, hidden
+        else:
+            return out_event_state, hidden
+
+    def init_hidden(self, batch_size):
+        if self.rnn_type == 'GRU':
+            hidden_cell = torch.zeros(self.num_rnn_layers, batch_size, self.rnn_hidden_size).to(self.device)
+            return hidden_cell
+        elif self.rnn_type == 'LSTM':
+            hidden_cell = torch.zeros(self.num_rnn_layers, batch_size, self.rnn_hidden_size).to(self.device)
+            state_cell = torch.zeros(self.num_rnn_layers, batch_size, self.rnn_hidden_size).to(self.device)
+            return (hidden_cell, state_cell)
+    
+    def supervised_loss(self, x, event_state, event_horizon=None):
+        batch_size = x.size(0)
+        hidden = self.init_hidden(batch_size)
+        if self.pred_delta:
+            # predict delta between current and next event state
+            event_state = event_state - x[:,-1,:]
+        if self.predict_horizon:
+            out_event_state, out_event_horizon, hidden = self.forward(x, hidden)
+        else:
+            out_event_state, hidden = self.forward(x, hidden)
+
+        # last output is prediction with entire burn in sequence
+        event_hat = out_event_state[:,-1,:]
+        try:
+            assert event_state.size() == event_hat.size()
+        except AssertionError as e:
+            print(f"AssertionError caught: {e}")
+            import pdb; pdb.set_trace()
+        #assert event_state.size() == event_hat.size()
+        event_loss = ((event_state - event_hat)**2).mean()
+
+        if self.predict_horizon:
+            event_horizon_hat = out_event_horizon[:,-1,:].squeeze(1)
+            assert event_horizon.size() == event_horizon_hat.size()
+            horizon_loss = self.horizon_loss_weight * ((event_horizon - event_horizon_hat)**2).mean()
+            loss = event_loss + horizon_loss
+        else:
+            loss = event_loss
+            horizon_loss = None
+            event_horizon_hat = None
+            
+        # Add KL divergence to the loss
+        kl_loss = -0.5 * torch.sum(1 + self.log_var - self.mu.pow(2) - self.log_var.exp())
+        loss += kl_loss
+
+        return loss, event_loss, horizon_loss, event_hat, event_horizon_hat, kl_loss
