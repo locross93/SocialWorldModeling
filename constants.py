@@ -1,7 +1,7 @@
 import os
 from models import DreamerV2, MultistepPredictor, MultistepDelta,  \
     TransformerMSPredictor, TransformerIrisWorldModel, TransformerWorldModel, \
-    EventPredictor, MSPredictorEventContext, EventModel, MultistepPredictor4D, RSSM_Delta
+    EventPredictor, MSPredictorEventContext, EventModel, MultistepPredictor4D, RSSM_Delta, EventPredictorStochastic
 from agent_former.agentformer import AgentFormer
 from sgnet_models.SGNet_CVAE import SGNet_CVAE
 from gnn_models.imma import IMMA
@@ -26,6 +26,7 @@ MODEL_DICT_TRAIN = {
     'agent_former': AgentFormer,
     'event_predictor': EventPredictor,
     'mp_event_context': MSPredictorEventContext,
+    'event_predictor_stochastic': EventPredictorStochastic,
     'event_model': EventModel,
     'multistep_predictor4d': MultistepPredictor4D,
 }

@@ -2867,7 +2867,10 @@ class MSPredictorEventContext(nn.Module):
 
 class EventModel:
     def __init__(self, ep_config, mp_config):
-        self.ep_model = EventPredictor(ep_config)
+        if ep_config['model_type'] == 'event_predictor':
+            self.ep_model = EventPredictor(ep_config)
+        elif ep_config['model_type'] == 'event_predictor_stochastic':
+            self.ep_model = EventPredictorStochastic(ep_config)
         self.mp_model = MSPredictorEventContext(mp_config)
         
     def load_weights(self, ep_weights_path, mp_weights_path):
@@ -2977,6 +2980,7 @@ class EventPredictorStochastic(nn.Module):
         elif self.rnn_type == 'LSTM':
             self.rnn = nn.LSTM(self.input_size, self.rnn_hidden_size, num_layers=self.num_rnn_layers, dropout=self.dropout, batch_first=True)
         # For the stochastic bottleneck
+        self.beta = config['beta']
         self.mu_mlp = self.build_mlp(self.num_mlp_layers, self.rnn_hidden_size, self.mlp_hidden_size, self.rnn_hidden_size, nn.ReLU, out_sigmoid=False)
         self.log_var_mlp = self.build_mlp(self.num_mlp_layers, self.rnn_hidden_size, self.mlp_hidden_size, self.rnn_hidden_size, nn.ReLU, out_sigmoid=False)
         self.event_decoder = self.build_mlp(self.num_mlp_layers, self.rnn_hidden_size, self.mlp_hidden_size, self.input_size, nn.ReLU, out_sigmoid=False)
@@ -3060,6 +3064,6 @@ class EventPredictorStochastic(nn.Module):
             
         # Add KL divergence to the loss
         kl_loss = -0.5 * torch.sum(1 + self.log_var - self.mu.pow(2) - self.log_var.exp())
-        loss += kl_loss
+        loss += self.beta * kl_loss
 
         return loss, event_loss, horizon_loss, event_hat, event_horizon_hat, kl_loss
