@@ -1,0 +1,7 @@
+,accuracy,precision,recall,model,ADE,FDE,epoch,dataset
+0,0.5938335347321396,0.6090182648401826,0.09299285340770437,Event Model Stochastic,5.168232440948486,5.695794582366943,/data2/locross/analysis/models/em_stoch/mp_model_epoch7600,swm_data.pkl
+1,0.5902083562195614,0.5719369598373157,0.09804776015339027,Event Model Stochastic,5.122859477996826,5.649332046508789,/data2/locross/analysis/models/em_stoch_beta0_5/mp_model_epoch7400,swm_data.pkl
+2,0.5927716137537076,0.5946380697050938,0.09665330312009761,Event Model Stochastic,5.162003040313721,5.6808342933654785,/data2/locross/analysis/models/em_stoch_beta0_1/mp_model_epoch7600,swm_data.pkl
+3,0.5908308616207111,0.5766871165644172,0.09830922084713264,Event Model Stochastic,5.221145153045654,5.79686164855957,/data2/locross/analysis/models/em_stoch_beta10/mp_model_epoch7600,swm_data.pkl
+4,0.5929913215423487,0.6023958927552767,0.09203416419731567,Event Model Stochastic,5.167799949645996,5.751795291900635,/data2/locross/analysis/models/em_stoch_beta100/mp_model_epoch7800,swm_data.pkl
+5,0.5953348712878538,0.620375640295959,0.09499738539306257,Event Model Stochastic,5.185613632202148,5.778708457946777,/data2/locross/analysis/models/em_stoch_beta1e3/mp_model_epoch7600,swm_data.pkl

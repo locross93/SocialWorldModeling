@@ -1,2 +1,2 @@
 ,model,score,ADE,FDE,epoch,dataset
-0,Event Model Stochastic,0.16775777414075285,7.997290134429932,8.204513549804688,/data2/locross/analysis/models/em_stoch_beta0_1/mp_model_epoch6600,swm_data.pkl
+0,Event Model Stochastic,0.23770491803278687,7.726451873779297,8.006645202636719,/data2/locross/analysis/models/em_stoch/mp_model_epoch7600,swm_data.pkl
