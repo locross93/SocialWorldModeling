@@ -1,7 +1,7 @@
-,model,score,ADE,FDE,epoch,dataset
-0,Event Model Stochastic,0.18657937806873978,7.8543477058410645,8.137262344360352,/data2/locross/analysis/models/em_stoch/mp_model_epoch6600,swm_data.pkl
-1,Event Model Stochastic,0.18330605564648117,8.128595352172852,8.464110374450684,/data2/locross/analysis/models/em_stoch_beta0_5/mp_model_epoch6600,swm_data.pkl
-2,Event Model Stochastic,0.16775777414075285,7.997290134429932,8.204513549804688,/data2/locross/analysis/models/em_stoch_beta0_1/mp_model_epoch6600,swm_data.pkl
-3,Event Model Stochastic,0.16448445171849427,8.025752067565918,8.25756549835205,/data2/locross/analysis/models/em_stoch_beta10/mp_model_epoch6600,swm_data.pkl
-4,Event Model Stochastic,0.1939443535188216,8.020400047302246,8.312159538269043,/data2/locross/analysis/models/em_stoch_beta100/mp_model_epoch6800,swm_data.pkl
-5,Event Model Stochastic,0.18085106382978725,7.954367637634277,8.252882957458496,/data2/locross/analysis/models/em_stoch_beta1e3/mp_model_epoch6800,swm_data.pkl
+,model,g2_acc,g2_goal_num,g3_acc,g3_goal_num,ADE,FDE,epoch,dataset
+0,Event Model Stochastic,0.5219206680584552,2nd Goal,0.23173277661795408,3rd Goal,8.685676574707031,9.278111457824707,/data2/locross/analysis/models/em_stoch/mp_model_epoch6600,swm_data.pkl
+1,Event Model Stochastic,0.5469728601252609,2nd Goal,0.25052192066805845,3rd Goal,8.83899974822998,9.376022338867188,/data2/locross/analysis/models/em_stoch_beta0_5/mp_model_epoch6600,swm_data.pkl
+2,Event Model Stochastic,0.4592901878914405,2nd Goal,0.1941544885177453,3rd Goal,9.071813583374023,9.661396980285645,/data2/locross/analysis/models/em_stoch_beta0_1/mp_model_epoch6600,swm_data.pkl
+3,Event Model Stochastic,0.524008350730689,2nd Goal,0.21920668058455114,3rd Goal,8.713828086853027,9.411338806152344,/data2/locross/analysis/models/em_stoch_beta10/mp_model_epoch6800,swm_data.pkl
+4,Event Model Stochastic,0.569937369519833,2nd Goal,0.2797494780793319,3rd Goal,8.441573143005371,9.00659465789795,/data2/locross/analysis/models/em_stoch_beta100/mp_model_epoch7000,swm_data.pkl
+5,Event Model Stochastic,0.511482254697286,2nd Goal,0.22129436325678498,3rd Goal,8.61690616607666,9.228055000305176,/data2/locross/analysis/models/em_stoch_beta1e3/mp_model_epoch6800,swm_data.pkl
