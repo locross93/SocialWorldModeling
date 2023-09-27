@@ -289,6 +289,15 @@ class Analysis(object):
 
         acc_g2 = np.mean(goals_obj2)
         acc_g3 = np.mean(goals_obj3)
+
+        # print successfully reconstructed goals, rows where y_labels are all 1, and y_recon is all 1
+        # Find rows where all elements are 1 for each array
+        all_one_rows_labels = np.all(y_labels == 1, axis=1)
+        all_one_rows_recon = np.all(y_recon == 1, axis=1)
+        # Find rows where both conditions are met
+        both_all_one = np.logical_and(all_one_rows_labels, all_one_rows_recon)
+        successful_trials = np.where(both_all_one)[0]
+        print('Successful trials:', successful_trials)
         
         # result = {
         #     'model': self.model_name,

@@ -1,4 +1,2 @@
-,model,score,epoch,dataset
-0,GT End State S1,0.2160392798690671,/mnt/fs2/locross/analysis/models/gt_end_state_s1/mp_model_epoch4600,swm_data.pkl
-1,GT End State S2,0.18576104746317512,/mnt/fs2/locross/analysis/models/gt_end_state_s2/mp_model_epoch6400,swm_data.pkl
-2,GT End State S3,0.2037643207855974,/mnt/fs2/locross/analysis/models/gt_end_state_s3/mp_model_epoch6000,swm_data.pkl
+,model,score,ADE,FDE,epoch,dataset
+0,Event Model No Horizon,0.3191489361702128,8.800292015075684,9.1426420211792,/data2/locross/analysis/models/emodel_no_horizon/mp_model_epoch18200,swm_data.pkl

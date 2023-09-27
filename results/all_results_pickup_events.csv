@@ -20,9 +20,10 @@
 18,GT End State S1,0.1178396072013093,4400,swm_data.pkl,2.970423698425293,1.347694754600525
 19,GT End State S2,0.1219312602291325,6200,swm_data.pkl,2.8542912006378174,1.1240990161895752
 20,GT End State S3,0.1317512274959083,5800,swm_data.pkl,2.8268988132476807,1.0436298847198486
-21,Event Model Stochastic,0.3518821603927987,/data2/locross/analysis/models/em_stoch/mp_model_epoch6600,swm_data.pkl,7.9197564125061035,8.315042495727539
+21,Event Model Stochastic,0.3518821603927987,/data2/locross/analysis/models/em_stoch/mp_model_epoch6600,swm_data.pkl,7.919756412506103,8.315042495727539
 22,Event Model Stochastic,0.3044189852700491,/data2/locross/analysis/models/em_stoch_beta0_5/mp_model_epoch6600,swm_data.pkl,8.203625679016113,8.655486106872559
 23,Event Model Stochastic,0.2864157119476268,/data2/locross/analysis/models/em_stoch_beta0_1/mp_model_epoch6600,swm_data.pkl,8.165453910827637,8.555606842041016
 24,Event Model Stochastic,0.2905073649754501,/data2/locross/analysis/models/em_stoch_beta10/mp_model_epoch6800,swm_data.pkl,8.094929695129395,8.534605026245117
 25,Event Model Stochastic,0.3158756137479542,/data2/locross/analysis/models/em_stoch_beta100/mp_model_epoch7000,swm_data.pkl,8.075302124023438,8.484896659851074
-26,Event Model Stochastic,0.28477905073649756,/data2/locross/analysis/models/em_stoch_beta1e3/mp_model_epoch6800,swm_data.pkl,8.076090812683105,8.518526077270508
+26,Event Model Stochastic,0.2847790507364975,/data2/locross/analysis/models/em_stoch_beta1e3/mp_model_epoch6800,swm_data.pkl,8.076090812683105,8.518526077270508
+27,Event Model No Horizon,0.3191489361702128,/data2/locross/analysis/models/emodel_no_horizon/mp_model_epoch18200,swm_data.pkl,8.800292015075684,9.1426420211792

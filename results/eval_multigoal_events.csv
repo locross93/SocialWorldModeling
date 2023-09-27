@@ -1,2 +1,2 @@
 ,model,g2_acc,g2_goal_num,g3_acc,g3_goal_num,ADE,FDE,epoch,dataset
-0,Event Model Stochastic,0.40425531914893614,2nd Goal,0.2978723404255319,3rd Goal,8.942963600158691,9.438211441040039,/data2/locross/analysis/models/em_stoch_beta1e3/mp_model_epoch5200,swm_data.pkl
+0,Event Model Stochastic,0.40425531914893614,2nd Goal,0.23404255319148937,3rd Goal,8.925127029418945,9.65073013305664,/data2/locross/analysis/models/em_stoch/mp_model_epoch7600,swm_data.pkl
