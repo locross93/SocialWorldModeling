@@ -1,4 +1,2 @@
-,model,g2_acc,g2_goal_num,g2_mse,g3_acc,g3_goal_num,g3_mse,epoch,dataset
-0,GT End State S1,0.9916492693110647,2nd Goal,0.747126579284668,1.0,3rd Goal,0.747126579284668,/mnt/fs2/locross/analysis/models/gt_end_state_s1/mp_model_epoch4400,swm_data.pkl
-1,GT End State S2,0.9916492693110647,2nd Goal,0.7736415266990662,1.0,3rd Goal,0.7736415266990662,/mnt/fs2/locross/analysis/models/gt_end_state_s2/mp_model_epoch6200,swm_data.pkl
-2,GT End State S3,0.9916492693110647,2nd Goal,0.7681198716163635,1.0,3rd Goal,0.7681198716163635,/mnt/fs2/locross/analysis/models/gt_end_state_s3/mp_model_epoch5800,swm_data.pkl
+,model,g2_acc,g2_goal_num,g3_acc,g3_goal_num,ADE,FDE,epoch,dataset
+0,Event Model Stochastic,0.40425531914893614,2nd Goal,0.2978723404255319,3rd Goal,8.942963600158691,9.438211441040039,/data2/locross/analysis/models/em_stoch_beta1e3/mp_model_epoch5200,swm_data.pkl

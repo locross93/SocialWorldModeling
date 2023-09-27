@@ -264,6 +264,24 @@ MODEL_DICT_VAL=  {
     'rssm_disc_h_2048_lr3e-4_s2': {
         'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
         'model_dir': 'rssm_disc_h_2048_lr3e-4_s2', 'model_label': 'RSSM-S2'},
+    'stoch_event_model': {
+        'class': EventModel, 'config': 'event_model_stochastic.json',
+        'model_dir': 'em_stoch', 'model_label': 'Event Model Stochastic'},
+    'stoch_em_beta0_5': {
+        'class': EventModel, 'config': 'event_model_stochastic.json',
+        'model_dir': 'em_stoch_beta0_5', 'model_label': 'Event Model Stochastic'},
+    'stoch_em_beta0_1': {
+        'class': EventModel, 'config': 'event_model_stochastic.json',
+        'model_dir': 'em_stoch_beta0_1', 'model_label': 'Event Model Stochastic'},
+    'stoch_em_beta10': {
+        'class': EventModel, 'config': 'event_model_stochastic.json',
+        'model_dir': 'em_stoch_beta10', 'model_label': 'Event Model Stochastic'},
+    'stoch_em_beta100': {
+        'class': EventModel, 'config': 'event_model_stochastic.json',
+        'model_dir': 'em_stoch_beta100', 'model_label': 'Event Model Stochastic'},
+    'stoch_em_beta1e3': {
+        'class': EventModel, 'config': 'event_model_stochastic.json',
+        'model_dir': 'em_stoch_beta1e3', 'model_label': 'Event Model Stochastic'},
 }
 # Get the hostname of the machine
 hostname = socket.gethostname()
@@ -328,7 +346,8 @@ DEFAULT_VALUES = {
     #'model_keys': list(MODEL_DICT_VAL.keys()),
     #'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','rssm_cont_h_2048_lr1e-4_s1','md_mlp_2048_lr3e-4_s1','transformer_iris'],
     #'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','tf_emb2048_lr1e-4_s1'],
-    'model_keys': ['sgnet_10', 'sgnet10_s2', 'sgnet10_s3'],     
+    #'model_keys': ['sgnet_10', 'sgnet10_s2', 'sgnet10_s3'],     
+    'model_keys': ['stoch_event_model', 'stoch_em_beta0_5', 'stoch_em_beta0_1', 'stoch_em_beta10', 'stoch_em_beta100', 'stoch_em_beta1e3'],
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,

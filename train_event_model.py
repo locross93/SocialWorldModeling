@@ -67,6 +67,7 @@ def load_args():
     parser.add_argument('--mp_mlp_hidden_size', type=int, help='MP MLP hidden size')
     parser.add_argument('--ep_rnn_hidden_size', type=int, help='EP RNN hidden size')
     parser.add_argument('--ep_mlp_hidden_size', type=int, help='EP MLP hidden size')
+    parser.add_argument('--ep_beta', type=float, help='VAE Beta for Stochastic Event Predictor')
     parser.add_argument('--burn_in_length', type=int, default=50, help='Amount of frames to burn into RNN')
     parser.add_argument('--rollout_length', type=int, default=30, help='Forward rollout length')    
 
@@ -183,6 +184,7 @@ def main():
     loss_dict['train'] = []
     loss_dict['mp_loss'] = []
     loss_dict['ep_loss'] = []
+    loss_dict['kl_loss'] = []
     loss_dict['val'] = []
     loss_dict['val_mp_loss'] = []
     loss_dict['val_ep_loss'] = []
@@ -201,7 +203,10 @@ def main():
             event_horizons = event_horizons.to(DEVICE)
             nsamples += batch_x.shape[0]
             opt.zero_grad()
-            ep_loss, event_loss, horizon_loss, event_hat, event_horizon_hat = ep_model.supervised_loss(batch_x[:,:burn_in_length,:], event_states, event_horizons)
+            if ep_config['model_type'] == 'event_predictor':
+                ep_loss, event_loss, horizon_loss, event_hat, event_horizon_hat = ep_model.supervised_loss(batch_x[:,:burn_in_length,:], event_states, event_horizons)
+            elif ep_config['model_type'] == 'event_predictor_stochastic':
+                ep_loss, event_loss, horizon_loss, event_hat, event_horizon_hat, kl_loss = ep_model.supervised_loss(batch_x[:,:burn_in_length,:], event_states, event_horizons)
             # condition ms predictor on predicted end states, detach from computational graph so gradients don't flow through ep_model
             if mp_config['input_pred_horizon']:
                 # concatenate event_hat and event_horizon_hat
@@ -210,17 +215,22 @@ def main():
             loss = ep_loss + mp_loss
             loss.backward()
             opt.step()
-            batch_loss.append([ep_loss.item(), mp_loss.item(), loss.item()])
-        loss_dict['train'].append(np.mean([b_loss[-1] for b_loss in batch_loss]))
+            batch_loss.append([ep_loss.item(), mp_loss.item(), loss.item(), kl_loss.item()])
+        loss_dict['train'].append(np.mean([b_loss[2] for b_loss in batch_loss]))
         loss_dict['ep_loss'].append(np.mean([b_loss[0] for b_loss in batch_loss]))
         loss_dict['mp_loss'].append(np.mean([b_loss[1] for b_loss in batch_loss]))
+        if ep_config['model_type'] == 'event_predictor_stochastic':
+            loss_dict['kl_loss'].append(np.mean([b_loss[3] for b_loss in batch_loss]))
         loss_dict['epoch_times'].append(time.time()-start_time)
             
         # test on validation set
         with torch.no_grad():
             mp_model.eval()
             ep_model.eval()
-            val_ep_loss, val_event_loss, val_horizon_loss, val_event_hat, val_event_horizon_hat = ep_model.supervised_loss(val_trajs[:,:burn_in_length,:], val_event_states, val_event_horizons)
+            if ep_config['model_type'] == 'event_predictor':
+                val_ep_loss, val_event_loss, val_horizon_loss, val_event_hat, val_event_horizon_hat = ep_model.supervised_loss(val_trajs[:,:burn_in_length,:], val_event_states, val_event_horizons)
+            elif ep_config['model_type'] == 'event_predictor_stochastic':
+                val_ep_loss, val_event_loss, val_horizon_loss, val_event_hat, val_event_horizon_hat, val_kl_loss = ep_model.supervised_loss(val_trajs[:,:burn_in_length,:], val_event_states, val_event_horizons)
             if mp_config['input_pred_horizon']:
                 # concatenate event_hat and event_horizon_hat
                 val_event_hat = torch.cat([val_event_hat, val_event_horizon_hat.unsqueeze(1)], dim=-1)
@@ -234,6 +244,7 @@ def main():
         writer.add_scalar('Train Loss/loss', loss_dict['train'][-1], epoch)
         writer.add_scalar('Train Loss/ep_loss', loss_dict['ep_loss'][-1], epoch)
         writer.add_scalar('Train Loss/mp_loss', loss_dict['mp_loss'][-1], epoch)
+        writer.add_scalar('Train Loss/kl_loss', loss_dict['kl_loss'][-1], epoch)
         writer.add_scalar('Val Loss/val', val_loss, epoch)
         writer.add_scalar('Val Loss/val_ep_loss', val_ep_loss.item(), epoch)
         writer.add_scalar('Val Loss/val_mp_loss', val_mp_loss.item(), epoch)
@@ -254,7 +265,10 @@ def main():
                 training_info[key] = loss_dict[key]
             df_training = pd.DataFrame.from_dict(training_info)
             df_training.to_csv(os.path.join(save_dir, f'training_info_{model_filename}.csv'))
-        print(f'Epoch {epoch}, Train Loss {loss_dict["train"][-1]}, Event Loss {loss_dict["ep_loss"][-1]}, MP Loss {loss_dict["mp_loss"][-1]}, Validation Loss {loss_dict["val"][-1]}')
+        if ep_config['model_type'] == 'event_predictor_stochastic':
+            print(f'Epoch {epoch}, Train Loss {loss_dict["train"][-1]}, Event Loss {loss_dict["ep_loss"][-1]}, MP Loss {loss_dict["mp_loss"][-1]}, KL Loss {loss_dict["kl_loss"][-1]}, Validation Loss {loss_dict["val"][-1]}')
+        else:
+            print(f'Epoch {epoch}, Train Loss {loss_dict["train"][-1]}, Event Loss {loss_dict["ep_loss"][-1]}, MP Loss {loss_dict["mp_loss"][-1]}, Validation Loss {loss_dict["val"][-1]}')
 
 
 if __name__ == '__main__':    

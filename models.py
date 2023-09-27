@@ -3063,7 +3063,7 @@ class EventPredictorStochastic(nn.Module):
             event_horizon_hat = None
             
         # Add KL divergence to the loss
-        kl_loss = -0.5 * torch.sum(1 + self.log_var - self.mu.pow(2) - self.log_var.exp())
-        loss += self.beta * kl_loss
+        kl_loss = (-0.5 * torch.sum(1 + self.log_var - self.mu.pow(2) - self.log_var.exp())) * self.beta
+        loss += kl_loss
 
         return loss, event_loss, horizon_loss, event_hat, event_horizon_hat, kl_loss
