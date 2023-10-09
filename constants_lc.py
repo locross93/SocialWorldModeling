@@ -234,15 +234,36 @@ MODEL_DICT_VAL=  {
     'rssm_ds1000': {
         'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
         'model_dir': 'rssm_ds1000', 'model_label': 'RSSM DS1000'},
+    'rssm_ds5000': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
+        'model_dir': 'rssm_ds5000', 'model_label': 'RSSM DS5000'},
+    'rssm_ds10000': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
+        'model_dir': 'rssm_ds10000', 'model_label': 'RSSM DS10000'},
     'rssm_ds20000': {
         'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
         'model_dir': 'rssm_ds20000', 'model_label': 'RSSM DS20000'},
+    'rssm_ds30000': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
+        'model_dir': 'rssm_ds30000', 'model_label': 'RSSM DS30000'},
     'mp_ds1000': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
         'model_dir': 'mp_ds1000', 'model_label': 'MP DS1000'},
+    'mp_ds5000': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
+        'model_dir': 'mp_ds5000', 'model_label': 'MP DS5000'},
+    'mp_ds10000': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
+        'model_dir': 'mp_ds10000', 'model_label': 'MP DS10000'},
     'mp_ds20000': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
         'model_dir': 'mp_ds20000', 'model_label': 'MP DS20000'},
+    'mp_ds30000': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
+        'model_dir': 'mp_ds30000', 'model_label': 'MP DS30000'},
+    'mp_ds1e5': {
+        'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
+        'model_dir': 'mp_ds1e5', 'model_label': 'MP DS1e5'},
     'rssm_cont_ds1000': {
         'class': DreamerV2, 'config': 'rssm_cont_ds2_dec_hidden_size_2048.json',
         'model_dir': 'rssm_cont_ds1000', 'model_label': 'RSSM Cont DS1000'},
@@ -347,7 +368,7 @@ DEFAULT_VALUES = {
     #'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','rssm_cont_h_2048_lr1e-4_s1','md_mlp_2048_lr3e-4_s1','transformer_iris'],
     #'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','tf_emb2048_lr1e-4_s1'],
     #'model_keys': ['sgnet_10', 'sgnet10_s2', 'sgnet10_s3'],     
-    'model_keys': ['stoch_event_model', 'stoch_em_beta0_5', 'stoch_em_beta0_1', 'stoch_em_beta10', 'stoch_em_beta100', 'stoch_em_beta1e3'],
+    'model_keys': ['rssm_ds1000', 'rssm_ds5000', 'rssm_ds10000', 'rssm_ds20000', 'rssm_ds30000', 'rssm_disc_h_2048_lr3e-4_s1', 'rssm_ds1e5'],
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
