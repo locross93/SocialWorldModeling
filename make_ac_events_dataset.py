@@ -128,6 +128,6 @@ if __name__ == '__main__':
 
         event_inds[train_or_val] = peaks_indices
             
-    save_file = os.path.join(args.analysis_dir,'results','event_inds','event_inds_'+args.model_key+'.pkl')
+    save_file = os.path.join(args.data_dir,'events_data','event_inds','event_inds_'+args.model_key+'.pkl')
     with open(save_file, 'wb') as f:
         pickle.dump(event_inds, f)

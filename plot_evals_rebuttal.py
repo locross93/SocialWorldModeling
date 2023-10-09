@@ -91,8 +91,8 @@ plt.figure(figsize=(13, 6))
 bar_plot = sns.barplot(x='model', y='score', data=df_results, palette=sn_palette, errorbar="se", capsize=0.1, order=model_order)
 sns.despine(top=True, right=True)    
 #bar_plot.set_xticklabels(bar_plot.get_xticklabels(), rotation=45, horizontalalignment='right')
-#plt.title('Single Goal Events Evaluation', fontsize=title_fontsize)
-plt.title('Single Goal Events - Post Pickup Event Context', fontsize=30)
+plt.title('Single Goal Events Evaluation', fontsize=title_fontsize)
+#plt.title('Single Goal Events - Post Pickup Event Context', fontsize=30)
 #plt.title('Single Goal Events - Post Pickup Event Context', fontsize=30)
 plt.xlabel('Model Name', fontsize=label_fontsize) 
 #xlabels = ['Multistep Predictor', 'RSSM Discrete', 'RSSM Continuous', 'Multistep Delta', 'Transformer']
@@ -254,6 +254,7 @@ fde_df_results = pd.concat([fde_df_results[fde_df_results.index == model] for mo
 ade_df_results.to_csv('results/eval_pickup_events_ade.csv')
 fde_df_results.to_csv('results/eval_pickup_events_fde.csv')
 
+##################################
 # MOVE EVENTS
 result_path = 'results/move_events_submission_full2.csv'
 df = pd.read_csv(result_path, index_col=0)

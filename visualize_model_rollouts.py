@@ -303,9 +303,10 @@ if __name__ == '__main__':
     
     rollout_length = input_data.size(1) - burn_in_length
     x = input_data[traj_ind,:,:].unsqueeze(0)
+    x = x.to(args.device)
     if x.dtype == torch.float64:
         x = x.float()
-    x_true = x[0,:burn_in_length+rollout_length,:].numpy()
+    x_true = x[0,:burn_in_length+rollout_length,:].cpu().numpy()
     x_pred = x_true.copy()
     # if args.model_key == 'transformer_wm':
     #     rollout_x = model.variable_length_rollout(x, steps2pickup, rollout_length).cpu().detach()
@@ -315,7 +316,7 @@ if __name__ == '__main__':
     x_pred[burn_in_length:,:] = rollout_x 
     
     if args.eval_event_model:
-        pred_event_state = model.event_hat.numpy()
+        pred_event_state = model.event_hat.cpu().numpy()
         if pred_event_state.shape[1] == 36:
             horizon_output = True
             pred_horizon = pred_event_state[:,-1]
