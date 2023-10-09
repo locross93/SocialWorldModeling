@@ -287,9 +287,9 @@ MODEL_DICT_VAL=  {
 hostname = socket.gethostname()
 if 'node05-ccncluster' in hostname:
     analysis_dir = '/home/locross/SocialWorldModeling/'
-    data_path = '/data2/locross/data/swm_data.pkl'
-    data_dir = '/data2/locross/data/'
-    checkpoint_dir = '/data2/locross/analysis/'
+    data_path = '/mnt/fs2/locross/data/swm_data.pkl'
+    data_dir = '/mnt/fs2/locross/data/'
+    checkpoint_dir = '/mnt/fs2/locross/analysis/'
     results_dir = '/home/locross/SocialWorldModeling/results/'
     model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
 elif 'DESKTOP-LU5SR6R' in hostname:
