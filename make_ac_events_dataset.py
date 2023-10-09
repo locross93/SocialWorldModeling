@@ -46,7 +46,10 @@ def load_args():
     parser.add_argument('--checkpoint_dir', type=str, 
                         default=DEFAULT_VALUES['checkpoint_dir'], 
                         help='Checkpoint directory')
-    parser.add_argument('--model_key', type=str, required=True, help='Model to use for visualization')
+    parser.add_argument('--events_filename', type=str, 
+                        default=None, 
+                        help='Save filename')
+    parser.add_argument('--model_key', type=str, required=True, help='Model to use for event labeling')
     parser.add_argument('--device', type=str, default='cuda', help='Device')
     parser.add_argument('--batch_size', type=int, action='store',
                         default=DEFAULT_VALUES['batch_size'],
@@ -128,6 +131,10 @@ if __name__ == '__main__':
 
         event_inds[train_or_val] = peaks_indices
             
-    save_file = os.path.join(args.data_dir,'events_data','event_inds','event_inds_'+args.model_key+'.pkl')
+    if args.events_filename is None:
+        events_filename = 'event_inds_'+args.model_key+'.pkl'
+    else:
+        events_filename = args.events_filename
+    save_file = os.path.join(args.data_dir,'events_data','event_inds', events_filename)
     with open(save_file, 'wb') as f:
         pickle.dump(event_inds, f)
