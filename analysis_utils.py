@@ -8,7 +8,7 @@ import os
 import json
 import torch
 
-from constants import MODEL_DICT_TRAIN
+from constants_lc import MODEL_DICT_TRAIN
 
 """Global variables"""
 model_dict = MODEL_DICT_TRAIN

@@ -19,5 +19,5 @@
     "ep_rnn_type": "LSTM",
     "ep_model_type": "event_predictor_stochastic",
     "ep_beta": 100.0,
-    "model_type": "event_model_stochastic"
+    "model_type": "event_model"
 }

@@ -411,8 +411,8 @@ DEFAULT_VALUES = {
                     'mp_ds1000', 'mp_ds5000', 'mp_ds10000', 'mp_ds20000', 'mp_ds30000', 'mp_mlp_2048_lr3e-4_s1', 'mp_ds1e5',
                     'em_deter_5000', 'em_deter_30000', 'emodel_no_horizon', 'em_stoch_5000', 'em_stoch_30000', 'stoch_em_beta100'],
     # ccn2
-    'model_keys': ['em_deter_1000', 'em_deter_10000', 'em_deter_20000', 'em_deter_1e5',
-                    'em_stoch_1000', 'em_stoch_10000', 'em_stoch_20000', 'em_stoch_1e5'],
+    # 'model_keys': ['em_deter_1000', 'em_deter_10000', 'em_deter_20000', 'em_deter_1e5',
+    #                 'em_stoch_1000', 'em_stoch_10000', 'em_stoch_20000', 'em_stoch_1e5'],
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
