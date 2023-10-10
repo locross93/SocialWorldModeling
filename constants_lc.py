@@ -233,7 +233,7 @@ MODEL_DICT_VAL=  {
         'model_dir': 'hdelta_30steps', 'model_label': 'HDelta 30 Step'},
     'rssm_ds1000': {
         'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
-        'model_dir': 'rssm_ds1000', 'model_label': 'RSSM DS1000', 'epoch': '0'},
+        'model_dir': 'rssm_ds1000', 'model_label': 'RSSM DS1000'},
     'rssm_ds5000': {
         'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
         'model_dir': 'rssm_ds5000', 'model_label': 'RSSM DS5000'},
@@ -306,6 +306,42 @@ MODEL_DICT_VAL=  {
     'stoch_em_beta1e3': {
         'class': EventModel, 'config': 'event_model_stochastic.json',
         'model_dir': 'em_stoch_beta1e3', 'model_label': 'Event Model Stochastic'},
+    'em_deter_1000': {
+        'class': EventModel, 'config': 'event_model_no_horizon.json',
+        'model_dir': 'em_deter_1000', 'model_label': 'Deter. Event Model DS 1000'},
+    'em_deter_5000': {
+        'class': EventModel, 'config': 'event_model_no_horizon.json',
+        'model_dir': 'em_deter_5000', 'model_label': 'Deter. Event Model DS 5000'},
+    'em_deter_10000': {
+        'class': EventModel, 'config': 'event_model_no_horizon.json',
+        'model_dir': 'em_deter_10000', 'model_label': 'Deter. Event Model DS 10000'},
+    'em_deter_20000': {
+        'class': EventModel, 'config': 'event_model_no_horizon.json',
+        'model_dir': 'em_deter_20000', 'model_label': 'Deter. Event Model DS 20000'},
+    'em_deter_30000': {
+        'class': EventModel, 'config': 'event_model_no_horizon.json',
+        'model_dir': 'em_deter_30000', 'model_label': 'Deter. Event Model DS 30000'},
+    'em_deter_1e5': {
+        'class': EventModel, 'config': 'event_model_no_horizon.json',
+        'model_dir': 'em_deter_1e5', 'model_label': 'Deter. Event Model DS 1e5'},
+    'em_stoch_1000': {
+        'class': EventModel, 'config': 'em_stoch_beta100_ep_beta_100.0.json',
+        'model_dir': 'em_stoch_1000', 'model_label': 'Stoch. Event Model DS 1000'},
+    'em_stoch_5000': {
+        'class': EventModel, 'config': 'em_stoch_beta100_ep_beta_100.0.json',
+        'model_dir': 'em_stoch_5000', 'model_label': 'Stoch. Event Model DS 5000'},
+    'em_stoch_10000': {
+        'class': EventModel, 'config': 'em_stoch_beta100_ep_beta_100.0.json',
+        'model_dir': 'em_stoch_10000', 'model_label': 'Stoch. Event Model DS 10000'},
+    'em_stoch_20000': {
+        'class': EventModel, 'config': 'em_stoch_beta100_ep_beta_100.0.json',
+        'model_dir': 'em_stoch_20000', 'model_label': 'Stoch. Event Model DS 20000'},
+    'em_stoch_30000': {
+        'class': EventModel, 'config': 'em_stoch_beta100_ep_beta_100.0.json',
+        'model_dir': 'em_stoch_30000', 'model_label': 'Stoch. Event Model DS 30000'},
+    'em_stoch_1e5': {
+        'class': EventModel, 'config': 'em_stoch_beta100_ep_beta_100.0.json',
+        'model_dir': 'em_stoch_1e5', 'model_label': 'Stoch. Event Model DS 1e5'},
 }
 # Get the hostname of the machine
 hostname = socket.gethostname()
@@ -346,9 +382,9 @@ elif 'node02-ccncluster' in hostname:
     model_config_dir = '/home/locross/SocialWorldModeling/model_configs/'
 elif 'node1-ccn2cluster.stanford.edu' in hostname:
     analysis_dir = '/data3/locross/SocialWorldModeling/'
-    data_path = '/ccn2/u/ziyxiang/swm_data_and_results/data/swm_data.pkl'
-    data_dir = '/ccn2/u/ziyxiang/swm_data_and_results/data/'
-    checkpoint_dir = '/ccn2/u/ziyxiang/swm_data_and_results/checkpoint/'
+    data_path = '/data3/ziyxiang/swm_data_and_results/data/swm_data.pkl'
+    data_dir = '/data3/ziyxiang/swm_data_and_results/data/'
+    checkpoint_dir = '/data3/ziyxiang/swm_data_and_results/checkpoint/'
     results_dir = '/data3/locross/SocialWorldModeling/results/'
     model_config_dir = '/data3/locross/SocialWorldModeling/model_configs/'
 
@@ -371,7 +407,12 @@ DEFAULT_VALUES = {
     #'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','rssm_cont_h_2048_lr1e-4_s1','md_mlp_2048_lr3e-4_s1','transformer_iris'],
     #'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','tf_emb2048_lr1e-4_s1'],
     #'model_keys': ['sgnet_10', 'sgnet10_s2', 'sgnet10_s3'],     
-    'model_keys': ['rssm_ds5000', 'rssm_ds10000', 'rssm_ds30000', 'rssm_disc_h_2048_lr3e-4_s1', 'rssm_ds1e5'],
+    # 'model_keys': ['rssm_ds1000', 'rssm_ds5000', 'rssm_ds10000', 'rssm_ds20000', 'rssm_ds30000', 'rssm_disc_h_2048_lr3e-4_s1', 'rssm_ds1e5',
+    #                 'mp_ds1000', 'mp_ds5000', 'mp_ds10000', 'mp_ds20000', 'mp_ds30000', 'mp_mlp_2048_lr3e-4_s1', 'mp_ds1e5',
+    #                 'em_deter_5000', 'em_deter_30000', 'emodel_no_horizon', 'em_stoch_5000', 'em_stoch_30000', 'stoch_em_beta100'],
+    # ccn2
+    # 'model_keys': ['em_deter_1000', 'em_deter_10000', 'em_deter_20000', 'em_deter_1e5',
+    #                 'em_stoch_1000', 'em_stoch_10000', 'em_stoch_20000', 'em_stoch_1e5'],
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,
