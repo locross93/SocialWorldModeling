@@ -233,7 +233,7 @@ MODEL_DICT_VAL=  {
         'model_dir': 'hdelta_30steps', 'model_label': 'HDelta 30 Step'},
     'rssm_ds1000': {
         'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
-        'model_dir': 'rssm_ds1000', 'model_label': 'RSSM DS1000'},
+        'model_dir': 'rssm_ds1000', 'model_label': 'RSSM DS1000', 'epoch': 0},
     'rssm_ds5000': {
         'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
         'model_dir': 'rssm_ds5000', 'model_label': 'RSSM DS5000'},
