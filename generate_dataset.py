@@ -269,7 +269,8 @@ if __name__ == '__main__':
     val_idx = random.choices(logged_indices, k=num_val_trials)
     train_idx = [i for i in range(len(dataset)) if i not in val_idx]
     random.shuffle(train_idx)
-    train_dataset = Subset(dataset, train_idx) # a subset of the dataset with train indices
+    # TEMP ::2
+    train_dataset = Subset(dataset, train_idx[::2]) # a subset of the dataset with train indices
     test_dataset = Subset(dataset, val_idx) # a subset of the dataset with test indices
     
     save_file = os.path.join(args.data_dir, args.dataset_name+'.pkl')
