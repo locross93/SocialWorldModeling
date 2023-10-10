@@ -328,16 +328,18 @@ if __name__ == '__main__':
         events_ds_file = os.path.join(args.analysis_dir,'results/event_inds/event_inds_mp_ds2.pkl')
         events_dataset = pickle.load(open(events_ds_file, 'rb'))
         event_inds = events_dataset[args.train_or_val]
-        # get closest future event state in that trajectory from burn in state
+        
+        # get closest future event state in that trajectory from burn in state + 5
         traj_event_inds = np.array(event_inds[traj_ind])
-        burn_in_ind = burn_in_length - 1
+        burn_in_ind = (burn_in_length - 1) + 5
         last_burnin_state = input_data[traj_ind,burn_in_ind,:].unsqueeze(0)
         closest_event_ind = np.min(traj_event_inds[np.where(traj_event_inds > burn_in_ind)[0]])
+        
         # get event horizon from end state
         event_horizon = closest_event_ind - burn_in_ind
         event_state = input_data[traj_ind,closest_event_ind,:].unsqueeze(0)
         assert torch.equal(event_state, x[:,closest_event_ind,:])
-        #event_state = event_state.numpy()
+        event_state = event_state.numpy()
         if horizon_output:
             fig, ax = plot_one_frame_compare(last_burnin_state, event_state, pred_event_state, data_columns, event_horizon, pred_horizon)
         else:
@@ -347,17 +349,17 @@ if __name__ == '__main__':
         # condition ms predictor on predicted next event
         # concatenate event_hat and event_horizon_hat
         # first normalize event_horizon
-        event_horizon = float((event_horizon - 1) / ((300 - 50) - 1))
-        # add true end state
-        event_state = input_data[traj_ind,-1,:].unsqueeze(0)
-        event_state = torch.cat([event_state, torch.tensor(event_horizon).unsqueeze(0).unsqueeze(0)], dim=-1)
-        with torch.no_grad():
-            rollout_x = model.mp_model.forward_rollout(x, event_state, burn_in_length, rollout_length).cpu().numpy()
+        # event_horizon = float((event_horizon - 1) / ((300 - 50) - 1))
+        # # add true end state
+        # event_state = input_data[traj_ind,-1,:].unsqueeze(0)
+        # event_state = torch.cat([event_state, torch.tensor(event_horizon).unsqueeze(0).unsqueeze(0)], dim=-1)
+        # with torch.no_grad():
+        #     rollout_x = model.mp_model.forward_rollout(x, event_state, burn_in_length, rollout_length).cpu().numpy()
         
         # Call MSPredictorEventContext's forward_rollout with event_hat
         # with torch.no_grad():
         #     rollout_x  = model.mp_model.forward_rollout(x, pred_event_state, burn_in_length, rollout_length)
-        x_pred[burn_in_length:,:] = rollout_x 
+        #x_pred[burn_in_length:,:] = rollout_x 
     
     viz_dir = os.path.join(args.analysis_dir, 'results/viz_trajs',args.model_key)
     if not os.path.exists(viz_dir):        
