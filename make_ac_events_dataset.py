@@ -135,6 +135,6 @@ if __name__ == '__main__':
         events_filename = 'event_inds_'+args.model_key+'.pkl'
     else:
         events_filename = args.events_filename
-    save_file = os.path.join(args.data_dir,'events_data','event_inds', events_filename)
+    save_file = os.path.join(args.data_dir,'events_data', events_filename)
     with open(save_file, 'wb') as f:
         pickle.dump(event_inds, f)
