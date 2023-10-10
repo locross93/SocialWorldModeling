@@ -246,6 +246,9 @@ MODEL_DICT_VAL=  {
     'rssm_ds30000': {
         'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
         'model_dir': 'rssm_ds30000', 'model_label': 'RSSM DS30000'},
+    'rssm_ds1e5': {
+        'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
+        'model_dir': 'rssm_ds1e5', 'model_label': 'RSSM DS1e5'},
     'mp_ds1000': {
         'class': MultistepPredictor, 'config': 'multistep_predictor_input_size_35_mlp_hidden_size_2048.json',
         'model_dir': 'mp_ds1000', 'model_label': 'MP DS1000'},
