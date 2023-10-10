@@ -42,6 +42,8 @@ def load_args():
     # general training parameters    
     parser.add_argument('--config', type=str,
                         required=True, help='Config JSON file')
+    parser.add_argument('--events_filename', type=str,
+                        required=True, help='Event labels filename')
     parser.add_argument('--batch_size', type=int, action='store',
                         default=DEFAULT_VALUES['batch_size'],
                         help='Batch size')
@@ -136,7 +138,8 @@ def main():
     val_data = test_dataset.dataset.tensors[0][test_dataset.indices,:,:]
 
     # load events data
-    events_ds_file = os.path.join(args.analysis_dir,'results/event_inds/event_inds_mp_ds2.pkl')
+    events_ds_file = os.path.join(args.data_dir,'events_data', args.events_filename)
+    #events_ds_file = os.path.join(args.analysis_dir,'results/event_inds/event_inds_mp_ds2.pkl')
     events_dataset = pickle.load(open(events_ds_file, 'rb'))
 
     # initialize the replay buffer
@@ -184,7 +187,8 @@ def main():
     loss_dict['train'] = []
     loss_dict['mp_loss'] = []
     loss_dict['ep_loss'] = []
-    loss_dict['kl_loss'] = []
+    if ep_config['model_type'] == 'event_predictor_stochastic':
+        loss_dict['kl_loss'] = []
     loss_dict['val'] = []
     loss_dict['val_mp_loss'] = []
     loss_dict['val_ep_loss'] = []
@@ -215,7 +219,10 @@ def main():
             loss = ep_loss + mp_loss
             loss.backward()
             opt.step()
-            batch_loss.append([ep_loss.item(), mp_loss.item(), loss.item(), kl_loss.item()])
+            if ep_config['model_type'] == 'event_predictor':
+                batch_loss.append([ep_loss.item(), mp_loss.item(), loss.item()])
+            elif ep_config['model_type'] == 'event_predictor_stochastic':
+                batch_loss.append([ep_loss.item(), mp_loss.item(), loss.item(), kl_loss.item()])
         loss_dict['train'].append(np.mean([b_loss[2] for b_loss in batch_loss]))
         loss_dict['ep_loss'].append(np.mean([b_loss[0] for b_loss in batch_loss]))
         loss_dict['mp_loss'].append(np.mean([b_loss[1] for b_loss in batch_loss]))
@@ -244,7 +251,8 @@ def main():
         writer.add_scalar('Train Loss/loss', loss_dict['train'][-1], epoch)
         writer.add_scalar('Train Loss/ep_loss', loss_dict['ep_loss'][-1], epoch)
         writer.add_scalar('Train Loss/mp_loss', loss_dict['mp_loss'][-1], epoch)
-        writer.add_scalar('Train Loss/kl_loss', loss_dict['kl_loss'][-1], epoch)
+        if ep_config['model_type'] == 'event_predictor_stochastic':
+            writer.add_scalar('Train Loss/kl_loss', loss_dict['kl_loss'][-1], epoch)
         writer.add_scalar('Val Loss/val', val_loss, epoch)
         writer.add_scalar('Val Loss/val_ep_loss', val_ep_loss.item(), epoch)
         writer.add_scalar('Val Loss/val_mp_loss', val_mp_loss.item(), epoch)
