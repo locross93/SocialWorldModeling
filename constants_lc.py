@@ -233,7 +233,7 @@ MODEL_DICT_VAL=  {
         'model_dir': 'hdelta_30steps', 'model_label': 'HDelta 30 Step'},
     'rssm_ds1000': {
         'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
-        'model_dir': 'rssm_ds1000', 'model_label': 'RSSM DS1000', 'epoch': '0'},
+        'model_dir': 'rssm_ds1000', 'model_label': 'RSSM DS1000'},
     'rssm_ds5000': {
         'class': DreamerV2, 'config': 'rssm_disc_ds3_dec_hidden_size_2048.json',
         'model_dir': 'rssm_ds5000', 'model_label': 'RSSM DS5000'},
@@ -371,7 +371,9 @@ DEFAULT_VALUES = {
     #'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','rssm_cont_h_2048_lr1e-4_s1','md_mlp_2048_lr3e-4_s1','transformer_iris'],
     #'model_keys': ['mp_mlp_2048_lr3e-4_s1','rssm_disc_h_2048_lr3e-4_s1','tf_emb2048_lr1e-4_s1'],
     #'model_keys': ['sgnet_10', 'sgnet10_s2', 'sgnet10_s3'],     
-    'model_keys': ['rssm_ds5000', 'rssm_ds10000', 'rssm_ds30000', 'rssm_disc_h_2048_lr3e-4_s1', 'rssm_ds1e5'],
+    'model_keys': ['rssm_ds1000', 'rssm_ds5000', 'rssm_ds10000', 'rssm_ds20000', 'rssm_ds30000', 'rssm_disc_h_2048_lr3e-4_s1', 'rssm_ds1e5',
+                    'mp_ds1000', 'mp_ds5000', 'mp_ds10000', 'mp_ds20000', 'mp_ds30000', 'mp_mlp_2048_lr3e-4_s1', 'mp_ds1e5',
+                    'em_deter_5000', 'em_deter_30000', 'em_stoch_5000', 'em_stoch_30000'],
     'eval_types': ['goal_events', 'multigoal_events', 'move_events', 'pickup_events', 'displacement'],
     'move_threshold': 4.0,
     'non_goal_burn_in': 50,

@@ -1,0 +1,2 @@
+,model,score,ADE,FDE,epoch,dataset
+0,RSSM DS30000,0.0,8.918424606323242,9.006335258483887,/mnt/fs2/locross/analysis/models/rssm_ds30000/rssm_ds30000_epoch200,swm_data.pkl
