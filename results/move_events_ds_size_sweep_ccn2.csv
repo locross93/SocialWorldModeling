@@ -1,0 +1,9 @@
+,accuracy,precision,recall,model,ADE,FDE,epoch,dataset
+0,0.5613900179428027,0.4190751445086705,0.11373540177793272,Deter. Event Model DS 1000,7.538329601287842,7.998154640197754,/data3/ziyxiang/swm_data_and_results/checkpoint/models/em_deter_1000/mp_model_epoch5600,swm_data.pkl
+1,0.5796623823647882,0.4989915288422751,0.1078089593864389,Deter. Event Model DS 10000,6.273849964141846,6.818595886230469,/data3/ziyxiang/swm_data_and_results/checkpoint/models/em_deter_10000/mp_model_epoch16200,swm_data.pkl
+2,0.6001318246731847,1.0,0.04828307477775841,Deter. Event Model DS 20000,5.007675647735596,5.336811542510986,/data3/ziyxiang/swm_data_and_results/checkpoint/models/em_deter_20000/mp_model_epoch200,swm_data.pkl
+3,0.6041964187630452,0.8295341922695738,0.07294753355412237,Deter. Event Model DS 1e5,4.364220142364502,4.93539571762085,/data3/ziyxiang/swm_data_and_results/checkpoint/models/em_deter_1e5/mp_model_epoch800,swm_data.pkl
+4,0.5598886813870885,0.41481713035323536,0.11565278019871013,Stoch. Event Model DS 1000,8.557564735412598,9.83953857421875,/data3/ziyxiang/swm_data_and_results/checkpoint/models/em_stoch_1000/mp_model_epoch5400,swm_data.pkl
+5,0.568274195320224,0.44432699083861876,0.1099006449363779,Stoch. Event Model DS 10000,7.0350518226623535,8.080657958984375,/data3/ziyxiang/swm_data_and_results/checkpoint/models/em_stoch_10000/mp_model_epoch13200,swm_data.pkl
+6,0.5868395034603977,0.5532626882320134,0.08645633606414502,Stoch. Event Model DS 20000,6.42024564743042,7.9620842933654785,/data3/ziyxiang/swm_data_and_results/checkpoint/models/em_stoch_20000/mp_model_epoch200,swm_data.pkl
+7,0.6052217217767036,0.8561151079136691,0.0725989192957992,Stoch. Event Model DS 1e5,4.219686031341553,4.913182735443115,/data3/ziyxiang/swm_data_and_results/checkpoint/models/em_stoch_1e5/mp_model_epoch2600,swm_data.pkl
