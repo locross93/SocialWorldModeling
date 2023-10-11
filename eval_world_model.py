@@ -295,7 +295,7 @@ class Analysis(object):
         all_one_rows_labels = np.all(y_labels == 1, axis=1)
         all_one_rows_recon = np.all(y_recon == 1, axis=1)
         # Find rows where both conditions are met
-        both_all_oned = np.logical_and(all_one_rows_labels, all_one_rows_recon)
+        both_all_one = np.logical_and(all_one_rows_labels, all_one_rows_recon)
         successful_trials = np.where(both_all_one)[0]
         print('Successful trials:', successful_trials)
         
