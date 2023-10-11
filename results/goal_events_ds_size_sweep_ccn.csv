@@ -1,21 +1,21 @@
 ,model,score,ADE,FDE,epoch,dataset
 0,RSSM DS1000,0.18032786885245902,9.412342071533203,9.950540542602539,/mnt/fs2/locross/analysis/models/rssm_ds1000/rssm_ds1000_epoch29999,swm_data.pkl
 1,RSSM DS5000,0.28688524590163933,8.748046875,8.981339454650879,/mnt/fs2/locross/analysis/models/rssm_ds5000/rssm_ds5000_epoch10000,swm_data.pkl
-2,RSSM DS10000,0.22950819672131148,8.416749954223633,8.945841789245605,/mnt/fs2/locross/analysis/models/rssm_ds10000/rssm_ds10000_epoch4600,swm_data.pkl
-3,RSSM DS20000,0.22131147540983606,8.437623023986816,8.772530555725098,/mnt/fs2/locross/analysis/models/rssm_ds20000/rssm_ds20000_epoch1800,swm_data.pkl
-4,RSSM DS30000,0.14754098360655737,8.684874534606934,8.816611289978027,/mnt/fs2/locross/analysis/models/rssm_ds30000/rssm_ds30000_epoch1600,swm_data.pkl
+2,RSSM DS10000,0.27049180327868855,8.118667602539062,8.361446380615234,/mnt/fs2/locross/analysis/models/rssm_ds10000/rssm_ds10000_epoch7600,swm_data.pkl
+3,RSSM DS20000,0.319672131147541,8.07028865814209,8.282873153686523,/mnt/fs2/locross/analysis/models/rssm_ds20000/rssm_ds20000_epoch3200,swm_data.pkl
+4,RSSM DS30000,0.3114754098360656,8.393743515014648,8.552273750305176,/mnt/fs2/locross/analysis/models/rssm_ds30000/rssm_ds30000_epoch2800,swm_data.pkl
 5,RSSM-S1,0.3770491803278688,7.932168960571289,8.119426727294922,/mnt/fs2/locross/analysis/models/rssm_disc_h_2048_lr3e-4_s1/rssm_disc_h_2048_lr3e-4_s1_epoch24200,swm_data.pkl
-6,RSSM DS1e5,0.2459016393442623,8.347577095031738,9.067188262939453,/mnt/fs2/locross/analysis/models/rssm_ds1e5/rssm_ds1e5_epoch3200,swm_data.pkl
+6,RSSM DS1e5,0.319672131147541,7.96340799331665,8.364444732666016,/mnt/fs2/locross/analysis/models/rssm_ds1e5/rssm_ds1e5_epoch4400,swm_data.pkl
 7,MP DS1000,0.13934426229508196,9.956789016723633,10.37551212310791,/mnt/fs2/locross/analysis/models/mp_ds1000/mp_ds1000_epoch29999,swm_data.pkl
 8,MP DS5000,0.040983606557377046,9.26333999633789,9.762869834899902,/mnt/fs2/locross/analysis/models/mp_ds5000/mp_ds5000_epoch11600,swm_data.pkl
 9,MP DS10000,0.040983606557377046,8.65808391571045,8.963282585144043,/mnt/fs2/locross/analysis/models/mp_ds10000/mp_ds10000_epoch6000,swm_data.pkl
-10,MP DS20000,0.0,113.78103637695312,108.01107025146484,/mnt/fs2/locross/analysis/models/mp_ds20000/mp_ds20000_epoch29999,swm_data.pkl
+10,MP DS20000,0.08196721311475409,8.641244888305664,9.079551696777344,10000,swm_data.pkl
 11,MP DS30000,0.13114754098360656,8.349692344665527,8.684033393859863,/mnt/fs2/locross/analysis/models/mp_ds30000/mp_ds30000_epoch9000,swm_data.pkl
 12,MP-S1,0.22131147540983606,8.102004051208496,8.388712882995605,/mnt/fs2/locross/analysis/models/mp_mlp_2048_lr3e-4_s1/mp_mlp_2048_lr3e-4_s1_epoch29999,swm_data.pkl
-13,MP DS1e5,0.4344262295081967,7.385889053344727,7.923004150390625,/mnt/fs2/locross/analysis/models/mp_ds1e5/mp_ds1e5_epoch2200,swm_data.pkl
-14,Deter. Event Model DS 5000,0.03278688524590164,9.080316543579102,9.309243202209473,/mnt/fs2/locross/analysis/models/em_deter_5000/mp_model_epoch6000,swm_data.pkl
-15,Deter. Event Model DS 30000,0.02459016393442623,8.393770217895508,8.618207931518555,/mnt/fs2/locross/analysis/models/em_deter_30000/mp_model_epoch1000,swm_data.pkl
+13,MP DS1e5,0.5327868852459017,6.667374610900879,7.041172981262207,/mnt/fs2/locross/analysis/models/mp_ds1e5/mp_ds1e5_epoch3000,swm_data.pkl
+14,Deter. Event Model DS 5000,0.04918032786885246,9.06981086730957,9.290138244628906,/mnt/fs2/locross/analysis/models/em_deter_5000/mp_model_epoch11600,swm_data.pkl
+15,Deter. Event Model DS 30000,0.040983606557377046,8.28055191040039,8.514533042907715,/mnt/fs2/locross/analysis/models/em_deter_30000/mp_model_epoch2000,swm_data.pkl
 16,Event Model No Horizon,0.02459016393442623,9.008630752563477,9.078506469726562,/mnt/fs2/locross/analysis/models/emodel_no_horizon/mp_model_epoch18200,swm_data.pkl
-17,Stoch. Event Model DS 5000,0.04918032786885246,9.327460289001465,9.614664077758789,/mnt/fs2/locross/analysis/models/em_stoch_5000/mp_model_epoch5600,swm_data.pkl
-18,Stoch. Event Model DS 30000,0.14754098360655737,7.914815902709961,8.071505546569824,/mnt/fs2/locross/analysis/models/em_stoch_30000/mp_model_epoch1000,swm_data.pkl
+17,Stoch. Event Model DS 5000,0.01639344262295082,9.165693283081055,9.548531532287598,/mnt/fs2/locross/analysis/models/em_stoch_5000/mp_model_epoch10800,swm_data.pkl
+18,Stoch. Event Model DS 30000,0.19672131147540983,7.739865303039551,7.906142234802246,/mnt/fs2/locross/analysis/models/em_stoch_30000/mp_model_epoch2200,swm_data.pkl
 19,Event Model Stochastic,0.21311475409836064,8.071121215820312,8.12712287902832,/mnt/fs2/locross/analysis/models/em_stoch_beta100/mp_model_epoch20600,swm_data.pkl
